@@ -5,7 +5,6 @@ import { Link, useNavigate } from "react-router-dom";
 import { login } from "../api/auth";
 import { toast } from "react-toastify";
 import { useCookies } from "react-cookie";
-import withoutAuth from "../high-order-component/withoutAuth";
 
 function Login() {
   const [loading, setLoading] = useState(false);
@@ -72,4 +71,4 @@ function Login() {
   );
 }
 
-export default withoutAuth(Login);
+export default Login;

@@ -1,19 +1,21 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FaArrowLeft } from 'react-icons/fa';
-import withAuth from "../high-order-component/withAuth";
 import { useCookies } from 'react-cookie';
 import { imageUrl } from '../api/configuration';
+import { toast } from "react-toastify";
 
 const CartPage = () => {
     const navigate = useNavigate();
     const [carts, setCarts] = useState([]);
     const [error, setError] = useState(null);
+    const [loading, setLoading] = useState(false);
     const [cookies] = useCookies();
     const [orderMessage, setOrderMessage] = useState('');
 
     const fetchCarts = async () => {
         try {
+            setLoading(true);
             console.log("Fetching carts with token:", cookies.token);
 
             const response = await fetch("http://localhost:8000/api/carts", {
@@ -31,6 +33,7 @@ const CartPage = () => {
             console.log("API Response:", res.data);
 
             setCarts(res.data);
+            setLoading(false);
         } catch (err) {
             console.error("Error fetching carts:", err.message);
             setError(`Error fetching carts: ${err.message}`);
@@ -69,6 +72,7 @@ const CartPage = () => {
     
             const res = await response.json();
             console.log("Order placed successfully:", res);
+            toast.success("Order placed successfully:");
     
             setOrderMessage(res.message);
 
@@ -93,6 +97,7 @@ const CartPage = () => {
         } catch (err) {
             console.error("Error placing order or deleting carts:", err.message);
             setOrderMessage(`Error: ${err.message}`);
+            toast.error("Your cart is empty");
         }
     };
 
@@ -100,7 +105,7 @@ const CartPage = () => {
     const updateProductQuantity = async (cartId, productId, quantity) => {
         const token = cookies.token;
         if (!token) {
-            alert('User is not authenticated!');
+            toast.error('User is not authenticated!');
             return;
         }
     
@@ -119,22 +124,22 @@ const CartPage = () => {
     
             const data = await response.json();
             if (response.ok) {
-                alert('Product quantity updated successfully!');
+                toast.success('Product quantity updated successfully!');
                 fetchCarts();
             } else {
                 console.error(data.message);
-                alert('Failed to update product quantity.');
+                toast.error('Failed to update product quantity.');
             }
         } catch (error) {
             console.error(error);
-            alert('An error occurred while updating the product quantity.');
+            toast.error('An error occurred while updating the product quantity.');
         }
     };
     
     const deleteProductFromCart = async (cartId, productId) => {
         const token = cookies.token;
         if (!token) {
-            alert('User is not authenticated!');
+            toast.error('User is not authenticated!');
             return;
         }
     
@@ -150,19 +155,28 @@ const CartPage = () => {
     
             const data = await response.json();
             if (response.ok) {
-                alert('Product deleted successfully!');
+                toast.success('Product deleted successfully!');
                 fetchCarts();
             } else {
                 console.error(data.message);
-                alert('Failed to delete product from cart.');
+                toast.error('Failed to delete product from cart.');
             }
         } catch (error) {
             console.error(error);
-            alert('An error occurred while deleting the product.');
+            toast.error('An error occurred while deleting the product.');
         }
     };
     
-
+    if (loading) {
+        return (
+            <div className="flex items-center justify-center min-h-screen">
+                <div className="text-center">
+                    <div className="w-16 h-16 border-4 border-themegreen border-t-transparent rounded-full animate-spin mx-auto"></div>
+                    <p className="mt-4 text-lg">Loading...</p>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="min-h-screen bg-gray-50">
@@ -268,4 +282,4 @@ const CartPage = () => {
     );
 };
 
-export default withAuth(CartPage);
+export default CartPage;

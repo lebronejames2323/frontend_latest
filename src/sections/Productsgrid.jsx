@@ -9,6 +9,7 @@ import { imageUrl } from "../api/configuration";
 import { toast } from "react-toastify";
 import { index } from "../api/product";
 import { useCookies } from "react-cookie";
+import { useNavigate } from 'react-router-dom'
 
 function Productsgrid() {
   const [showAll, setShowAll] = useState(false);
@@ -37,7 +38,7 @@ function Productsgrid() {
   const addToCart = async (productId) => {
     const token = cookies.token;
     if (!token) {
-      alert('User is not authenticated!');
+        toast.error('User is not authenticated!');
       return;
     }
   
@@ -61,7 +62,7 @@ function Productsgrid() {
       );
 
       if (isProductInCart) {
-          alert('This product is already in the cart!');
+            toast.error('This product is already in the cart!');
           return;
       }
 
@@ -78,14 +79,14 @@ function Productsgrid() {
 
       const addData = await addResponse.json();
       if (addResponse.ok) {
-          alert('Product added to cart successfully!');
+        toast.success('Product added to cart successfully!');
       } else {
           console.error(addData.message);
-          alert('Failed to add product to cart.');
+          toast.error('Failed to add product to cart.');
       }
   } catch (error) {
       console.error(error);
-      alert('An error occurred.');
+      toast.error('An error occurred.');
   }
   };
 
@@ -93,7 +94,7 @@ function Productsgrid() {
   const addToWishlist = async (productId) => {
     const token = cookies.token;
     if (!token) {
-      alert('User is not authenticated!');
+        toast.error('User is not authenticated!');
       return;
     }
   
@@ -117,7 +118,7 @@ function Productsgrid() {
       );
 
       if (isProductInCart) {
-          alert('This product is already in the wishlist!');
+        toast.error('This product is already in the wishlist!');
           return;
       }
 
@@ -134,14 +135,14 @@ function Productsgrid() {
 
       const addData = await addResponse.json();
       if (addResponse.ok) {
-          alert('Product added to wishlist successfully!');
+        toast.success('Product added to wishlist successfully!');
       } else {
           console.error(addData.message);
-          alert('Failed to add product to cart.');
+          toast.error('Failed to add product to cart.');
       }
   } catch (error) {
       console.error(error);
-      alert('An error occurred.');
+      toast.error('An error occurred.');
   }
   };
   
@@ -156,6 +157,11 @@ function Productsgrid() {
     }
   };
 
+  const navigate = useNavigate();
+      const handleProductClick = (productId) => {
+      navigate(`/product/${productId}`);
+      };
+
   return (
     <div id="products" className="w-full lg:px-20 px-5 py-[80px] bg-gray-100 flex flex-col justify-center items-center gap-4">
       <h1 data-aos="zoom-in" data-aos-delay="100" className="text-themegreen text-2xl font-semibold">Browse Collections</h1>
@@ -167,7 +173,7 @@ function Productsgrid() {
               
             <div id="icons" className="flex justify-center items-center gap-2 absolute top-[20px]">
               <div className="bg-themegreen hover:bg-themeyellow hover:text-black rounded-full p-3 text-white">
-              <MdOutlineRemoveRedEye />
+              <MdOutlineRemoveRedEye onClick={() => handleProductClick(product.id)}/>
               </div>
               <div className="bg-themegreen hover:bg-themeyellow hover:text-black rounded-full p-3 text-white">
               <FaRegHeart onClick={() => { addToWishlist(product.id) }}/>

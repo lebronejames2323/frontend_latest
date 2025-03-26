@@ -1,4 +1,4 @@
-import withAuth from "../high-order-component/withAuth";
+
 import Header from "../sections/Header";
 import Hero from "../sections/Hero";
 import Category from "../sections/Category";
@@ -27,4 +27,4 @@ function Home() {
     );
 }
 
-export default withAuth(Home);
+export default Home;

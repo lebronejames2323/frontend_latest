@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react'
-import withAuth from "../high-order-component/withAuth";
 import { useCookies } from 'react-cookie';
 import { FaArrowLeft } from 'react-icons/fa';
 import { GoDotFill } from "react-icons/go";
@@ -100,8 +99,8 @@ function AccountPage() {
                 const result = await response.json();
                 if (response.ok) {
                     toast.success(result.message ?? "Profile updated successfully!");
-                    setOpenModal(false); // Close the modal
-                    refreshUser(); // Refresh user data
+                    setOpenModal(false);
+                    refreshUser();
                 } else {
                     toast.error(result.message ?? "Failed to update profile!");
                 }
@@ -117,7 +116,14 @@ function AccountPage() {
         const closeUpdateModal = () => setOpenModal(false);
     
         if (loading) {
-            return <p>Loading...</p>;
+            return (
+                <div className="flex items-center justify-center min-h-screen">
+                    <div className="text-center">
+                        <div className="w-16 h-16 border-4 border-themegreen border-t-transparent rounded-full animate-spin mx-auto"></div>
+                        <p className="mt-4 text-lg">Loading...</p>
+                    </div>
+                </div>
+            );
         }
     
         if (!user) {
@@ -303,4 +309,4 @@ function AccountPage() {
   )
 }
 
-export default withAuth(AccountPage)
+export default AccountPage

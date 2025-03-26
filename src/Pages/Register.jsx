@@ -4,7 +4,6 @@ import { Button } from "../components/ui/button";
 import { Link, useNavigate } from "react-router-dom";
 import { register } from "../api/auth";
 import { toast } from "react-toastify";
-import withoutAuth from "../high-order-component/withoutAuth";
 
 function Register() {
   const [loading, setLoading] = useState(false);
@@ -125,4 +124,4 @@ function Register() {
   );
 }
 
-export default withoutAuth(Register);
+export default Register;

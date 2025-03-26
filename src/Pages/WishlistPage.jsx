@@ -1,18 +1,20 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FaArrowLeft } from 'react-icons/fa';
-import withAuth from "../high-order-component/withAuth";
 import { useCookies } from 'react-cookie';
 import { imageUrl } from '../api/configuration';
+import { toast } from "react-toastify";
 
 const WishlistPage = () => {
     const navigate = useNavigate();
     const [wishlists, setWishlists] = useState([]);
     const [error, setError] = useState(null);
     const [cookies] = useCookies();
+    const [loading, setLoading] = useState(false);
 
     const fetchWhislists = async () => {
         try {
+            setLoading(true);
             console.log("Fetching wishlists with token:", cookies.token);
 
             const response = await fetch("http://localhost:8000/api/wishlists", {
@@ -30,6 +32,7 @@ const WishlistPage = () => {
             console.log("API Response:", res.data);
 
             setWishlists(res.data);
+            setLoading(false);
         } catch (err) {
             console.error("Error fetching wishlists:", err.message);
             setError(`Error fetching wishlists: ${err.message}`);
@@ -47,7 +50,7 @@ const WishlistPage = () => {
     const deleteProductFromWishlist = async (wishlistId, productId) => {
         const token = cookies.token;
         if (!token) {
-            alert('User is not authenticated!');
+            toast.error('User is not authenticated!');
             return;
         }
     
@@ -63,19 +66,28 @@ const WishlistPage = () => {
     
             const data = await response.json();
             if (response.ok) {
-                alert('Product deleted successfully!');
+                toast.success('Product deleted successfully!');
                 fetchWhislists();
             } else {
                 console.error(data.message);
-                alert('Failed to delete product from wishlist.');
+                toast.error('Failed to delete product from wishlist.');
             }
         } catch (error) {
             console.error(error);
-            alert('An error occurred while deleting the product.');
+            toast.error('An error occurred while deleting the product.');
         }
     };
     
-
+    if (loading) {
+        return (
+            <div className="flex items-center justify-center min-h-screen">
+                <div className="text-center">
+                    <div className="w-16 h-16 border-4 border-themegreen border-t-transparent rounded-full animate-spin mx-auto"></div>
+                    <p className="mt-4 text-lg">Loading...</p>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="min-h-screen bg-gray-50">
@@ -141,4 +153,4 @@ const WishlistPage = () => {
     );
 };
 
-export default withAuth(WishlistPage);
+export default WishlistPage;

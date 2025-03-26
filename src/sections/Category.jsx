@@ -4,7 +4,7 @@ import { imageUrl } from "../api/configuration";
 import Slider from "react-slick";
 import AOS from 'aos';
 import 'aos/dist/aos.css';
-import { getCategories } from "../api/category";
+import { getCategories } from "../api/product";
 import { useCookies } from "react-cookie";
 
 function Category() {
