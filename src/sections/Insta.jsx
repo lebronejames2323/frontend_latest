@@ -23,11 +23,11 @@ const Insta = () => {
 
     return (
         <div className='w-full lg:px-20 px-5 py-[80px] bg-white flex flex-col justify-center items-center gap-4'>
-            <h1 data-aos="zoom-in" data-aos-delay="100" className='text-themegreen text-xl font-semibold capitalize'>
+            <h1 data-aos="zoom-in" data-aos-delay="100" className='text-xl font-semibold capitalize text-themegreen'>
                 Our Instagram Account
             </h1>
             <h1 data-aos="zoom-in" data-aos-delay="200" className='text-black font-semibold text-[42px] leading-[50px] text-center capitalize'>Follow us on Instagram</h1>
-            <div data-aos="zoom-in" data-aos-delay="300" className='w-full grid lg:grid-cols-6 grid-cols-1 justify-center items-center gap-6 mt-8'>
+            <div data-aos="zoom-in" data-aos-delay="300" className='grid items-center justify-center w-full grid-cols-1 gap-6 mt-8 lg:grid-cols-6'>
                 <img src={insta1} alt="" className='rounded-lg' />
                 <img src={insta2} alt="" className='rounded-lg' />
                 <img src={insta3} alt="" className='rounded-lg' />
@@ -35,7 +35,7 @@ const Insta = () => {
                 <img src={insta5} alt="" className='rounded-lg' />
                 <img src={insta6} alt="" className='rounded-lg' />
             </div>
-            <button data-aos="zoom-in" data-aos-delay="200" className='bg-themegreen hover:bg-themeyellow text-white hover:text-black font-semibold px-8 py-3 rounded-lg mt-12 uppercase'>Instagram</button>
+            <button data-aos="zoom-in" data-aos-delay="200" className='px-8 py-3 mt-12 font-semibold text-white uppercase rounded-lg bg-themegreen hover:bg-themeyellow hover:text-black'>Instagram</button>
         </div>
     )
 }

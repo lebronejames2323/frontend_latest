@@ -31,16 +31,16 @@ function Register() {
   };
 
   return (
-      <div className="min-h-screen bg-gray-100 flex justify-center items-center">
+      <div className="flex items-center justify-center min-h-screen bg-gray-100">
       <div className="bg-white p-8 rounded-xl shadow-lg w-full max-w-md h-[91vh]">
         <form onSubmit={onFormSubmit} className="flex flex-col gap-5">
-        <div className="text-3xl font-semibold text-center text-themegreen mb-2">Register</div>
+        <div className="mb-2 text-3xl font-semibold text-center text-themegreen">Register</div>
 
         <div>
         <Input
         required name="username"
         placeholder="Username" 
-        className="border rounded-md p-3 w-full focus:outline-none focus:ring-2 focus:ring-indigo-500"/>
+        className="w-full p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"/>
         </div>
 
         <div>
@@ -48,7 +48,7 @@ function Register() {
         required
         name="email"
         placeholder="Email Address"
-        className="border rounded-md p-3 w-full focus:outline-none focus:ring-2 focus:ring-indigo-500"
+        className="w-full p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
         />
         </div>
 
@@ -56,7 +56,7 @@ function Register() {
         <Input
         required name="password"
         placeholder="Password" type="password"
-        className="border rounded-md p-3 w-full focus:outline-none focus:ring-2 focus:ring-indigo-500"/>
+        className="w-full p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"/>
         </div>
 
         <div>
@@ -65,7 +65,7 @@ function Register() {
         type="password"
         name="password_confirmation"
         placeholder="Repeat Password"
-        className="border rounded-md p-3 w-full focus:outline-none focus:ring-2 focus:ring-indigo-500"
+        className="w-full p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
         />
         </div>
 
@@ -74,7 +74,7 @@ function Register() {
         required
         name="first_name"
         placeholder="First Name"
-        className="border rounded-md p-3 w-full focus:outline-none focus:ring-2 focus:ring-indigo-500"
+        className="w-full p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
         />
         </div>
 
@@ -83,7 +83,7 @@ function Register() {
         required
         name="last_name"
         placeholder="Last Name"
-        className="border rounded-md p-3 w-full focus:outline-none focus:ring-2 focus:ring-indigo-500"
+        className="w-full p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
         />
         </div>
 
@@ -92,7 +92,7 @@ function Register() {
         required
         name="phone_number"
         placeholder="Contact"
-        className="border rounded-md p-3 w-full focus:outline-none focus:ring-2 focus:ring-indigo-500"
+        className="w-full p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
         />
         </div>
 
@@ -101,7 +101,7 @@ function Register() {
         required
         name="address"
         placeholder="Address"
-        className="border rounded-md p-3 w-full focus:outline-none focus:ring-2 focus:ring-themegreen"
+        className="w-full p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-themegreen"
         />
         </div>
 
@@ -115,7 +115,7 @@ function Register() {
         </div>
 
         <div className="text-center">
-        <Link to="/login" className="text-themegreen text-sm">
+        <Link to="/login" className="text-sm text-themegreen">
         <h1 className="font-semibold hover:text-blue-400">Already have an account? Login here.</h1>
         </Link>
         </div>
