@@ -56,7 +56,7 @@ const Reviews = () => {
     return (
         <div id='reviews' className='w-full lg:px-20 px-5 py-[80px] bg-gray-100
          flex flex-col justify-center items-center gap-4'>
-            <h1 data-aos="zoom-in" data-aos-delay="100" className='text-themegreen text-xl font-semibold capitalize'>
+            <h1 data-aos="zoom-in" data-aos-delay="100" className='text-xl font-semibold capitalize text-themegreen'>
                 100+ Customer reviews
             </h1>
             <h1 data-aos="zoom-in" data-aos-delay="200" className='text-black font-semibold text-[42px] leading-[50px] text-center capitalize'>Our Customer Reviews</h1>
@@ -68,18 +68,18 @@ const Reviews = () => {
                             <div>
                             <div key={index} className='w-full flex flex-col justify-center items-center gap-4 lg:p=10 p-3'>
                             <img src={item.img1} alt="" className='rounded-full w-[100px] m-auto'/>
-                                <div className='flex justify-center items-center gap-1'>
+                                <div className='flex items-center justify-center gap-1'>
                                 <FaStar className='text-themeyellow'/>
                                 <FaStar className='text-themeyellow'/>
                                 <FaStar className='text-themeyellow'/>
                                 <FaStar className='text-themeyellow'/>
                                 <FaStar className='text-themeyellow'/>
                                 </div>
-                                <p className='text-center text-gray-500 text-lg'>{item.para}</p>
-                                <div className='flex justify-center items-center gap-5'>
+                                <p className='text-lg text-center text-gray-500'>{item.para}</p>
+                                <div className='flex items-center justify-center gap-5'>
                                 <FaQuoteLeft className='fill-themegreen size-16'/>
-                                    <div className='w-full flex flex-col justify-center items-start'>
-                                    <h1 className='text-black text-xl capitalize font-semibold'>{item.name}</h1>
+                                    <div className='flex flex-col items-start justify-center w-full'>
+                                    <h1 className='text-xl font-semibold text-black capitalize'>{item.name}</h1>
                                     <h1 className='text-gray-500 capitalize'>{item.post}</h1>
                                 </div>
                                 </div>

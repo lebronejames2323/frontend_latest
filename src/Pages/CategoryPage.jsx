@@ -71,13 +71,41 @@ const CategoryPage = () => {
     }
     };
 
+    const addToWishlist = async (productId) => {
+        try {
+            const response = await fetch('http://localhost:8000/api/wishlists', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${cookies.token}`,
+                },
+                body: JSON.stringify({
+                    products: [{ id: productId, quantity: 1 }],
+                }),
+            });
+    
+            if (response.ok) {
+                alert('Product added to wishlist successfully!');
+            } else {
+                throw new Error('Failed to add to wishlist');
+            }
+        } catch (error) {
+            alert('Error adding to wishlist');
+            console.error('Error:', error);
+        }
+    };
+
+    const viewProduct = (productId) => {
+        navigate(`/product/${productId}`);
+    };
+
     const refreshProducts = () => {
-    index(cookies.token, categoryName).then((res) => {
-    const filteredProducts = res?.data.filter(product => 
-    product.category?.name.toLowerCase() === categoryName.toLowerCase()
-    );
-    setProducts(filteredProducts);
-    });
+        index(cookies.token, categoryName).then((res) => {
+            const filteredProducts = res?.data.filter(product => 
+                product.category?.name.toLowerCase() === categoryName.toLowerCase()
+            );
+            setProducts(filteredProducts);
+        });
     };
 
     useEffect(refreshProducts, [])
@@ -85,65 +113,78 @@ const CategoryPage = () => {
     return (
         <div className="min-h-screen bg-gray-100">
             <div className="w-full h-[80px] bg-white shadow-lg fixed top-0 left-0 z-50">
-            <div className="w-full h-full lg:px-10 px-5 flex items-center">
-                <button 
-                onClick={() => navigate('/')}
-                className="flex items-center text-themegreen hover:text-themeyellow transition-colors"
-                >
-                <FaArrowLeft className='mr-1 w-[20px] h-[20px]'/>
-                <h1 className='text-base font-semibold'>Home</h1>
-                </button>
-                <h1 className=" flex-grow text-center text-2xl font-bold capitalize">{categoryName}</h1>
+                <div className="flex items-center w-full h-full px-5 lg:px-10">
+                    <button 
+                        onClick={() => navigate('/')}
+                        className="flex items-center transition-colors text-themegreen hover:text-themeyellow"
+                    >
+                        <FaArrowLeft className='mr-1 w-[20px] h-[20px]'/>
+                        <h1 className='text-base font-semibold'>Home</h1>
+                    </button>
+                    <h1 className="flex-grow text-2xl font-bold text-center capitalize ">{categoryName}</h1>
                 </div>
             </div>
 
             <div className='p-20'>
-            <div className="w-full grid lg:grid-cols-4 grid-cols-1 justify-center items-center gap-10 mt-10">
-                    {
-                      products.map((product) => (
-                        <div key={product.id} id="product-box" className="flex flex-col justify-center items-center gap-2 bg-white p-4 rounded-lg cursor-pointer relative shadow-md border">
-                          
-                          <div id="icons" className="flex justify-center items-center gap-2 absolute top-[20px]">
-                            <div className="bg-themegreen hover:bg-themeyellow hover:text-black rounded-full p-3 text-white">
-                              <MdOutlineRemoveRedEye />
+                <div className="grid items-center justify-center w-full grid-cols-1 gap-10 mt-10 lg:grid-cols-4">
+                    {products.map((product) => (
+                        <div key={product.id} id="product-box" className="relative flex flex-col items-center justify-center gap-2 p-4 bg-white border rounded-lg shadow-md cursor-pointer">
+                            <div id="icons" className="flex justify-center items-center gap-2 absolute top-[20px]">
+                                <button 
+                                    className="p-3 text-white rounded-full bg-themegreen hover:bg-themeyellow hover:text-black"
+                                    onClick={() => viewProduct(product.id)}
+                                    aria-label="View product"
+                                >
+                                    <MdOutlineRemoveRedEye />
+                                </button>
+                                <button 
+                                    className="p-3 text-white rounded-full bg-themegreen hover:bg-themeyellow hover:text-black"
+                                    onClick={() => addToWishlist(product.id)}
+                                    aria-label="Add to wishlist"
+                                >
+                                    <FaRegHeart />
+                                </button>
+                                <button 
+                                    className="p-3 text-white rounded-full bg-themegreen hover:bg-themeyellow hover:text-black"
+                                    onClick={() => addToCart(product.id)}
+                                    aria-label="Add to cart"
+                                >
+                                    <MdAddShoppingCart />
+                                </button>
                             </div>
-                            <div className="bg-themegreen hover:bg-themeyellow hover:text-black rounded-full p-3 text-white">
-                              <FaRegHeart />
-                            </div>
-                            <div className="bg-themegreen hover:bg-themeyellow hover:text-black rounded-full p-3 text-white">
-                              <MdAddShoppingCart onClick={() => { addToCart(product.id) }}/>
-                            </div>
-                          </div>
-                          
-                          <div className="object-cover">
-                          <img
-                            src={`${imageUrl}/${product.id}.${product.extension}`}
-                            alt={product.name}
-                            className="w-full h-[250px] relative overflow-hidden mt-12 mb-5"
-                          />
-                          </div>
-                          <p className='text-lg text-gray-500 font-semibold'>{product.category?.name}</p>
-                          <h3 className='text-xl text-black font-semibold'>{product.name}</h3>
-                          <h4 className='text-lg text-themegreen font-semibold'>${product.price}</h4>
+                            
+                            <button 
+                                className="object-cover w-full"
+                                onClick={() => viewProduct(product.id)}
+                                aria-label={product.name}
+                            >
+                                <img
+                                    src={`${imageUrl}/${product.id}.${product.extension}`}
+                                    alt={product.name}
+                                    className="w-full h-[250px] relative overflow-hidden mt-12 mb-5"
+                                />
+                            </button>
+                            <p className='text-lg font-semibold text-gray-500'>{product.category?.name}</p>
+                            <h3 className='text-xl font-semibold text-black'>{product.name}</h3>
+                            <h4 className='text-lg font-semibold text-themegreen'>₱{Number(product.price).toFixed(2)}</h4>
             
-                          <div className="w-full mt-2">
-                            <hr />
-                            <div className="flex justify-between items-center gap-6 mt-3">
-                            <div className="flex justify-start items-center gap-1">
-                            <FaStar className="text-themeyellow" />
-                            <FaStar className="text-themeyellow" />
-                            <FaStar className="text-themeyellow" />
-                            <FaStar className="text-themeyellow" />
-                            <FaStar className="text-themeyellow" />
+                            <div className="w-full mt-2">
+                                <hr />
+                                <div className="flex items-center justify-between gap-6 mt-3">
+                                    <div className="flex items-center justify-start gap-1">
+                                        <FaStar className="text-themeyellow" />
+                                        <FaStar className="text-themeyellow" />
+                                        <FaStar className="text-themeyellow" />
+                                        <FaStar className="text-themeyellow" />
+                                        <FaStar className="text-themeyellow" />
+                                    </div>
+                                    <button className="bg-black text-white px-4 py-2 rounded-lg text-[13px] font-semibold">SALE 14%</button>
+                                </div>
                             </div>
-                            <button className="bg-black text-white px-4 py-2 rounded-lg text-[13px] font-semibold">SALE 14%</button>
-                            </div>
-                          </div>
                         </div>
-                      ))
-                    }
-                  </div>
-                  </div>
+                    ))}
+                </div>
+            </div>
         </div>
     );
 };

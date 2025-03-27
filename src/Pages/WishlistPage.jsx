@@ -81,10 +81,10 @@ const WishlistPage = () => {
         <div className="min-h-screen bg-gray-50">
 
             <div className="w-full h-[80px] bg-white shadow-lg fixed top-0 left-0 z-50">
-                <div className="w-full h-full lg:px-10 px-5 flex items-center justify-between">
+                <div className="flex items-center justify-between w-full h-full px-5 lg:px-10">
                     <button 
                         onClick={() => navigate('/')}
-                        className="flex items-center text-themegreen hover:text-themeyellow transition-colors"
+                        className="flex items-center transition-colors text-themegreen hover:text-themeyellow"
                     >
                         <FaArrowLeft className='mr-2 w-[20px] h-[20px]' />
                         <span className="text-base font-semibold">Home</span>
@@ -96,7 +96,7 @@ const WishlistPage = () => {
 
             <div className="p-5 pt-[100px] flex-grow overflow-auto">
                 {error && (
-                    <div className="bg-red-100 text-red-700 px-5 py-3 mb-5 rounded-md">
+                    <div className="px-5 py-3 mb-5 text-red-700 bg-red-100 rounded-md">
                         <h2 className="text-lg font-semibold">Error</h2>
                         <p>{error}</p>
                     </div>
@@ -104,25 +104,25 @@ const WishlistPage = () => {
 
                 {wishlists.length > 0 ? (
                     wishlists.map(wishlist => (
-                        <div key={wishlist.id} className="bg-white shadow-sm rounded-lg mb-5 p-5">
-                            <h2 className="text-xl font-semibold text-gray-900 mb-3">Wishlist ID: {wishlist.id}</h2>
+                        <div key={wishlist.id} className="p-5 mb-5 bg-white rounded-lg shadow-sm">
+                            <h2 className="mb-3 text-xl font-semibold text-gray-900">Wishlist ID: {wishlist.id}</h2>
                             <ul>
                                 {wishlist.products.map(product => (
-                                    <li key={product.id} className="flex items-center mb-4 border-b pb-4">
+                                    <li key={product.id} className="flex items-center pb-4 mb-4 border-b">
                                         <div className="w-[60px] h-[60px] mr-4">
                                             <img
                                                 src={`${imageUrl}/${product.id}.${product.extension}`}
                                                 alt={product.name}
-                                                className="w-full h-full object-cover rounded-md"
+                                                className="object-cover w-full h-full rounded-md"
                                             />
                                         </div>
                                         <div className="flex-grow">
                                             <h3 className="text-lg font-medium text-gray-800">{product.name}</h3>
                                             <p className="text-sm text-gray-500">Price: ₱{product.price}</p>
                                         </div>
-                                        <div className="mt-2 flex items-center justify-center">
+                                        <div className="flex items-center justify-center mt-2">
                                             <button
-                                                className="bg-red-500 text-white px-4 py-2 rounded-lg ml-2"
+                                                className="px-4 py-2 ml-2 text-white bg-red-500 rounded-lg"
                                                 onClick={() => deleteProductFromWishlist(wishlist.id, product.id)}
                                             >
                                                 Delete

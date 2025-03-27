@@ -20,20 +20,20 @@ const Types = () => {
 
     return (
         <div className='w-full lg:px-20 px-5 py-[80px] grid lg:grid-cols-3 grid-cols-1 justify-center items-start gap-10'>
-            <div data-aos="zoom-in" data-aos-delay="100" className='flex flex-col justify-center items-end gap-6 bg-cover bg-center p-10 rounded-lg' style={{backgroundImage: `url(${banner1})`}}>
-                <h1 className='text-themeyellow border-2 rounded-lg border-themeyellow px-6 py-2 text-xl font-semibold'>Storage</h1>
-                <h1 className='text-4xl text-end text-white font-semibold '>Seagate HDD</h1>
-                <button className='bg-themeyellow px-6 py-3 rounded-lg text-black font-semibold'>SHOP NOW</button>
+            <div data-aos="zoom-in" data-aos-delay="100" className='flex flex-col items-end justify-center gap-6 p-10 bg-center bg-cover rounded-lg' style={{backgroundImage: `url(${banner1})`}}>
+                <h1 className='px-6 py-2 text-xl font-semibold border-2 rounded-lg text-themeyellow border-themeyellow'>Storage</h1>
+                <h1 className='text-4xl font-semibold text-white text-end '>Seagate HDD</h1>
+                <button className='px-6 py-3 font-semibold text-black rounded-lg bg-themeyellow'>SHOP NOW</button>
             </div>
-            <div data-aos="zoom-in" data-aos-delay="100" className='flex flex-col justify-center items-end gap-6 bg-cover bg-center p-10 rounded-lg' style={{backgroundImage: `url(${banner2})`}}>
-                <h1 className='text-themeyellow border-2 rounded-lg border-themeyellow px-6 py-2 text-lg font-semibold'>Storage</h1>
-                <h1 className='text-4xl text-end text-white font-semibold '>Sata SSD</h1>
-                <button className='bg-themeyellow px-6 py-3 rounded-lg text-black font-semibold'>SHOP NOW</button>
+            <div data-aos="zoom-in" data-aos-delay="100" className='flex flex-col items-end justify-center gap-6 p-10 bg-center bg-cover rounded-lg' style={{backgroundImage: `url(${banner2})`}}>
+                <h1 className='px-6 py-2 text-lg font-semibold border-2 rounded-lg text-themeyellow border-themeyellow'>Storage</h1>
+                <h1 className='text-4xl font-semibold text-white text-end '>Sata SSD</h1>
+                <button className='px-6 py-3 font-semibold text-black rounded-lg bg-themeyellow'>SHOP NOW</button>
             </div>
-            <div data-aos="zoom-in" data-aos-delay="100" className='flex flex-col justify-center items-end gap-6 bg-cover bg-center p-10 rounded-lg' style={{backgroundImage: `url(${banner3})`}}>
-                <h1 className='text-themeyellow border-2 rounded-lg border-themeyellow px-6 py-2 text-lg font-semibold'>Storage</h1>
-                <h1 className='text-4xl text-end text-white font-semibold '>NVME</h1>
-                <button className='bg-themeyellow px-6 py-3 rounded-lg text-black font-semibold'>SHOP NOW</button>
+            <div data-aos="zoom-in" data-aos-delay="100" className='flex flex-col items-end justify-center gap-6 p-10 bg-center bg-cover rounded-lg' style={{backgroundImage: `url(${banner3})`}}>
+                <h1 className='px-6 py-2 text-lg font-semibold border-2 rounded-lg text-themeyellow border-themeyellow'>Storage</h1>
+                <h1 className='text-4xl font-semibold text-white text-end '>NVME</h1>
+                <button className='px-6 py-3 font-semibold text-black rounded-lg bg-themeyellow'>SHOP NOW</button>
             </div>
         </div>
     )

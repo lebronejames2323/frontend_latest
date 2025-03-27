@@ -31,16 +31,16 @@ function Login() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 flex justify-center items-center">
-    <div className="bg-white p-8 rounded-xl shadow-lg w-full max-w-sm">
+    <div className="flex items-center justify-center min-h-screen bg-gray-100">
+    <div className="w-full max-w-sm p-8 bg-white shadow-lg rounded-xl">
       <form onSubmit={onFormSubmit} className="flex flex-col gap-5">
 
-        <div className="text-3xl font-semibold text-center text-themegreen mb-5">Login</div>
+        <div className="mb-5 text-3xl font-semibold text-center text-themegreen">Login</div>
         <div>
         <Input
         name="username"
         placeholder="Username"
-        className="border rounded-md p-3 w-full focus:outline-none focus:ring-2 focus:ring-indigo-500"
+        className="w-full p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
         />
         </div>
         <div>
@@ -48,7 +48,7 @@ function Login() {
         name="password"
         type="password"
         placeholder="Password"
-        className="border rounded-md p-3 w-full focus:outline-none focus:ring-2 focus:ring-indigo-500"
+        className="w-full p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
         />
         </div>
         <div className="flex justify-center">
@@ -60,8 +60,8 @@ function Login() {
         {loading ? "Logging In..." : "Login"}
         </Button>
         </div>
-        <div className="text-center mt-4">
-        <Link to="/register" className="text-themegreen text-sm">
+        <div className="mt-4 text-center">
+        <Link to="/register" className="text-sm text-themegreen">
         <h1 className="font-semibold hover:text-blue-400">Don't have an account yet? Register here.</h1>
         </Link>
         </div>
