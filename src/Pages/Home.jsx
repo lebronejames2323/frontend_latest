@@ -10,6 +10,7 @@ import Reviews from "../sections/Reviews";
 import Insta from "../sections/Insta";
 import Footer from "../sections/Footer";
 
+
 function Home() {
 
     return (
@@ -27,4 +28,4 @@ function Home() {
     );
 }
 
-export default Home;
+export default Home

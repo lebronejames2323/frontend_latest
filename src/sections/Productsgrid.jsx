@@ -5,7 +5,7 @@ import { FaRegHeart } from 'react-icons/fa';
 import { MdOutlineRemoveRedEye } from 'react-icons/md';
 import AOS from 'aos';
 import 'aos/dist/aos.css';
-import { imageUrl } from "../api/configuration";
+import { imageUrl1 } from "../api/configuration";
 import { toast } from "react-toastify";
 import { index } from "../api/product";
 import { useCookies } from "react-cookie";
@@ -16,6 +16,7 @@ function Productsgrid() {
   const [visibleProducts, setVisibleProducts] = useState(8);
   const [products, setProducts] = useState([]);
   const [cookies] = useCookies();
+  const [loading, setLoading] = useState(false);
   
   const refreshProducts = () => {
   index(cookies.token).then((res) => {
@@ -43,6 +44,7 @@ function Productsgrid() {
     }
   
     try {
+    setLoading(true);
       const response = await fetch('http://localhost:8000/api/carts', {
           headers: {
               'Authorization': `Bearer ${token}`,
@@ -83,12 +85,14 @@ function Productsgrid() {
       } else {
           console.error(addData.message);
           toast.error('Failed to add product to cart.');
+          }
+      } catch (error) {
+          console.error(error);
+          toast.error('An error occurred.');
+      } finally {
+        setLoading(false);
       }
-  } catch (error) {
-      console.error(error);
-      toast.error('An error occurred.');
-  }
-  };
+      };
 
 
   const addToWishlist = async (productId) => {
@@ -99,6 +103,7 @@ function Productsgrid() {
     }
   
     try {
+      setLoading(true);
       const response = await fetch('http://localhost:8000/api/wishlists', {
           headers: {
               'Authorization': `Bearer ${token}`,
@@ -140,11 +145,13 @@ function Productsgrid() {
           console.error(addData.message);
           toast.error('Failed to add product to cart.');
       }
-  } catch (error) {
-      console.error(error);
-      toast.error('An error occurred.');
-  }
-  };
+      } catch (error) {
+          console.error(error);
+          toast.error('An error occurred.');
+      } finally {
+        setLoading(false);
+      }
+      };
   
 
   const handleViewMoreClick = () => {
@@ -158,9 +165,9 @@ function Productsgrid() {
   };
 
   const navigate = useNavigate();
-      const handleProductClick = (productId) => {
-      navigate(`/product/${productId}`);
-      };
+  const handleProductClick = (productId) => {
+  navigate(`/product/${productId}`);
+  };
 
   return (
     <div id="products" className="w-full lg:px-20 px-5 py-[80px] bg-gray-100 flex flex-col justify-center items-center gap-4">
@@ -172,29 +179,30 @@ function Productsgrid() {
             <div key={product.id} id="product-box" className="flex flex-col justify-center items-center gap-1 bg-white p-4 rounded-lg cursor-pointer relative shadow-md border">
               
             <div id="icons" className="flex justify-center items-center gap-2 absolute top-[20px]">
-              <div className="bg-themegreen hover:bg-themeyellow hover:text-black rounded-full p-3 text-white">
-              <MdOutlineRemoveRedEye onClick={() => handleProductClick(product.id)}/>
+              <div onClick={() => handleProductClick(product.id)} className="bg-themegreen hover:bg-themeyellow hover:text-black rounded-full p-3 text-white">
+              <MdOutlineRemoveRedEye className={`${loading ? "opacity-50 cursor-not-allowed" : ""}`} disabled={loading}/>
               </div>
-              <div className="bg-themegreen hover:bg-themeyellow hover:text-black rounded-full p-3 text-white">
-              <FaRegHeart onClick={() => { addToWishlist(product.id) }}/>
+              <div onClick={() => { addToWishlist(product.id) }} className="bg-themegreen hover:bg-themeyellow hover:text-black rounded-full p-3 text-white">
+              <FaRegHeart className={`${loading ? "opacity-50 cursor-not-allowed" : ""}`} disabled={loading}/>
               </div>
-              <div className="bg-themegreen hover:bg-themeyellow hover:text-black rounded-full p-3 text-white">
-              <MdAddShoppingCart onClick={() => { addToCart(product.id) }}/>
+              <div onClick={() => { addToCart(product.id) }} className="bg-themegreen hover:bg-themeyellow hover:text-black rounded-full p-3 text-white">
+              <MdAddShoppingCart className={`${loading ? "opacity-50 cursor-not-allowed" : ""}`} disabled={loading}/>
               </div>
               </div>
               
-              <div className="object-cover">
+              <div onClick={() => handleProductClick(product.id)} className="object-cover justify-items-center">
               <img
-              src={`${imageUrl}/${product.id}.${product.extension}`}
+              src={`${imageUrl1}/${product.id}.${product.extension}`}
               alt={product.name}
               className="p-2 w-full h-[250px] relative overflow-hidden mt-12 mb-5"
               />
-              </div>
+              
               <p className='text-lg text-gray-500 font-semibold'>{product.category?.name}</p>
               <h3 className='text-xl text-black font-semibold'>{product.name}</h3>
-              <h4 className='text-lg text-themegreen font-semibold'>${product.price}</h4>
+              <h4 className='text-lg text-themegreen font-semibold'>₱{Number(product.price).toLocaleString()}</h4>
+              </div>
 
-              <div className="w-full mt-2">
+              <div onClick={() => handleProductClick(product.id)} className="w-full mt-2">
               <hr />
               <div className="flex justify-between items-center gap-6 mt-3">
                   <div className="flex justify-start items-center gap-1">
@@ -213,7 +221,7 @@ function Productsgrid() {
       </div>
       {products.length > 8 && (
         <button 
-          onClick={handleViewMoreClick} 
+          onClick={handleViewMoreClick}
           className="bg-themegreen hover:bg-themeyellow text-white hover:text-black font-semibold px-8 py-3 rounded-lg mt-8">
           {showAll ? "VIEW LESS" : "VIEW MORE"}
         </button>

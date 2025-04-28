@@ -46,8 +46,8 @@ const Footer = () => {
             <div className='w-full lg:px-20 px-5 py-[32px] bg-gray-100 grid lg:grid-cols-[auto,auto,auto,auto,auto] grid-cols-1 justify-between items-start lg:gap-3 gap-10'>
                 <div data-aos="zoom-in" data-aos-delay="200" className='flex flex-col justify-center item-start gap-10 grow'>
                     <div className='flex flex-col justify-center items-start gap-4'>
-                        <h1 className='text-4xl font-bold text-themegreen underline italic'>GuildCord Shop</h1>
-                        <p className='text-gray-500 text-justify'>Lorem ipsum dolor sit amet consectetur adipisicing elit. Suscipit<br/> vero laudantium quis,<br /> provident ducimus rem saepe accusantium tempore eos modi?</p>
+                        <h1 className='text-4xl font-bold text-themegreen underline italic'>CyberDrive Shop</h1>
+                        <p className='text-gray-500 text-justify'>Your go-to store for top tech gear and PC components. <br/>Build, upgrade, and explore with ease! With top-tier products, <br/>competitive prices, and exceptional customer support.</p>
                     </div>
                     <div className='flex flex-col justify-center items-start gap-4'>
                         <h1 className='text-black text-xl font-semibold capitalize'> Download our App</h1>
