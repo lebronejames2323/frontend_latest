@@ -1,145 +1,45 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { FaArrowLeft } from 'react-icons/fa';
-import { index } from '../api/product';
+import { FaArrowLeft, FaShoppingCart } from 'react-icons/fa';
+import { getProducts } from '../api/product-fetch';
 import { useCookies } from 'react-cookie';
-import { imageUrl } from '../api/configuration';
-import { FaStar } from 'react-icons/fa';
-import { toast } from "react-toastify";
+import { imageUrl1 } from '../api/configuration';
+import { addToCart } from '../api/product-actions';
+import { addToWishlist } from '../api/product-actions';
+import RecommendedProducts from '../components/RecommendedProducts';
 
 const ProductPage = () => {
-    const { productId } = useParams();
-    const navigate = useNavigate();
-    const [products, setProducts] = useState([]);
-    const [cookies] = useCookies();
-    const [loading, setLoading] = useState(false);
+  const { productId } = useParams();
+  const navigate = useNavigate();
+  const [products, setProducts] = useState([]);
+  const [cookies] = useCookies();
+  const [loading, setLoading] = useState(false);
+  const [loading2, setLoading2] = useState(false);
 
-    const addToCart = async (productId) => {
-      const token = cookies.token;
-      if (!token) {
-        toast.error('User is not authenticated!');
-        return;
-      }
-    
-      try {
-        const response = await fetch('http://localhost:8000/api/carts', {
-            headers: {
-                'Authorization': `Bearer ${token}`,
-            },
-        });
-  
-        if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(errorData.message || "Failed to fetch cart");
-        }
-  
-        const res = await response.json();
-        const carts = res?.data;
-
-        const isProductInCart = carts.some(cart =>
-            cart.products.some(product => product.id === productId)
-        );
-  
-        if (isProductInCart) {
-          toast.error('This product is already in the cart!');
-            return;
-        }
-
-        const addResponse = await fetch('http://localhost:8000/api/carts', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`,
-            },
-            body: JSON.stringify({
-                products: [{ id: productId, quantity: 1 }],
-            }),
-        });
-  
-        const addData = await addResponse.json();
-        if (addResponse.ok) {
-          toast.success('Product added to cart successfully!');
-        } else {
-            console.error(addData.message);
-            toast.error('Failed to add product to cart.');
-        }
-    } catch (error) {
-        console.error(error);
-        toast.error('An error occurred.');
-    }
+    const handleCartClick = () => {
+      navigate(`/cart`);
     };
 
+    const handleAddToCart = async (productId, stock) => {
+      await addToCart(productId, cookies, setLoading2, stock);
+    };
 
-    const addToWishlist = async (productId) => {
-      const token = cookies.token;
-      if (!token) {
-        toast.error('User is not authenticated!');
-        return;
-      }
-    
-      try {
-        const response = await fetch('http://localhost:8000/api/wishlists', {
-            headers: {
-                'Authorization': `Bearer ${token}`,
-            },
-        });
-  
-        if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(errorData.message || "Failed to fetch cart");
-        }
-  
-        const res = await response.json();
-        const carts = res?.data;
-  
-        const isProductInCart = carts.some(cart =>
-            cart.products.some(product => product.id === productId)
-        );
-  
-        if (isProductInCart) {
-          toast.error('This product is already in the wishlist!');
-            return;
-        }
-  
-        const addResponse = await fetch('http://localhost:8000/api/wishlists', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`,
-            },
-            body: JSON.stringify({
-                products: [{ id: productId, quantity: 1 }],
-            }),
-        });
-  
-        const addData = await addResponse.json();
-        if (addResponse.ok) {
-          toast.success('Product added to wishlist successfully!');
-        } else {
-            console.error(addData.message);
-            toast.error('Failed to add product to cart.');
-        }
-    } catch (error) {
-        console.error(error);
-        toast.error('An error occurred.');
-    }
+    const handleAddToWishlist = async (productId) => {
+      await addToWishlist(productId, cookies, setLoading2);
     };
 
     const refreshProducts = () => {
     setLoading(true);
     const numericProductId = Number(productId);
     
-      index(cookies.token).then((res) => {
-        console.log("productId:", numericProductId);
-        console.log("API Response:", res?.data);
-    
-        const filteredProduct = res?.data.filter(product => product.id === numericProductId);
-        setProducts(filteredProduct);
-        setLoading(false);
-      }).catch((error) => {
-        console.error("Error fetching products:", error);
-        setProducts([]);
-      });
+    getProducts().then((res) => {
+  
+      const filteredProduct = res?.data.filter(product => product.id === numericProductId);
+      setProducts(filteredProduct);
+      setLoading(false);
+    }).catch((error) => {
+      setProducts([]);
+    });
     };
     
     useEffect(refreshProducts, [productId]);
@@ -154,7 +54,7 @@ const ProductPage = () => {
               </div>
           </div>
       );
-  }
+    }
     
 
     return (
@@ -162,15 +62,16 @@ const ProductPage = () => {
 
       <div className="w-full h-[80px] bg-white shadow-lg fixed top-0 left-0 z-50 items-center flex justify-between lg:px-10 px-5">
         <button
-          onClick={() => navigate('/')}
+          onClick={() => navigate(-1)}
           className="flex items-center text-themegreen hover:text-themeyellow transition-colors"
         >
           <FaArrowLeft className="mr-1 w-[20px] h-[20px]" />
-          <h1 className="text-base font-semibold">Home</h1>
+          <h1 className="text-base font-semibold">Back</h1>
         </button>
-        <h1 className="text-xl lg:text-3xl flex-1 font-bold capitalize text-center">
+        <h1 className="lg:text-2xl flex-1 font-bold capitalize text-center">
           Product Information
         </h1>
+        <button onClick={handleCartClick} className="w-[105px] items-center justify-center flex gap-1 text-themegreen hover:text-themeyellow"><h1 className="text-base font-semibold">Cart </h1><FaShoppingCart className='w-[22px] h-[22px]'/></button>
       </div>
 
       <div className="w-full max-w-5xl mt-[100px] p-6 bg-white rounded-lg shadow-lg border">
@@ -179,7 +80,7 @@ const ProductPage = () => {
 
             <div className="w-full lg:w-1/2">
               <img
-                src={`${imageUrl}/${product.id}.${product.extension}`}
+                src={`${imageUrl1}/${product.id}.${product.extension}`}
                 alt={product.name}
                 className="w-full h-auto object-contain rounded-lg"
               />
@@ -189,29 +90,36 @@ const ProductPage = () => {
               <h2 className="text-3xl font-bold text-black">{product.name}</h2>
               <p className="text-lg text-gray-600">{product.category?.name}</p>
               <p className="text-base text-gray-500">{product.description}</p>
-              <h3 className="text-2xl font-semibold text-themegreen">${product.price}</h3>
+
+              <div className="flex items-center gap-4">
+                <h3 className="text-2xl font-semibold text-themegreen">₱{Number(product.price).toLocaleString()}</h3>
+                <h3 className={`text-xl font-semibold ${product.stock === 0 ? 'text-red-600' : 'text-gray-500'}`}>
+                {product.stock === 0 ? 'Out of Stock' : `(${product.stock} ${product.stock === 1 ? 'stock' : 'stocks'} left)`}
+                </h3>
+              </div>
+
               <div className="flex items-center gap-3">
                 <button
-                  onClick={() => addToCart(product.id)}
-                  className="bg-themegreen hover:bg-themeyellow text-white font-semibold px-6 py-2 rounded-lg transition"
+                  onClick={() => handleAddToCart(product.id, product.stock)}
+                  className={`bg-themegreen text-white font-semibold px-6 py-2 rounded-lg transition ${loading2 ? "opacity-50 cursor-not-allowed" : "hover:bg-themeyellow hover:text-black"}`} disabled={loading2}
                 >
                   Add to Cart
                 </button>
                 <button
-                  onClick={() => addToWishlist(product.id)}
-                  className="bg-gray-200 hover:bg-gray-300 text-black font-semibold px-6 py-2 rounded-lg transition"
+                  onClick={() => handleAddToWishlist(product.id)}
+                  className={`bg-gray-200 text-black font-semibold px-6 py-2 rounded-lg transition ${loading2 ? "opacity-50 cursor-not-allowed" : "hover:bg-gray-300"}`} disabled={loading2}
                 >
                   Add to Wishlist
                 </button>
               </div>
-              <div className="flex items-center gap-1 mt-4">
-                {[...Array(5)].map((_, i) => (
-                  <FaStar key={i} className="text-themeyellow" />
-                ))}
-              </div>
+              
             </div>
+            
           </div>
         ))}
+      </div>
+      <div className="mt-8">
+        <RecommendedProducts />
       </div>
     </div>
     

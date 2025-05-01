@@ -1,4 +1,3 @@
-import React, { useEffect } from 'react'
 import client1 from '../assets/client1.png'
 import client2 from '../assets/client2.png'
 import client3 from '../assets/client3.png'
@@ -13,52 +12,44 @@ import pay3 from '../assets/pay-3.jpg'
 import pay4 from '../assets/pay-4.jpg'
 import { Link } from 'react-scroll';
 import { FaArrowUp } from 'react-icons/fa'
-import AOS from 'aos';
-import 'aos/dist/aos.css';
 
 
 const Footer = () => {
-    
-    useEffect(() => {
-    AOS.init({ 
-    offset: 100,
-    duration: 500,
-    easing: 'ease-in-out',
-    });
-
-    AOS.refresh();
-
-    }, [])
 
     return (
         <div id='contact' className='w-full flex flex-col justify-center items-center'>
 
-            <div data-aos="zoom-in" data-aos-delay="100" className='w-full bg-themegreen lg:px-20 px-10 py-8 grid lg:grid-cols-6 grid-cols-2 justify-center items-center gap-10'>
+            <div className='w-full bg-themegreen lg:px-20 px-10 py-8 grid lg:grid-cols-6 grid-cols-2 justify-center items-center gap-20'>
+            <a href="https://www.samsung.com/ph/" target="_blank">
                 <img src={client1} alt="" className='w-[130px] opacity-70 cursor-pointer hover:opacity-100'/>
+                </a>
+                <a href="https://www.acer.com/us-en/" target="_blank">
                 <img src={client2} alt="" className='w-[130px] opacity-70 cursor-pointer hover:opacity-100'/>
+                </a>
+                <a href="https://www.lenovo.com/us/en/" target="_blank">
                 <img src={client3} alt="" className='w-[130px] opacity-70 cursor-pointer hover:opacity-100'/>
+                </a>
+                <a href="https://www.sony.com/en/" target="_blank">
                 <img src={client4} alt="" className='w-[130px] opacity-70 cursor-pointer hover:opacity-100'/>
+                </a>
+                <a href="https://www.asus.com/us/" target="_blank">
                 <img src={client5} alt="" className='w-[130px] opacity-70 cursor-pointer hover:opacity-100'/>
+                </a>
+                <a href="https://www.logitech.com/en-us" target="_blank">
                 <img src={client6} alt="" className='w-[130px] opacity-70 cursor-pointer hover:opacity-100'/>
+                </a>
             </div>
 
 
             <div className='w-full lg:px-20 px-5 py-[32px] bg-gray-100 grid lg:grid-cols-[auto,auto,auto,auto,auto] grid-cols-1 justify-between items-start lg:gap-3 gap-10'>
-                <div data-aos="zoom-in" data-aos-delay="200" className='flex flex-col justify-center item-start gap-10 grow'>
+                <div className='flex flex-col justify-center item-start gap-10 grow'>
                     <div className='flex flex-col justify-center items-start gap-4'>
-                        <h1 className='text-4xl font-bold text-themegreen underline italic'>GuildCord Shop</h1>
-                        <p className='text-gray-500 text-justify'>Lorem ipsum dolor sit amet consectetur adipisicing elit. Suscipit<br/> vero laudantium quis,<br /> provident ducimus rem saepe accusantium tempore eos modi?</p>
-                    </div>
-                    <div className='flex flex-col justify-center items-start gap-4'>
-                        <h1 className='text-black text-xl font-semibold capitalize'> Download our App</h1>
-                        <div className='flex justify-center items-center gap-4'>
-                        <img src={google} alt=""/>
-                        <img src={apple} alt=""/>
-                        </div>
+                        <h1 className='text-4xl font-bold text-themegreen underline italic'>CyberDrive Shop</h1>
+                        <p className='text-gray-500 text-justify'>Your go-to store for top tech gear and PC components. <br/>Build, upgrade, and explore with ease! With top-tier products, <br/>competitive prices, and exceptional customer support.</p>
                     </div>
                 </div>
 
-                <div data-aos="zoom-in" data-aos-delay="200">
+                <div>
                     <h1 className='text-black text-xl font-semibold capitalize'>Useful Links</h1>
                     <ul className='mt-8 flex flex-col justify-center items-start gap-2'>
                         <li className='text-gray-500 cursor-pointer hover:text-black'>Home</li>
@@ -68,7 +59,7 @@ const Footer = () => {
                         <li className='text-gray-500 cursor-pointer hover:text-black'>Home</li>
                     </ul>
                 </div>
-                <div data-aos="zoom-in" data-aos-delay="200">
+                <div>
                     <h1 className='text-black text-xl font-semibold capitalize'>Useful Links</h1>
                     <ul className='mt-8 flex flex-col justify-center items-start gap-2'>
                         <li className='text-gray-500 cursor-pointer hover:text-black'>Home</li>
@@ -78,7 +69,7 @@ const Footer = () => {
                         <li className='text-gray-500 cursor-pointer hover:text-black'>Home</li>
                     </ul>
                 </div>
-                <div data-aos="zoom-in" data-aos-delay="200">
+                <div>
                     <h1 className='text-black text-xl font-semibold capitalize'>Useful Links</h1>
                     <ul className='mt-8 flex flex-col justify-center items-start gap-2'>
                         <li className='text-gray-500 cursor-pointer hover:text-black'>Home</li>
@@ -88,7 +79,7 @@ const Footer = () => {
                         <li className='text-gray-500 cursor-pointer hover:text-black'>Home</li>
                     </ul>
                 </div>
-                <div data-aos="zoom-in" data-aos-delay="200">
+                <div>
                     <h1 className='text-black text-xl font-semibold capitalize'>Useful Links</h1>
                     <ul className='mt-8 flex flex-col justify-center items-start gap-2'>
                         <li className='text-gray-500 cursor-pointer hover:text-black'>Home</li>
@@ -124,12 +115,11 @@ const Footer = () => {
                 </div>
             </div>
 
-
-            <div id='icon-box' className='bg-themegreen text-white p-3 rounded-full hover:bg-themeyellow hover:text-black cursor-pointer fixed lg:bottom-6 right-6 bottom-6'>
-                <Link to="hero" spy={true} offset={-100} smooth={true}>
-                <FaArrowUp className='w-[35px] h-[35px]'/>
-                </Link>
-            </div>
+            <Link to="hero" spy={true} offset={-100} smooth={true}>
+                <div id='icon-box' className='bg-themegreen text-white p-3 rounded-full hover:bg-themeyellow hover:text-black cursor-pointer fixed lg:bottom-6 right-6 bottom-6'>
+                    <FaArrowUp className='w-[35px] h-[35px]'/>
+                </div>
+            </Link>
         </div>
     )
 }

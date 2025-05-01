@@ -1,6 +1,6 @@
-import {Button,Modal,Box} from '@mui/material'
+import { Modal, Box} from '@mui/material'
 
-export default function CustomModal({open, handleOpen, buttonText, handleClose, children}){
+export default function CustomModal({open, handleClose, children}){
     return(
         <>
             <Modal

@@ -7,6 +7,12 @@ import AccountPage from "./Pages/AccountPage";
 import CartPage from "./Pages/CartPage";
 import WishlistPage from "./Pages/WishlistPage";
 import ProductPage from "./Pages/ProductPage";
+import Add from './Pages/admin/Add'
+import AddCategory from './pages/admin/AddCategory'
+import List from './pages/admin/List'
+import Orders from './pages/admin/Orders'
+import ListCategory from "./Pages/admin/ListCategory";
+import AllProductsPage from "./Pages/AllProductsPage";
 
 export const router = createBrowserRouter([
   {
@@ -40,5 +46,29 @@ export const router = createBrowserRouter([
   {
     path: "/wishlist",
     element: <WishlistPage />,
+  },
+  {
+    path: "/add",
+    element: <Add />,
+  },
+  {
+    path: "/add-category",
+    element: <AddCategory />,
+  },
+  {
+    path: "/list",
+    element: <List />,
+  },
+  {
+    path: "/list-category",
+    element: <ListCategory />,
+  },
+  {
+    path: "/order",
+    element: <Orders />,
+  },
+  {
+  path: "/all-products",
+    element: <AllProductsPage />,
   },
 ]);

@@ -1,6 +1,4 @@
 import React, { useState } from "react";
-import { Input } from "../components/ui/input";
-import { Button } from "../components/ui/button";
 import { Link, useNavigate } from "react-router-dom";
 import { login } from "../api/auth";
 import { toast } from "react-toastify";
@@ -10,7 +8,7 @@ function Login() {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  const [cookies, setCookie, removeCookie] = useCookies();
+  const [cookies, setCookie] = useCookies();
   const onFormSubmit = (e) => {
   e.preventDefault();
   if (!loading) {
@@ -36,35 +34,37 @@ function Login() {
 
         <div className="text-3xl font-semibold text-center text-themegreen mb-5">Login</div>
         <div>
-        <Input
+        <input
         name="username"
         placeholder="Username"
-        className="border rounded-md p-3 w-full focus:outline-none focus:ring-2 focus:ring-indigo-500"
+        className="border rounded-md p-3 w-full"
         />
         </div>
         <div>
-        <Input
+        <input
         name="password"
         type="password"
         placeholder="Password"
-        className="border rounded-md p-3 w-full focus:outline-none focus:ring-2 focus:ring-indigo-500"
+        className="border rounded-md p-3 w-full"
         />
         </div>
         <div className="flex justify-center">
-        <Button
+        <button
         type="submit"
-        className={`w-full py-3 rounded-md text-white bg-themegreen hover:bg-themeyellow focus:outline-none focus:ring-2 focus:ring-indigo-500 ${loading ? "opacity-50 cursor-not-allowed" : ""}`}
+        className={`w-full py-3 rounded-md text-white bg-themegreen hover:bg-themeyellow ${loading ? "opacity-50 cursor-not-allowed" : ""}`}
         disabled={loading}
         >
         {loading ? "Logging In..." : "Login"}
-        </Button>
+        </button>
         </div>
-        <div className="text-center mt-4">
-        <Link to="/register" className="text-themegreen text-sm">
-        <h1 className="font-semibold hover:text-blue-400">Don't have an account yet? Register here.</h1>
+        <div className="text-center mt-1">
+        <Link to="/register" className="text-themegreen text-base">
+        <h1 className="font-semibold hover:text-blue-400">Don't have account yet? Register here.</h1>
+        </Link>
+        <Link to="/" className="text-themegreen text-base mt-1">
+        <h1 className="font-semibold hover:text-blue-400">Home Page</h1>
         </Link>
         </div>
-
       </form>
     </div>
     </div>

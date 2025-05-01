@@ -1,170 +1,63 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FaArrowLeft } from 'react-icons/fa';
+import { FaArrowLeft, FaMinus, FaPlus, FaTrashAlt } from 'react-icons/fa';
 import { useCookies } from 'react-cookie';
-import { imageUrl } from '../api/configuration';
-import { toast } from "react-toastify";
+import { imageUrl1 } from '../api/configuration';
+import { fetchCarts } from '../api/product-fetch';
+import { deleteProductFromCart, placeOrder, updateProductQuantity } from '../api/product-actions';
+import OrderReceipt from '../components/OrderReceipt';
 
 const CartPage = () => {
     const navigate = useNavigate();
     const [carts, setCarts] = useState([]);
-    const [error, setError] = useState(null);
-    const [loading, setLoading] = useState(false);
     const [cookies] = useCookies();
-    const [orderMessage, setOrderMessage] = useState('');
+    const [loading, setLoading] = useState(false);
+    const [loading2, setLoading2] = useState(false);
+    const [showReceipt, setShowReceipt] = useState(false);
+    const [lastOrder, setLastOrder] = useState(null);
 
-    const fetchCarts = async () => {
-        try {
-            setLoading(true);
-            console.log("Fetching carts with token:", cookies.token);
+    const token = cookies.token;
+    const isAuthenticated = token && token !== 'undefined' && token.trim() !== '';
+  
+    if (!isAuthenticated) {
+      return (
+        <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50">
+        <p className="text-xl font-medium mb-6">You are not logged in.</p>
+        <button
+            className="bg-themegreen hover:bg-themeyellow text-white font-semibold px-6 py-2 rounded-lg"
+            onClick={() => navigate('/')}
+        >
+            Go back
+        </button>
+        </div>
+      );
+    }
 
-            const response = await fetch("http://localhost:8000/api/carts", {
-                headers: {
-                    Authorization: `Bearer ${cookies.token}`,
-                },
-            });
+    const refreshCarts = () => {
+        setLoading(true);
+        fetchCarts(cookies.token).then((res) => {
+        setCarts(res?.data);
+        setLoading(false);
+        })
+      };
+    
+    useEffect(refreshCarts, []);
 
-            if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.message || "Failed to fetch carts");
-            }
-
-            const res = await response.json();
-            console.log("API Response:", res.data);
-
-            setCarts(res.data);
-            setLoading(false);
-        } catch (err) {
-            console.error("Error fetching carts:", err.message);
-            setError(`Error fetching carts: ${err.message}`);
-        }
+    const closeReceipt = () => {
+        setShowReceipt(false);
     };
 
-    useEffect(() => {
-        fetchCarts();
-    }, []);
-
-    const placeOrder = async () => {
-        try {
-
-            const products = carts
-                .flatMap(cart => cart.products)
-                .map(product => ({
-                    id: product.id,
-                    quantity: product.pivot.quantity,
-                }));
-    
-            console.log("Placing order with products:", products);
-
-            const response = await fetch("http://localhost:8000/api/orders", {
-                method: "POST",
-                headers: {
-                    Authorization: `Bearer ${cookies.token}`,
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({ products }),
-            });
-    
-            if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.message || "Failed to place order");
-            }
-    
-            const res = await response.json();
-            console.log("Order placed successfully:", res);
-            toast.success("Order placed successfully:");
-    
-            setOrderMessage(res.message);
-
-            for (const cart of carts) {
-                console.log(`Deleting cart with ID: ${cart.id}`);
-                const deleteResponse = await fetch(`http://localhost:8000/api/carts/${cart.id}`, {
-                    method: "DELETE",
-                    headers: {
-                        Authorization: `Bearer ${cookies.token}`,
-                    },
-                });
-    
-                if (!deleteResponse.ok) {
-                    const deleteError = await deleteResponse.json();
-                    console.error(`Failed to delete cart with ID ${cart.id}:`, deleteError.message);
-                    throw new Error(`Failed to delete cart with ID ${cart.id}`);
-                }
-            }
-
-            setCarts([]);
-            console.log("All carts deleted successfully.");
-        } catch (err) {
-            console.error("Error placing order or deleting carts:", err.message);
-            setOrderMessage(`Error: ${err.message}`);
-            toast.error("Your cart is empty");
-        }
-    };
-
-
-    const updateProductQuantity = async (cartId, productId, quantity) => {
-        const token = cookies.token;
-        if (!token) {
-            toast.error('User is not authenticated!');
-            return;
-        }
-    
-        try {
-            const response = await fetch(`http://localhost:8000/api/carts/${cartId}/update-product`, {
-                method: 'PATCH',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`,
-                },
-                body: JSON.stringify({
-                    product_id: productId,
-                    quantity: quantity,
-                }),
-            });
-    
-            const data = await response.json();
-            if (response.ok) {
-                toast.success('Product quantity updated successfully!');
-                fetchCarts();
-            } else {
-                console.error(data.message);
-                toast.error('Failed to update product quantity.');
-            }
-        } catch (error) {
-            console.error(error);
-            toast.error('An error occurred while updating the product quantity.');
-        }
+    const handlePlaceOrder = async () => {
+        await placeOrder(carts, cookies, setLoading2, setLastOrder, setCarts, setShowReceipt);
     };
     
-    const deleteProductFromCart = async (cartId, productId) => {
-        const token = cookies.token;
-        if (!token) {
-            toast.error('User is not authenticated!');
-            return;
-        }
+    const handleUpdateQuantity = async (cartId, productId, newQuantity) => {
+        await updateProductQuantity(cartId, productId, newQuantity, cookies, refreshCarts);
+    };
     
-        try {
-            const response = await fetch(`http://localhost:8000/api/carts/${cartId}/delete-product`, {
-                method: 'DELETE',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`,
-                },
-                body: JSON.stringify({ product_id: productId }),
-            });
     
-            const data = await response.json();
-            if (response.ok) {
-                toast.success('Product deleted successfully!');
-                fetchCarts();
-            } else {
-                console.error(data.message);
-                toast.error('Failed to delete product from cart.');
-            }
-        } catch (error) {
-            console.error(error);
-            toast.error('An error occurred while deleting the product.');
-        }
+    const handleDeleteCart = async (cartId, productId) => {
+        await deleteProductFromCart(cartId, productId, cookies, setLoading2, refreshCarts);
     };
     
     if (loading) {
@@ -183,101 +76,120 @@ const CartPage = () => {
 
             <div className="w-full h-[80px] bg-white shadow-lg fixed top-0 left-0 z-50">
                 <div className="w-full h-full lg:px-10 px-5 flex items-center justify-between">
-                    <button 
-                        onClick={() => navigate('/')}
-                        className="flex items-center text-themegreen hover:text-themeyellow transition-colors"
-                    >
-                        <FaArrowLeft className='mr-2 w-[20px] h-[20px]' />
-                        <span className="text-base font-semibold">Home</span>
-                    </button>
-                    <h1 className="text-xl font-bold text-gray-900">Cart Page</h1>
-                    <div></div>
-                </div>
-            </div>
-
-            <div className="p-5 pt-[100px] flex-grow overflow-auto">
-                {error && (
-                    <div className="bg-red-100 text-red-700 px-5 py-3 mb-5 rounded-md">
-                        <h2 className="text-lg font-semibold">Error</h2>
-                        <p>{error}</p>
-                    </div>
-                )}
-
-                {carts.length > 0 ? (
-                    carts.map(cart => (
-                        <div key={cart.id} className="bg-white shadow-sm rounded-lg mb-5 p-5">
-                            <h2 className="text-xl font-semibold text-gray-900 mb-3">Cart ID: {cart.id}</h2>
-                            <ul>
-                                {cart.products.map(product => (
-                                    <li key={product.id} className="flex items-center mb-4 border-b pb-4">
-                                        <div className="w-[60px] h-[60px] mr-4">
-                                            <img
-                                                src={`${imageUrl}/${product.id}.${product.extension}`}
-                                                alt={product.name}
-                                                className="w-full h-full object-cover rounded-md"
-                                            />
-                                        </div>
-                                        <div className="flex-grow">
-                                            <h3 className="text-lg font-medium text-gray-800">{product.name}</h3>
-                                            <p className="text-sm text-gray-500">Quantity: {product.pivot.quantity}</p>
-                                            <p className="text-sm text-gray-500">Total: ₱{(product.price * product.pivot.quantity).toFixed(2)}</p>
-                                        </div>
-                                        <div className="mt-2 flex items-center justify-center">
-                                            <input
-                                                id={`quantity-${product.id}`}
-                                                type="number"
-                                                defaultValue={product.pivot.quantity}
-                                                min="1"
-                                                className="border rounded-md p-2 w-[60px] text-center"
-                                            />
-                                            <button
-                                                className="bg-themegreen text-white px-4 py-2 rounded-lg ml-2"
-                                                onClick={() =>
-                                                    updateProductQuantity(cart.id, product.id, document.getElementById(`quantity-${product.id}`).value)
-                                                }
-                                            >
-                                                Update
-                                            </button>
-                                            <button
-                                                className="bg-red-500 text-white px-4 py-2 rounded-lg ml-2"
-                                                onClick={() => deleteProductFromCart(cart.id, product.id)}
-                                            >
-                                                Delete
-                                            </button>
-                                        </div>
-                                    </li>
-                                ))}
-                            </ul>
-                        </div>
-                    ))
-                ) : (
-                    <p className="text-center text-gray-600">No carts found for this user.</p>
-                )}
-            </div>
-
-            <div className="bg-white shadow-sm p-5 mb-5">
-                <h2 className="text-xl font-semibold text-gray-900 mb-3">Cart Summary</h2>
-                <div className="flex justify-between text-lg font-medium text-gray-800">
-                    <span>Total Items:</span>
-                    <span>
-                        {carts.reduce((total, cart) => 
-                        total + cart.products.reduce((subtotal, product) => subtotal + product.pivot.quantity, 0) , 0)}
-                    </span>
-                </div>
-                <div className="flex justify-between text-lg font-medium text-gray-800 mt-2">
-                    <span>Total Price:</span>
-                    <span>₱{carts.flatMap(cart => cart.products).reduce((total, product) => total + product.price * product.pivot.quantity, 0).toFixed(2)}</span>
-                </div>
-            </div>
-
-            <div className="w-full bg-white shadow-lg py-4">
                 <button 
-                    className="w-full bg-themegreen text-white py-3 font-semibold text-lg hover:bg-themeyellow transition-colors"
-                    onClick={placeOrder}
+                    onClick={() => navigate('/')}
+                    className="flex items-center text-themegreen hover:text-themeyellow transition-colors"
                 >
-                    Place Order
+                    <FaArrowLeft className='mr-1 w-[20px] h-[20px]' />
+                    <span className="text-base font-semibold">Back</span>
                 </button>
+                <h1 className="text-2xl font-bold text-gray-900">Cart Page</h1>
+                <div className="w-[105px]"></div>
+                </div>
             </div>
+
+            <div className="container px-4 pt-24 pb-12 mx-auto max-w-7xl">
+                <div className="grid lg:grid-cols-[1fr,400px] gap-6">
+                    <div className="overflow-hidden bg-white shadow-sm rounded-xl">
+                        <div className="px-6 pt-6 pb-2">
+                            <div className="divide-y">
+                            <h2 className="mb-4 text-xl font-bold text-gray-900">Cart Items</h2>
+                            {carts.length > 0 ? (
+                                carts.map(cart => (
+                                    <div key={cart.id}>
+                                        {cart.products.map(product => (
+                                            <div key={product.id} className="flex items-center gap-4 py-4">
+                                                <div className="w-[10%] h-[10%] mr-4">
+                                                    <img
+                                                        src={`${imageUrl1}/${product.id}.${product.extension}`}
+                                                        alt={product.name}
+                                                        className="w-full h-full object-cover rounded-md"
+                                                    />
+                                                </div>
+                                                <div className="flex-grow">
+                                                    <h3 className="text-lg font-medium text-gray-800">{product.name}</h3>
+                                                    <p className="text-sm text-gray-400">₱{Number(product.price).toLocaleString()}</p>
+                                                </div>
+                                                <div className="flex items-center justify-center gap-4">
+                                                    <div className="flex items-center border rounded-lg">
+                                                        <button 
+                                                            className="p-2 hover:bg-gray-100"
+                                                            onClick={() => handleUpdateQuantity(cart.id, product.id, Math.max(1, product.pivot.quantity - 1))}
+                                                        >
+                                                            <FaMinus className="w-3 h-3" />
+                                                        </button>
+                                                        <span className="w-12 text-center">{product.pivot.quantity}</span>
+                                                        <button 
+                                                            className="p-2 hover:bg-gray-100"
+                                                            onClick={() => handleUpdateQuantity(cart.id, product.id, product.pivot.quantity + 1)}
+                                                        >
+                                                            <FaPlus className="w-3 h-3" />
+                                                        </button>
+                                                    </div>
+                                                    <button
+                                                        className="p-2 text-themered rounded-lg hover:text-opacity-50"
+                                                        onClick={() => handleDeleteCart(cart.id, product.id)}
+                                                    >
+                                                        <FaTrashAlt className="w-5 h-5" />
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                ))
+                            ) : (
+                            <div className="py-12 text-center">
+                            <h2 className="mb-2 text-2xl font-bold text-gray-900">Your cart is empty</h2>
+                            <p className="mb-6 text-gray-600">Looks like you haven't added any items to your cart yet.</p>
+                            <button onClick={() => navigate('/')} className="px-4 py-2 font-semibold text-white transition-colors rounded-lg bg-themegreen hover:bg-themeyellow hover:text-black">
+                                Continue Shopping
+                            </button>
+                            </div>
+                            )}
+                            </div>
+                        </div>
+                    </div>
+            
+
+                    <div className="space-y-6">
+                        <div className="sticky bg-white shadow-sm rounded-xl h-fit top-24">
+                            <div className="p-6">
+                                <h2 className="mb-4 text-xl font-bold text-gray-900">Order Summary</h2>
+                                <div className="space-y-4">
+                                    <div className="flex justify-between text-gray-600">
+                                        <span>Total Items:</span>
+                                        <span>{carts.reduce((total, cart) => 
+                                        total + cart.products.reduce((subtotal, product) => subtotal + product.pivot.quantity, 0) , 0)}</span>
+                                    </div>
+                                    <div className="flex justify-between text-gray-600">
+                                        <span>Shipping</span>
+                                        <span>Free</span>
+                                    </div>
+                                    <div className="pt-4 border-t">
+                                        <div className="flex justify-between text-lg font-bold">
+                                            <span>Total</span>
+                                            <span className="text-themegreen">₱{carts.flatMap(cart => cart.products).reduce((total, product) => total + product.price * product.pivot.quantity, 0).toLocaleString()}</span>
+                                        </div>
+                                    </div>
+                                    <button 
+                                        onClick={handlePlaceOrder}
+                                        disabled={loading2}
+                                        className="w-full text-lg py-3 font-semibold text-white transition-colors rounded-lg bg-themegreen hover:bg-themeyellow hover:text-black disabled:opacity-50 disabled:cursor-not-allowed"
+                                    >
+                                        {loading2 ? "Processing..." : "Place order"}
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            {showReceipt && lastOrder && (
+                <OrderReceipt order={lastOrder} onClose={closeReceipt} />
+            )}
+
         </div>
     );
 };

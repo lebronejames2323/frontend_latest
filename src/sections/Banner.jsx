@@ -1,25 +1,13 @@
 import React, { useEffect } from 'react'
-import deal from '../assets/deal-bg11.jpg'
-import AOS from 'aos';
-import 'aos/dist/aos.css';
+import deal from '../assets/deal-bg.jpg'
 
 const Banner = () => {
 
-    useEffect(() => {
-        AOS.init({ 
-        offset: 100,
-        duration: 500,
-        easing: 'ease-in-out',
-        });
-
-        AOS.refresh();
-    }, [])
-
     return (
         <div className='w-full lg:px-20 px-5 py-[80px]'>
-            <div data-aos="zoom-in" data-aos-delay="100" className='w-full h-[300px] round-lg bg-cover bg-center flex flex-col justify-center items-center gap-3' style={{backgroundImage: `url(${deal})`}}>
-                <h1 className='text-yellow-300 text-2xl font-semibold'>Everyday Shopping</h1>
-                <h1 className='text-white font-bold text-[42px] leading-[50px] text-center'>Build your dream PC</h1>
+            <div className='w-full h-[300px] round-lg bg-cover bg-center flex flex-col justify-center items-center gap-3' style={{backgroundImage: `url(${deal})`}}>
+                <h1 className='text-yellow-300 text-2xl font-semibold'>Daily Tech Deals</h1>
+                <h1 className='text-white font-bold text-[42px] leading-[50px] text-center'>Build Your Custom Rig</h1>
             </div>
         </div>
     )

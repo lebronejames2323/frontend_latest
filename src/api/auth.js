@@ -10,8 +10,9 @@ export const checkToken = async (token) => {
 
   return await res.json();
 };
+
 export const logout = async (token) => {
-  const res = await fetch(`${url}/logout?_method=DELETE`, {
+  const res = await fetch(`${url}/logout`, {
     method: "POST",
     headers: {
       Accept: "application/json",
@@ -21,6 +22,7 @@ export const logout = async (token) => {
 
   return await res.json();
 };
+
 export const login = async (body, token) => {
   const res = await fetch(`${url}/login`, {
     method: "POST",
@@ -33,6 +35,7 @@ export const login = async (body, token) => {
 
   return await res.json();
 };
+
 export const register = async (body, token) => {
   const res = await fetch(`${url}/register`, {
     method: "POST",

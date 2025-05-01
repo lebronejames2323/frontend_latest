@@ -6,9 +6,9 @@ import Types from "../sections/Types";
 import Services from "../sections/Services";
 import Productsgrid from "../sections/Productsgrid";
 import Banner from "../sections/Banner";
-import Reviews from "../sections/Reviews";
-import Insta from "../sections/Insta";
+import Gallery from "../sections/Gallery";
 import Footer from "../sections/Footer";
+
 
 function Home() {
 
@@ -21,10 +21,10 @@ function Home() {
     <Services />
     <Productsgrid />
     <Banner />
-    <Insta />
+    <Gallery />
     <Footer />
     </>
     );
 }
 
-export default Home;
+export default Home
