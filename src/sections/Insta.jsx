@@ -11,22 +11,22 @@ import 'aos/dist/aos.css';
 const Insta = () => {
 
     useEffect(() => {
-    AOS.init({ 
-    offset: 100,
-    duration: 500,
-    easing: 'ease-in-out',
-    });
+        AOS.init({ 
+            offset: 100,
+            duration: 500,
+            easing: 'ease-in-out',
+        });
 
-    AOS.refresh();
+        AOS.refresh();
 
     }, [])
 
     return (
         <div className='w-full lg:px-20 px-5 py-[80px] bg-white flex flex-col justify-center items-center gap-4'>
-            <h1 data-aos="zoom-in" data-aos-delay="100" className='text-themegreen text-xl font-semibold capitalize'>
-                Our Instagram Account
+            <h1 data-aos="zoom-in" data-aos-delay="100" className='text-themepurple text-xl font-semibold capitalize'>
+                Our Instagram Shop
             </h1>
-            <h1 data-aos="zoom-in" data-aos-delay="200" className='text-black font-semibold text-[42px] leading-[50px] text-center capitalize'>Follow us on Instagram</h1>
+            <h1 data-aos="zoom-in" data-aos-delay="200" className='text-black font-semibold text-[42px] leading-[50px] text-center capitalize'>Follow on Instagram</h1>
             <div data-aos="zoom-in" data-aos-delay="300" className='w-full grid lg:grid-cols-6 grid-cols-1 justify-center items-center gap-6 mt-8'>
                 <img src={insta1} alt="" className='rounded-lg' />
                 <img src={insta2} alt="" className='rounded-lg' />
@@ -35,7 +35,7 @@ const Insta = () => {
                 <img src={insta5} alt="" className='rounded-lg' />
                 <img src={insta6} alt="" className='rounded-lg' />
             </div>
-            <button data-aos="zoom-in" data-aos-delay="200" className='bg-themegreen hover:bg-themeyellow text-white hover:text-black font-semibold px-8 py-3 rounded-lg mt-12 uppercase'>Instagram</button>
+            <button data-aos="zoom-in" data-aos-delay="200" className='bg-themepurple hover:bg-themeyellow text-white hover:text-black font-semibold px-8 py-3 rounded-lg mt-12 uppercase'>#GuildCord</button>
         </div>
     )
 }

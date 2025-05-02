@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react'
 import payment from '../assets/payment.png'
-import shipping from '../assets/shipping1.jpg'
+import shipping from '../assets/shipping.png'
 import refund from '../assets/return.png'
 import gift from '../assets/gift.png'
 import AOS from 'aos';
@@ -9,13 +9,13 @@ import 'aos/dist/aos.css';
 const Services = () => {
 
     useEffect(() => {
-    AOS.init({ 
-    offset: 100,
-    duration: 500,
-    easing: 'ease-in-out',
-    });
+            AOS.init({ 
+                offset: 100,
+                duration: 500,
+                easing: 'ease-in-out',
+            });
     
-    AOS.refresh();
+            AOS.refresh();
     
         }, [])
 
