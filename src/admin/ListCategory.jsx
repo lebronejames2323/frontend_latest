@@ -7,7 +7,7 @@ import CustomModal from "../components/Modal";
 import { imageUrl2 } from "../api/configuration";
 import { getCategories } from "../api/product-fetch";
 import withAuth from "../high-order-component/withAuth";
-import { url } from "../api/configuration";
+import { url } from "../`api/configuration";
 
 const ListCategory = () => {
   const [categories, setCategories] = useState([]);
