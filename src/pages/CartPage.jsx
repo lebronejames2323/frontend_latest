@@ -78,7 +78,7 @@ const CartPage = () => {
                 <div className="w-full h-full lg:px-10 px-5 flex items-center justify-between">
                 <button 
                     onClick={() => navigate('/')}
-                    className="flex items-center text-themegreen hover:text-themeyellow transition-colors"
+                    className="w-[105px] items-center justify-center flex gap-1 text-themegreen hover:text-themeyellow"
                 >
                     <FaArrowLeft className='mr-1 w-[20px] h-[20px]' />
                     <span className="text-base font-semibold">Back</span>

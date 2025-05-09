@@ -92,8 +92,8 @@ const Orders = () => {
                   </div>
                   <div>
                     <p className='text-sm sm:text-[15]'>Items: {order.products.reduce( (total, product) => total + product.pivot.quantity, 0)}</p>
-                    <p className='mt-3'>Method : COD</p>
-                    <p>Date : {new Date(order.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric'})}</p>  
+                    <p className='mt-3'>Date : {new Date(order.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric'})}</p>
+                    <p>Order ID: {order.order_id}</p>
                   </div>
                   <p className='text-sm sm:text-[15px]'>Total: ₱{order.products.reduce( (total, product) => total + product.price * product.pivot.quantity, 0)}</p>
                   <div>

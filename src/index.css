@@ -1,3 +1,4 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap');
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -10,4 +11,54 @@
     #icons {
         display: flex !important;
     }
+}
+
+*{
+    font-family: Outfit;
+}
+  
+.slider-container {
+    position: relative;
+    width: 100%;
+}
+  
+.slick-arrow {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 1000;
+}
+  
+.slick-prev:before,
+.slick-next:before {
+    position: absolute;
+    top: 50% !important;
+    transform: translateY(-50%);
+    z-index: 60;
+    font-size: 35px !important;
+    color: #00b000 !important;
+}
+  
+.slick-prev:before {
+    left: -15px;
+}
+  
+.slick-next:before {
+    right: -15px;
+}
+  
+/* .slick-slider {
+    overflow: hidden !important;
+} */
+  
+.slick-track {
+    display: flex !important;
+}
+  
+.slick-slide {
+    flex-shrink: 0 !important;
+}
+  
+body, html {
+    overflow-x: hidden;
 }

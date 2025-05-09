@@ -139,7 +139,7 @@ function Header() {
                     spy={true}
                     smooth={true}
                     offset={-100}
-                    className="text-black text-sm uppercase font-semibold px-4 py-2 rounded-lg hover:bg-themegreen hover:text-white cursor-pointer"
+                    className="text-black text-sm uppercase font-semibold px-3 py-2 rounded-lg hover:bg-themegreen hover:text-white cursor-pointer"
                     >
                     Home
                     </ScrollLink>
@@ -150,7 +150,7 @@ function Header() {
                     spy={true}
                     smooth={true}
                     offset={-100}
-                    className="text-black text-sm uppercase font-semibold px-4 py-2 rounded-lg hover:bg-themegreen hover:text-white cursor-pointer"
+                    className="text-black text-sm uppercase font-semibold px-3 py-2 rounded-lg hover:bg-themegreen hover:text-white cursor-pointer"
                     >
                     Category
                     </ScrollLink>
@@ -158,7 +158,7 @@ function Header() {
                 <li>
                     <a
                     href="/all-products"
-                    className="text-black text-sm uppercase font-semibold px-4 py-2 rounded-lg hover:bg-themegreen hover:text-white"
+                    className="text-black text-sm uppercase font-semibold px-3 py-2 rounded-lg hover:bg-themegreen hover:text-white"
                     >
                     Products
                     </a>
@@ -169,7 +169,7 @@ function Header() {
                     spy={true}
                     smooth={true}
                     offset={-100}
-                    className="text-black text-sm uppercase font-semibold px-4 py-2 rounded-lg hover:bg-themegreen hover:text-white cursor-pointer"
+                    className="text-black text-sm uppercase font-semibold px-3 py-2 rounded-lg hover:bg-themegreen hover:text-white cursor-pointer"
                     >
                     Featured
                     </ScrollLink>
@@ -180,7 +180,7 @@ function Header() {
                     spy={true}
                     smooth={true}
                     offset={-100}
-                    className="text-black text-sm uppercase font-semibold px-4 py-2 rounded-lg hover:bg-themegreen hover:text-white cursor-pointer"
+                    className="text-black text-sm uppercase font-semibold px-3 py-2 rounded-lg hover:bg-themegreen hover:text-white cursor-pointer"
                     >
                     Contact
                     </ScrollLink>

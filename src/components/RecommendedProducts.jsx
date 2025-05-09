@@ -53,7 +53,7 @@ function RecommendedProducts({ excludeProductId = null }) {
             <h2 className="mb-6 text-2xl font-bold text-gray-900">
                 You May Also Like
             </h2>
-            <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4 max-w-[1150px] mx-auto">
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4 max-w-[1050px] mx-auto">
                 {products.map((product) => (
                     <div 
                         key={product.id} 

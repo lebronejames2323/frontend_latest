@@ -39,13 +39,13 @@ function Category() {
             <div className='lg:w-[70%] grid lg:grid-cols-1 justify-center items-center'>
                 <Slider {...settings}>
                 {categories && categories.length > 0 && categories.map((category) => (
-                <div key={category.id} className='flex flex-col justify-center items-center px-5'>
-                    <div onClick={() => handleCategoryClick(category.name)} className='flex justify-center items-center max-w-[200px] max-h-[200px]'>
-                        <img 
-                        src={`${imageUrl2}/${category.id}.${category.extension}`} alt="" 
-                        className='rounded-xl cursor-pointer w-[160px] h-[160px] p-3 object-cover bg-white shadow-md' 
-                        />
-                    </div>
+                <div key={category.id} className='flex flex-col justify-items-center items-center px-1'>
+                <div onClick={() => handleCategoryClick(category.name)} className='flex justify-center items-center max-w-[200px] max-h-[200px]'>
+                    <img 
+                    src={`${imageUrl2}/${category.id}.${category.extension}`} alt="" 
+                    className='rounded-xl cursor-pointer w-[160px] h-[160px] p-3 object-cover bg-white shadow-md' 
+                    />
+                </div>
                 <h1 onClick={() => handleCategoryClick(category.name)} className='text-lg font-semibold hover:text-themegreen cursor-pointer text-center mt-2'>{category.name}</h1>
                 </div>
                 ))}

@@ -17,7 +17,10 @@ function Productsgrid() {
   
   const refreshProducts = () => {
     getProducts().then((res) => {
-    setProducts(res?.data.slice(0, 8));
+    const filteredProducts = res?.data
+      .filter(product => product.stock > 0)
+      .sort((a, b) => b.purchase_count - a.purchase_count);
+    setProducts(filteredProducts.slice(0, 8));
     });
   };
   

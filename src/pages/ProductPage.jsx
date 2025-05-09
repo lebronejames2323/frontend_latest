@@ -74,7 +74,7 @@ const ProductPage = () => {
       <div className="w-full h-[80px] bg-white shadow-lg fixed top-0 left-0 z-50 items-center flex justify-between lg:px-10 px-5">
         <button
           onClick={() => navigate(-1)}
-          className="flex items-center text-themegreen hover:text-themeyellow transition-colors"
+          className="w-[105px] items-center justify-center flex gap-1 text-themegreen hover:text-themeyellow"
         >
           <FaArrowLeft className="mr-1 w-[20px] h-[20px]" />
           <h1 className="text-base font-semibold">Back</h1>
@@ -130,38 +130,56 @@ const ProductPage = () => {
         ))}
       </div>
 
-      <div className="mt-8 w-[60%] bg-white shadow-md rounded-lg p-6">
-        <h2 className="text-xl font-bold text-center mb-4">Customer Reviews</h2>
+      <div className="mt-8">
+        <RecommendedProducts />
+      </div>
+
+      <div className="my-8 w-[1040px] bg-white shadow-lg rounded-lg p-6">
+        <h2 className="text-xl font-bold text-center mb-6">Customer Reviews</h2>
         {reviews.length === 0 ? (
-          <p className="text-center text-gray-500">No reviews yet. Be the first to review!</p>
+          <p className="text-center text-gray-500">No reviews yet for this product</p>
         ) : (
           reviews.map((review) => (
-            <div key={review.id} className="border-b py-4">
-              <div className="flex items-center gap-4">
-                <div>
+            <div key={review.id} className="border-b py-6">
+              <div className="flex items-start gap-6">
+                
+                <div className="flex-1">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 bg-gray-300 rounded-full flex items-center justify-center text-gray-700 font-bold">
+                      {review.user.profile.first_name.charAt(0).toUpperCase()}
+                    </div>
+                    <div>
+                      <p className="font-semibold text-lg">{review.user.profile.first_name}</p>
+                      <p className="text-sm text-gray-500">{new Date(review.created_at).toISOString().slice(0, 16).replace('T', ' ')}</p>
+                    </div>
+                  </div>
+
+                  <p className="text-yellow-500 mt-2 text-lg">{'⭐'.repeat(review.products[0]?.pivot.star_rating)}</p>
+                  <p className="text-gray-700 mt-2">{review.products[0]?.pivot.review_text}</p>
+
+                  <p className="text-sm text-gray-500 mt-2">
+                    <span className="font-semibold">Variation:</span> {review.products[0]?.variation || "Default"}
+                  </p>
+                </div>
+
+                <div className="w-32 flex-shrink-0">
                   {review.products?.map((product) => (
                     <img 
-                        key={`${review.id}-${product.id}`}
-                        src={`${imageUrl3}/${review.id}-${product.id}.${product.pivot.extension}`} 
-                        alt="Review Image"
-                        className="w-full h-[150px] object-cover rounded-md"
+                      key={`${review.id}-${product.id}`}
+                      src={`${imageUrl3}/${review.id}-${product.id}.${product.pivot.extension}`} 
+                      alt="Review Image"
+                      className="w-full h-[100px] object-cover rounded-md shadow-md"
                     />
                   ))}
-                  <p className="font-semibold">{review.user.profile.first_name}</p>
-                  <p className="text-sm text-gray-600">{review.products[0]?.pivot.review_text}</p>
-                  <p className="text-yellow-500">{'⭐'.repeat(review.products[0]?.pivot.star_rating)}</p>
                 </div>
+
               </div>
             </div>
           ))
         )}
       </div>
 
-      <div className="mt-8">
-        <RecommendedProducts />
-      </div>
-    </div>
-    
+    </div>    
     );
 };
 

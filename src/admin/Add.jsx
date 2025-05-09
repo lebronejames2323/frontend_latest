@@ -71,6 +71,8 @@ const Add = () => {
     outlineColor: '#000',
     borderRadius: '4px',
     padding: '8px',
+    resize: "none",
+    overflow: "hidden"
   };
   
 
@@ -121,9 +123,13 @@ const Add = () => {
             style={inputStyle}
               className="w-full max-w-[500px] px-3 py-2"
               type="text"
-              placeholder="Write content here"
+              placeholder="Write description here"
               value={productDescription}
-              onChange={(e) => setProductDescription(e.target.value)}
+              onChange={(e) => {
+                setProductDescription(e.target.value);
+                e.target.style.height = "auto";
+                e.target.style.height = e.target.scrollHeight + "px";
+              }}
               required
             />
             </div>

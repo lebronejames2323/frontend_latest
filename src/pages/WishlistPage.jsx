@@ -84,7 +84,7 @@ const WishlistPage = () => {
                         <div className="w-full h-full lg:px-10 px-5 flex items-center justify-between">
                             <button 
                                 onClick={() => navigate('/')}
-                                className="flex items-center text-themegreen hover:text-themeyellow transition-colors"
+                                className="w-[105px] items-center justify-center flex gap-1 text-themegreen hover:text-themeyellow"
                             >
                                 <FaArrowLeft className="mr-1 w-[20px] h-[20px]" />
                                 <span className="text-base font-semibold">Back</span>
@@ -146,14 +146,15 @@ const WishlistPage = () => {
                                 </div>
                             ))
                         ) : (
-                            <div className="flex items-center justify-center mt-8">
-                                <div className="text-center">
-                                    <p className="text-xl font-semibold text-gray-800">Your Wishlist is Empty</p>
-                                    <p className="text-gray-600 mt-2">Looks like you haven't added any products yet. Explore and add your wishlists!</p>
-                                    <button onClick={() => navigate('/')} className="mt-4 px-6 py-2 bg-themegreen text-white rounded-lg hover:bg-themeyellow focus:outline-none">
-                                    Go to home page
-                                    </button>
-                                </div>
+                            <div className="flex flex-col items-center justify-center text-center min-h-[60vh]">
+                                <h2 className="text-2xl font-bold text-gray-900">Your Wishlist is Empty</h2>
+                                <p className="text-gray-600 mt-2">Start adding products to keep track of what you love!</p>
+                                <button 
+                                onClick={() => navigate('/')} 
+                                className="mt-5 px-6 py-3 bg-themegreen text-white rounded-lg hover:bg-themeyellow hover:text-black transition-all transform hover:scale-105"
+                                >
+                                Explore Products
+                                </button>
                             </div>
                         )}
                     </div>

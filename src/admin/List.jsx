@@ -187,7 +187,7 @@ const ProductsList = () => {
         <CustomModal open={updateModalOpen} handleClose={closeUpdateModal}>
           <div className="w-full">
             <div className="bg-themegreen text-white p-4 rounded-t-xl">
-              <h2 className="text-xl font-bold">Update Product</h2>
+              <h2 className="text-xl font-bold text-center">Update Product</h2>
             </div>
             <div className="bg-white p-8 rounded-xl shadow-lg w-full">
             <form onSubmit={onUpdateFormSubmit} className="flex flex-col gap-5">
@@ -199,13 +199,19 @@ const ProductsList = () => {
               onChange={handleUpdateInputChange}
               className="border rounded-md p-3 w-full focus:outline-none focus:ring-2"
             />
-            <input
+            <textarea
               required
               name="description"
               placeholder="Product Description"
               value={updateData.description}
               onChange={handleUpdateInputChange}
               className="border rounded-md p-3 w-full focus:outline-none focus:ring-2"
+              rows="1"
+              style={{ resize: "none", overflow: "hidden" }}
+              onInput={(e) => {
+                e.target.style.height = "auto"; 
+                e.target.style.height = e.target.scrollHeight + "px";
+              }}
             />
             <input
               required
@@ -261,7 +267,7 @@ const ProductsList = () => {
                       image: e.target.files[0],
                     }))
                   }
-                  className="text-sm text-gray-900 border border-gray-300 rounded-md cursor-pointer bg-gray-50 focus:outline-none"
+                  className="w-full max-w-xs text-sm text-gray-900 border border-gray-300 rounded-md cursor-pointer bg-gray-50 focus:outline-none"
                 />
               </div>
             </label>
