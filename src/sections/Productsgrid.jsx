@@ -3,7 +3,7 @@ import { MdAddShoppingCart } from 'react-icons/md';
 import { FaRegHeart } from 'react-icons/fa';
 import { MdOutlineRemoveRedEye } from 'react-icons/md';
 import { imageUrl1 } from "../api/configuration";
-import { getProducts } from "../api/product-fetch";
+import { featuredProducts } from "../api/product-fetch";
 import { useCookies } from "react-cookie";
 import { useNavigate } from 'react-router-dom'
 import { addToCart } from '../api/product-actions';
@@ -16,11 +16,8 @@ function Productsgrid() {
   const navigate = useNavigate();
   
   const refreshProducts = () => {
-    getProducts().then((res) => {
-    const filteredProducts = res?.data
-      .filter(product => product.stock > 0)
-      .sort((a, b) => b.purchase_count - a.purchase_count);
-    setProducts(filteredProducts.slice(0, 8));
+    featuredProducts ().then((res) => {
+    setProducts(res?.data);
     });
   };
   

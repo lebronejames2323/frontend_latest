@@ -15,29 +15,6 @@ export const addToCart = async (productId, cookies, setLoading2, productStock) =
 
   try {
     setLoading2(true);
-    const response = await fetch(`${url}/carts`, {
-      headers: {
-        'Authorization': `Bearer ${token}`,
-      },
-    });
-
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.message || "Failed to fetch cart");
-    }
-
-    const res = await response.json();  
-    const carts = res?.data;
-
-    const isProductInCart = carts.some(cart =>
-      cart.products.some(product => product.id === productId)
-    );
-
-    if (isProductInCart) {
-      toast.error('This product is already in the cart!');
-      return;
-    }
-
     const addResponse = await fetch(`${url}/carts`, {
       method: 'POST',
       headers: {
@@ -51,11 +28,66 @@ export const addToCart = async (productId, cookies, setLoading2, productStock) =
 
     const addData = await addResponse.json();
     if (addResponse.ok) {
-      toast.success('Product added to cart successfully!');
-    } else {
-      toast.error('Failed to add product to cart.');
+      const message = addData.message || 'Product added to cart successfully!';
+
+      if (message === "Its already in the cart.") {
+        toast.error("Product is already in the cart.");
+      } else {
+        toast.error(message);
+      }
     }
   } catch (error) {
+    toast.error('An error occurred.');
+  } finally {
+    setLoading2(false);
+  }
+};
+
+
+export const addToCartWithQuantity = async (productId, cookies, setLoading2, productStock, quantity,) => {
+  const token = cookies.token;
+  if (!token || token === "undefined" || token.trim() === "") {
+    toast.error('You are not logged in.');
+    return;
+  }
+
+  if (typeof productStock === 'undefined' || productStock <= 0) {
+    toast.error('This product is out of stock!');
+    return;
+  }
+
+  if (quantity < 1) {
+    toast.error('Please select a valid quantity.');
+    return;
+  }
+
+  try {
+    setLoading2(true);
+
+    const addResponse = await fetch(`${url}/carts`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        products: [{ id: productId, quantity, }],
+      }),
+    });
+
+    const addData = await addResponse.json();
+    
+    if (addResponse.ok) {
+      const message = addData.message || 'Product added to cart successfully!';
+
+      if (message === "Its already in the cart.") {
+        toast.error("Product is already in the cart.");
+      } else {
+        toast.error(message);
+      }
+    }
+  } catch (error) {
+    console.error("Fetch error:", error);
     toast.error('An error occurred.');
   } finally {
     setLoading2(false);

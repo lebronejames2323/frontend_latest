@@ -11,6 +11,29 @@ export const getProducts = async () => {
   return await res.json();
 };
 
+export const getSpecificProduct = async (productId) => {
+  const res = await fetch(`${url}/products/${productId}`, {
+    method: "GET",
+    headers: {
+      Accept: "application/json",
+    },
+  });
+
+  return await res.json();
+};
+
+export const featuredProducts = async () => {
+  const res = await fetch(`${url}/featured-products`, {
+    method: "GET",
+    headers: {
+      Accept: "application/json",
+    },
+  });
+
+  return await res.json();
+};
+
+
 export const getCategories = async () => {
   const res = await fetch(`${url}/categories`, {
     method: "GET",
@@ -78,8 +101,8 @@ export const fetchWishlists = async (token) => {
   return await res.json();
 };
 
-export const getProductReviews = async (productId) => {
-  const res = await fetch(`${url}/reviews?product_id=${productId}`, {
+export const getProductReviews = async (productId, page = 1) => {
+  const res = await fetch(`${url}/reviews?product_id=${productId}&page=${page}`, {
     method: "GET",
     headers: { Accept: "application/json" },
   });
@@ -88,5 +111,7 @@ export const getProductReviews = async (productId) => {
     throw new Error(`Error fetching reviews: ${res.statusText}`);
   }
 
-  return await res.json();
+  const data = await res.json();
+
+  return data;
 };

@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { FaArrowLeft, FaShoppingCart } from 'react-icons/fa';
-import { getProducts } from '../api/product-fetch';
-import { getProductReviews } from '../api/product-fetch';
+import { FaArrowLeft, FaShoppingCart, FaMinus, FaPlus, } from 'react-icons/fa';
+import { getSpecificProduct, getProductReviews } from '../api/product-fetch';
 import { useCookies } from 'react-cookie';
 import { imageUrl1, imageUrl3 } from '../api/configuration';
-import { addToCart } from '../api/product-actions';
-import { addToWishlist } from '../api/product-actions';
+import { addToCart, addToWishlist } from '../api/product-actions';
+import { MdArrowForwardIos } from "react-icons/md";
+import { MdArrowBackIosNew } from "react-icons/md";
 import RecommendedProducts from '../components/RecommendedProducts';
 
 const ProductPage = () => {
@@ -17,22 +17,36 @@ const ProductPage = () => {
   const [loading, setLoading] = useState(false);
   const [loading2, setLoading2] = useState(false);
   const [reviews, setReviews] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [lastPage, setLastPage] = useState(null);
+  const [quantity, setQuantity] = useState(1);
   
-    useEffect(() => {
-      if (productId) {
-        getProductReviews(productId).then((res) => {
-          setReviews(res?.data || []);
-        }).catch(error => console.error("Error fetching reviews:", error));
+    const refreshReviews = async () => {
+      const res = await getProductReviews(productId, currentPage);
+      const paginated = res?.data;
+
+      if (paginated?.data && Array.isArray(paginated.data)) {
+        setReviews(paginated.data);
+        setCurrentPage(paginated.current_page || 1);
+        setLastPage(paginated.last_page || 1);
+      } else {
+        setReviews([]);
+        setCurrentPage(1);
+        setLastPage(1);
       }
-    }, [productId]); 
+    };
+
+    useEffect(() => {
+      refreshReviews();
+    }, [productId, currentPage]);
     
 
     const handleCartClick = () => {
       navigate(`/cart`);
     };
 
-    const handleAddToCart = async (productId, stock) => {
-      await addToCart(productId, cookies, setLoading2, stock);
+    const handleAddToCart = async (productId, stock, quantity,) => {
+      await addToCart(productId, cookies, setLoading2, stock, quantity,);
     };
 
     const handleAddToWishlist = async (productId) => {
@@ -40,19 +54,18 @@ const ProductPage = () => {
     };
 
     const refreshProducts = () => {
-    setLoading(true);
-    const numericProductId = Number(productId);
-    
-    getProducts().then((res) => {
-  
-      const filteredProduct = res?.data.filter(product => product.id === numericProductId);
-      setProducts(filteredProduct);
-      setLoading(false);
-    }).catch((error) => {
-      setProducts([]);
-    });
+      setLoading(true);
+
+      getSpecificProduct(productId)
+        .then((res) => {
+          setProducts(res?.data ? [res.data] : []);
+          setLoading(false);
+        })
+        .catch(() => {
+          setProducts([]);
+        });
     };
-    
+
     useEffect(refreshProducts, [productId]);
     
     
@@ -99,11 +112,26 @@ const ProductPage = () => {
 
             <div className="w-full lg:w-1/2 flex flex-col justify-center items-start gap-4">
               <h2 className="text-3xl font-bold text-black">{product.name}</h2>
-              <p className="text-lg text-gray-600">{product.category?.name}</p>
+              <h3 className="text-2xl font-semibold text-themegreen">₱{Number(product.price).toLocaleString()}</h3>
               <p className="text-base text-gray-500">{product.description}</p>
 
               <div className="flex items-center gap-4">
-                <h3 className="text-2xl font-semibold text-themegreen">₱{Number(product.price).toLocaleString()}</h3>
+                <div className="flex items-center border rounded-lg">
+                  <button 
+                    className="p-2 hover:bg-gray-100"
+                    onClick={() => setQuantity(prev => Math.max(1, prev - 1))}
+                  >
+                    <FaMinus className="w-3 h-3" />
+                  </button>
+                  <span className="w-12 text-center">{quantity}</span>
+                  <button 
+                    className={`p-2 hover:bg-gray-100 ${quantity >= product.stock ? "cursor-not-allowed" : ""}`}
+                    onClick={() => setQuantity(prev => prev + 1)}
+                    disabled={quantity >= product.stock}
+                  >
+                    <FaPlus className="w-3 h-3" />
+                  </button>
+                </div>
                 <h3 className={`text-xl font-semibold ${product.stock === 0 ? 'text-red-600' : 'text-gray-500'}`}>
                 {product.stock === 0 ? 'Out of Stock' : `(${product.stock} ${product.stock === 1 ? 'stock' : 'stocks'} left)`}
                 </h3>
@@ -111,7 +139,7 @@ const ProductPage = () => {
 
               <div className="flex items-center gap-3">
                 <button
-                  onClick={() => handleAddToCart(product.id, product.stock)}
+                  onClick={() => handleAddToCart(product.id, product.stock, quantity,)}
                   className={`bg-themegreen text-white font-semibold px-6 py-2 rounded-lg transition ${loading2 ? "opacity-50 cursor-not-allowed" : "hover:bg-themeyellow hover:text-black"}`} disabled={loading2}
                 >
                   Add to Cart
@@ -140,7 +168,7 @@ const ProductPage = () => {
           <p className="text-center text-gray-500">No reviews yet for this product</p>
         ) : (
           reviews.map((review) => (
-            <div key={review.id} className="border-b py-6">
+            <div key={review.id} className="border-t py-6">
               <div className="flex items-start gap-6">
                 
                 <div className="flex-1">
@@ -156,29 +184,48 @@ const ProductPage = () => {
 
                   <p className="text-yellow-500 mt-2 text-lg">{'⭐'.repeat(review.products[0]?.pivot.star_rating)}</p>
                   <p className="text-gray-700 mt-2">{review.products[0]?.pivot.review_text}</p>
-
-                  <p className="text-sm text-gray-500 mt-2">
-                    <span className="font-semibold">Variation:</span> {review.products[0]?.variation || "Default"}
-                  </p>
                 </div>
 
-                <div className="w-32 flex-shrink-0">
-                  {review.products?.map((product) => (
-                    <img 
-                      key={`${review.id}-${product.id}`}
-                      src={`${imageUrl3}/${review.id}-${product.id}.${product.pivot.extension}`} 
-                      alt="Review Image"
-                      className="w-full h-[100px] object-cover rounded-md shadow-md"
-                    />
-                  ))}
-                </div>
+                {review.products?.some(product => product.pivot.extension) && (
+                  <div className="w-32 flex-shrink-0">
+                    {review.products?.map((product) => 
+                      product.pivot.extension ? (
+                        <img 
+                          key={`${review.id}-${product.id}`}
+                          src={`${imageUrl3}/${review.id}-${product.id}.${product.pivot.extension}`} 
+                          alt="Review Image"
+                          className="w-full h-[100px] object-cover border"
+                        />
+                      ) : null
+                    )}
+                  </div>
+                )}
 
               </div>
             </div>
           ))
         )}
-      </div>
 
+        {lastPage > 1 && (
+          <div className="flex justify-center gap-4 mt-8">
+            <button 
+              onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+              className={`px-3 py-1 bg-themegreen text-white rounded-md disabled:opacity-50 ${currentPage === 1 ? "opacity-50 cursor-not-allowed" : ""}`}
+              disabled={currentPage === 1}
+            >
+              <MdArrowBackIosNew />
+            </button>
+            <span className="text-lg font-semibold py-1">Page {currentPage} of {lastPage}</span>
+            <button 
+              onClick={() => setCurrentPage(prev => prev + 1)}
+              className={`px-3 py-1 bg-themegreen text-white rounded-md disabled:opacity-50 ${currentPage >= lastPage ? "opacity-50 cursor-not-allowed" : ""}`}
+              disabled={currentPage >= lastPage}
+            >
+              <MdArrowForwardIos />
+            </button>
+          </div>
+        )}
+      </div>
     </div>    
     );
 };

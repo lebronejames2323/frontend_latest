@@ -20,17 +20,17 @@ const Sidebar = () => {
 
             </NavLink>
 
-            <NavLink className='flex items-center gap-3 border border-gray-300 border-r-0 px-3 rounded-l' to = "/add"
+            <NavLink className='flex items-center gap-3 border border-gray-300 border-r-0 px-3 rounded-l' to = "/add-product"
             style={({ isActive }) => ({
               backgroundColor: isActive ? '#90EE90' : 'transparent',
               borderColor: isActive ? '#32CD32' : 'transparent',
             })}
             >
               <CiCirclePlus className='w-7 h-7'/>
-              <p className='hidden md:block'>Add Items</p>
+              <p className='hidden md:block'>Add Products</p>
 
             </NavLink>
-            <NavLink className='flex items-center gap-3 border border-gray-300 border-r-0 px-3 rounded-l' to = "/list-category"
+            <NavLink className='flex items-center gap-3 border border-gray-300 border-r-0 px-3 rounded-l' to = "/category-list"
             style={({ isActive }) => ({
               backgroundColor: isActive ? '#90EE90' : 'transparent',
               borderColor: isActive ? '#32CD32' : 'transparent',
@@ -39,14 +39,14 @@ const Sidebar = () => {
               <LiaCalendarCheckSolid className='w-7 h-7'/>
               <p className='hidden md:block'>Category List</p>
             </NavLink>
-            <NavLink className='flex items-center gap-3 border border-gray-300 border-r-0 px-3 rounded-l' to = "/list"
+            <NavLink className='flex items-center gap-3 border border-gray-300 border-r-0 px-3 rounded-l' to = "/product-list"
             style={({ isActive }) => ({
               backgroundColor: isActive ? '#90EE90' : 'transparent',
               borderColor: isActive ? '#32CD32' : 'transparent',
             })}
             >
               <LiaCalendarCheckSolid className='w-7 h-7'/>
-              <p className='hidden md:block'>Item List</p>
+              <p className='hidden md:block'>Product List</p>
 
             </NavLink>
             <NavLink className='flex items-center gap-3 border border-gray-300 border-r-0 px-3 rounded-l' to = "/order"

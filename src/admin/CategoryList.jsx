@@ -9,7 +9,7 @@ import { getCategories } from "../api/product-fetch";
 import withAuth from "../high-order-component/withAuth";
 import { url } from "../api/configuration";
 
-const ListCategory = () => {
+const CategoryList = () => {
   const [categories, setCategories] = useState([]);
   const [cookies] = useCookies();
   const [loading, setLoading] = useState(false);
@@ -228,4 +228,4 @@ const ListCategory = () => {
   );
 };
 
-export default withAuth(ListCategory);
+export default withAuth(CategoryList);

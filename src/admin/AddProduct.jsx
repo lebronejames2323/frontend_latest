@@ -10,7 +10,7 @@ import { url } from "../api/configuration";
 
 
 
-const Add = () => {
+const AddProduct = () => {
   const [categories, setCategories] = useState([]);
   const [cookies] = useCookies();
   const [image1, setImage1] = useState(false);
@@ -188,4 +188,4 @@ const Add = () => {
   )
 }
 
-export default withAuth(Add)
+export default withAuth(AddProduct)

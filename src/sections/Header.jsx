@@ -62,7 +62,7 @@ function Header() {
     navigate(`/register`);
     };
     const handleAdminClick = () => {
-    navigate(`/add`);
+    navigate(`/add-product`);
     };        
 
 

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { getProducts } from '../api/product-fetch';
+import { getCategories } from '../api/product-fetch';
 import { useCookies } from 'react-cookie';
 import { imageUrl1 } from '../api/configuration';
 import { FaShoppingCart, FaArrowLeft } from 'react-icons/fa';
@@ -13,7 +13,7 @@ import { addToWishlist } from '../api/product-actions';
 const CategoryPage = () => {
     const { categoryName } = useParams();
     const navigate = useNavigate();
-    const [products, setProducts] = useState([]);
+    const [category, setCategory] = useState(null);
     const [cookies] = useCookies();
     const [loading, setLoading] = useState(false);
     const [loading2, setLoading2] = useState(false);
@@ -36,17 +36,16 @@ const CategoryPage = () => {
     };
 
 
-    const refreshProducts = () => {
-    setLoading(true);
-    getProducts(categoryName).then((res) => {
-    const filteredProducts = res?.data.filter(product => 
-    product.category?.name.toLowerCase() === categoryName.toLowerCase()
-    );
-    setProducts(filteredProducts);
-    setLoading(false);
-    });
+    const refreshCategory = async () => {
+      setLoading(true);
+      const res = await getCategories(categoryName);
+      setCategory(res?.data?.find((cat) => cat.name.toLowerCase() === categoryName.toLowerCase()));
+      setLoading(false);
     };
-    useEffect(refreshProducts, [])
+
+    useEffect(() => {
+      refreshCategory();
+    }, [categoryName]);
 
     if (loading) {
       return (
@@ -79,7 +78,7 @@ const CategoryPage = () => {
             <div className='p-20'>
             <div className="w-full grid lg:grid-cols-4 grid-cols-1 justify-center items-center gap-10 mt-10">
                     {
-                      products.map((product) => (
+                      category?.products?.map((product) => (
                         <div key={product.id} id="product-box" className="flex flex-col justify-center items-center gap-2 bg-white p-4 rounded-lg cursor-pointer relative shadow-md border">
                           
                           <div id="icons" className="flex justify-center items-center gap-2 absolute top-[20px]">
