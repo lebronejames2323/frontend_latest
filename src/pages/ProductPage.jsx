@@ -4,7 +4,7 @@ import { FaArrowLeft, FaShoppingCart, FaMinus, FaPlus, } from 'react-icons/fa';
 import { getSpecificProduct, getProductReviews } from '../api/product-fetch';
 import { useCookies } from 'react-cookie';
 import { imageUrl1, imageUrl3 } from '../api/configuration';
-import { addToCart, addToWishlist } from '../api/product-actions';
+import { addToCartWithQuantity, addToWishlist } from '../api/product-actions';
 import { MdArrowForwardIos } from "react-icons/md";
 import { MdArrowBackIosNew } from "react-icons/md";
 import RecommendedProducts from '../components/RecommendedProducts';
@@ -46,7 +46,7 @@ const ProductPage = () => {
     };
 
     const handleAddToCart = async (productId, stock, quantity,) => {
-      await addToCart(productId, cookies, setLoading2, stock, quantity,);
+      await addToCartWithQuantity(productId, cookies, setLoading2, stock, quantity,);
     };
 
     const handleAddToWishlist = async (productId) => {

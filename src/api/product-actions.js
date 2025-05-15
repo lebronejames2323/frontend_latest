@@ -33,7 +33,7 @@ export const addToCart = async (productId, cookies, setLoading2, productStock) =
       if (message === "Its already in the cart.") {
         toast.error("Product is already in the cart.");
       } else {
-        toast.error(message);
+        toast.success(message);
       }
     }
   } catch (error) {
@@ -83,7 +83,7 @@ export const addToCartWithQuantity = async (productId, cookies, setLoading2, pro
       if (message === "Its already in the cart.") {
         toast.error("Product is already in the cart.");
       } else {
-        toast.error(message);
+        toast.success(message);
       }
     }
   } catch (error) {

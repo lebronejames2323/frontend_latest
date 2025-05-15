@@ -4,7 +4,7 @@ import { FaArrowLeft } from 'react-icons/fa';
 import { getProducts } from '../api/product-fetch';
 import { useCookies } from 'react-cookie';
 import { imageUrl1, url } from '../api/configuration';
-import upload_area from '../assets/upload_area.png';
+import { toast } from 'react-toastify';
 
 const OrderReview = () => {
   const { productId } = useParams();
@@ -70,7 +70,7 @@ const OrderReview = () => {
             throw new Error(`Error submitting review: ${response.statusText}`);
         }
 
-        alert("Review submitted successfully!");
+        toast.success("Review submitted successfully!");
         setReviewText("");
         setStarRating(5);
         setImage(null);
