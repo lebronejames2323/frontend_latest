@@ -74,11 +74,14 @@ function AccountPage() {
         });
 
         const result = await response.json();
-        if (response.ok){
+        if (response.ok) {
         toast.success(result.message ?? "Profile updated successfully!");
         setOpenModal(false);
         refreshUser();
-        }else{
+        } else if (result.errors) {
+        if (result.errors.username) toast.error("Username is already taken");
+        if (result.errors.email) toast.error("Email is already in use");
+        } else {
         toast.error(result.message ?? "Failed to update profile!");
         }
         }catch (error){
@@ -129,10 +132,10 @@ function AccountPage() {
             </div>
         </div>
 
-        <div className='flex pt-20 p-7 gap-5'>
+        <div className='flex flex-col lg:flex-row pt-20 p-7 gap-5'>
             {user && (
             <>
-            <div className='w-[450px] h-[309px] bg-white flex justify-center items-center mx-auto mt-5 rounded-lg shadow-md'>
+            <div className='w-full lg:w-[450px] h-auto bg-white flex justify-center items-center mx-auto mt-5 rounded-lg shadow-md p-5'>
                 <div className="">
                     <div className='flex justify-center items-center'>
                     <img src={profiles} className='h-[100px] w-[100px]'/> 

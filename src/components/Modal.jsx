@@ -14,7 +14,7 @@ export default function CustomModal({ open, handleClose, children }) {
             <Box
                 sx={{
                     borderRadius: 5,
-                    width: '25%',
+                    width: { xs: '90%', sm: '70%', md: '50%', lg: '25%' },
                     maxHeight: '80vh',
                     overflowY: 'auto',
                     bgcolor: 'background.paper',

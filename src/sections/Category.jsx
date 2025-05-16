@@ -51,6 +51,23 @@ function Category() {
                 ))}
                 </Slider>
             </div>
+
+            <div className='lg:hidden flex flex-col items-center w-full gap-5'>
+                <div className='grid grid-cols-1 gap-4 w-full px-4'>
+                    {categories.map((category) => (
+                        <div key={category.id} className='flex flex-col items-center'>
+                            <div onClick={() => handleCategoryClick(category.name)} className='flex justify-center items-center w-[140px] h-[140px]'>
+                                <img 
+                                    src={`${imageUrl2}/${category.id}.${category.extension}`} alt="" 
+                                    className='rounded-xl cursor-pointer w-full h-full object-cover bg-white shadow-md' 
+                                />
+                            </div>
+                            <h1 onClick={() => handleCategoryClick(category.name)} className='text-lg font-semibold hover:text-themegreen cursor-pointer text-center mt-2'>{category.name}</h1>
+                        </div>
+                    ))}
+                </div>
+            </div>
+            
         </div>
     )
 }

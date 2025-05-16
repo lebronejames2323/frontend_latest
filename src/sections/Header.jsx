@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useRef} from 'react'
-import { FaSearch, FaHeart, FaShoppingCart } from 'react-icons/fa'
+import { FaSearch, FaHeart, FaShoppingCart, FaBars } from 'react-icons/fa'
+import { FaTimes } from 'react-icons/fa';
 import { IoPerson } from 'react-icons/io5'
 import { Link as ScrollLink } from 'react-scroll'
 import { useNavigate, useLocation } from 'react-router-dom'
@@ -22,7 +23,12 @@ function Header() {
     const [isSearchFocused, setIsSearchFocused] = useState(false);
     const [searchError, setSearchError] = useState('');
     const searchDebounceRef = useRef(null);
-    
+    const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+
+    const toggleMenu = () => {
+        setIsMenuOpen(!isMenuOpen);
+    }
 
     const logout = () => {
         Logout(cookies.token).then((res) => {
@@ -130,60 +136,29 @@ function Header() {
 
     return (
         <>
-        <nav className='w-full flex justify-between items-center gap-1 lg:px-16 px-6 py-5 sticky top-0 z-50 shadow-lg'>
-            <h1 className='text-black font-bold lg:text-[30px] text-3x1 italic cursor-pointer'>CyberDrive</h1>
-            <ul className="flex justify-center items-center gap-10">
-                <li>
-                    <ScrollLink
-                    to="hero"
-                    spy={true}
-                    smooth={true}
-                    offset={-100}
-                    className="text-black text-sm uppercase font-semibold px-3 py-2 rounded-lg hover:bg-themegreen hover:text-white cursor-pointer"
-                    >
-                    Home
-                    </ScrollLink>
-                </li>
-                <li>
-                    <ScrollLink
-                    to="category"
-                    spy={true}
-                    smooth={true}
-                    offset={-100}
-                    className="text-black text-sm uppercase font-semibold px-3 py-2 rounded-lg hover:bg-themegreen hover:text-white cursor-pointer"
-                    >
-                    Category
-                    </ScrollLink>
-                </li>
+        <nav className='w-full flex justify-between items-center gap-4 lg:px-16 px-4 py-5 sticky top-0 z-50 shadow-lg'>
+            <h1 className='text-black font-bold lg:text-[30px] text-3xl italic cursor-pointer hidden lg:block'>CyberDrive</h1>
+            <ul className='lg:flex justify-center items-center gap-10 hidden'>
+                {['Home', 'Category', 'Featured', 'Contact'].map((item, index) => (
+                    <li key={index}>
+                        <ScrollLink
+                            to={item.toLowerCase()}
+                            spy={true}
+                            smooth={true}
+                            offset={-100}
+                            className="text-black text-sm uppercase font-semibold px-3 py-2 rounded-lg hover:bg-themegreen hover:text-white cursor-pointer"
+                        >
+                            {item}
+                        </ScrollLink>
+                    </li>
+                ))}
                 <li>
                     <a
-                    href="/all-products"
-                    className="text-black text-sm uppercase font-semibold px-3 py-2 rounded-lg hover:bg-themegreen hover:text-white"
+                        href="/all-products"
+                        className="text-black text-sm uppercase font-semibold px-3 py-2 rounded-lg hover:bg-themegreen hover:text-white"
                     >
-                    Products
+                        Products
                     </a>
-                </li>
-                <li>
-                    <ScrollLink
-                    to="products"
-                    spy={true}
-                    smooth={true}
-                    offset={-100}
-                    className="text-black text-sm uppercase font-semibold px-3 py-2 rounded-lg hover:bg-themegreen hover:text-white cursor-pointer"
-                    >
-                    Featured
-                    </ScrollLink>
-                </li>
-                <li>
-                    <ScrollLink
-                    to="contact"
-                    spy={true}
-                    smooth={true}
-                    offset={-100}
-                    className="text-black text-sm uppercase font-semibold px-3 py-2 rounded-lg hover:bg-themegreen hover:text-white cursor-pointer"
-                    >
-                    Contact
-                    </ScrollLink>
                 </li>
             </ul>
 
@@ -280,6 +255,103 @@ function Header() {
                 </button>
               <FaHeart onClick={handleWishlistClick} className='w-[20px] h-[20px] transform hover:scale-125 transition-transform duration-300 cursor-pointer hover:text-themegreen'/>
               <FaShoppingCart onClick={handleCartClick} className='w-[20px] h-[20px] transform hover:scale-125 transition-transform duration-300 cursor-pointer hover:text-themegreen'/>
+            </div>
+
+
+            <div className="mobile-search-container w-full lg:hidden relative">
+                <div className="relative flex items-center border-2 border-themegreen rounded-lg p-2 bg-white w-full">
+                    <FaSearch className="absolute left-3 text-black" />
+
+                    <input 
+                        type="text"
+                        placeholder="Search products..."
+                        value={searchQuery}
+                        onChange={handleSearch}
+                        className="w-full pl-10 bg-white text-black rounded-b-lg text-sm outline-none"
+                    />
+                </div>
+
+                {showSearchResults && (
+                <div className="absolute top-full left-0 w-full bg-white border border-gray-300 rounded-b-lg shadow-md">
+                    {searchError ? (
+                        <div className="p-4 text-center text-red-500">{searchError}</div>
+                    ) : searchResults.length > 0 ? (
+                        <div className="max-h-[250px] overflow-y-auto w-full">
+                            {searchResults.map(product => (
+                                <div 
+                                    onClick={() => handleClickProduct(product.id)} 
+                                    key={product.id} 
+                                    className="flex items-center gap-2 px-2 py-2 border-b cursor-pointer hover:bg-gray-50"
+                                >
+                                    <img src={`${imageUrl1}/${product.id}.${product.extension}`} alt={product.name} className="w-12 h-12 rounded-lg"/>
+                                    <div className="flex-grow">
+                                        <h3 className="font-medium text-gray-900 text-sm">{product.name}</h3>
+                                        <p className="text-xs text-gray-500">{product.category?.name}</p>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    ) : (
+                        <div className="p-2 text-center text-gray-500 text-sm">No products found</div>
+                    )}
+                </div>
+                )}
+            </div>
+
+            <div className='lg:hidden flex justify-center items-center' onClick={toggleMenu}>
+                {isMenuOpen ? <FaTimes className='text-themegreen text-3xl cursor-pointer' /> : <FaBars className='text-themegreen text-3xl cursor-pointer' />}
+            </div>
+
+            <div className={`${isMenuOpen ? 'flex' : 'hidden'} w-full bg-themegreen2 p-4 absolute top-[80px] left-0`}>
+                <ul className='flex flex-col justify-center items-center gap-2 w-full'>
+                    <li className='w-full text-center'>
+                        <a href="/all-products" className="text-white uppercase font-semibold p-3 rounded-lg hover:bg-themeyellow hover:text-black w-full block">
+                            All Products
+                        </a>
+                    </li>
+                    {['Products'].map((item, index) => (
+                        <ScrollLink key={index} className='text-white uppercase font-semibold p-3 rounded-lg hover:bg-themeyellow hover:text-black w-full text-center' to={item.toLowerCase()} spy={true} offset={-100} smooth={true}>
+                            {item}
+                        </ScrollLink>
+                    ))}
+                    {user ? (
+                        <>
+                            {user.username.toLowerCase() === "admin" && (
+                                <li className='w-full text-center'>
+                                    <a onClick={handleAdminClick} className="text-white uppercase font-semibold p-3 rounded-lg hover:bg-themeyellow hover:text-black w-full block">
+                                        Admin Page
+                                    </a>
+                                </li>
+                            )}
+                            <li className='w-full text-center'>
+                                <a onClick={handleAccountClick} className="text-white uppercase font-semibold p-3 rounded-lg hover:bg-themeyellow hover:text-black w-full block">
+                                    Account
+                                </a>
+                            </li>
+                            <li className='w-full text-center'>
+                                <a onClick={logout} className="text-white uppercase font-semibold p-3 rounded-lg hover:bg-themeyellow hover:text-black w-full block">
+                                    Logout
+                                </a>
+                            </li>
+                        </>
+                    ) : (
+                        <li className='w-full text-center'>
+                            <a onClick={handleLoginClick} className="text-white uppercase font-semibold p-3 rounded-lg hover:bg-themeyellow hover:text-black w-full block">
+                                Login
+                            </a>
+                        </li>
+                    )}
+                    <li className='w-full text-center'>
+                        <a onClick={handleWishlistClick} className="text-white uppercase font-semibold p-3 rounded-lg hover:bg-themeyellow hover:text-black w-full block">
+                            Wishlist
+                        </a>
+                    </li>
+                    <li className='w-full text-center'>
+                        <a onClick={handleCartClick} className="text-white uppercase font-semibold p-3 rounded-lg hover:bg-themeyellow hover:text-black w-full block">
+                            Cart
+                        </a>
+                    </li>
+                </ul>
             </div>
         </nav>
         </>

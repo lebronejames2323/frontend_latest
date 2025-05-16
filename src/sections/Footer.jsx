@@ -39,7 +39,7 @@ const Footer = () => {
             </div>
 
 
-            <div className='w-full lg:px-20 px-5 py-[32px] bg-gray-100 grid lg:grid-cols-[auto,auto,auto,auto,auto] grid-cols-1 justify-between items-start lg:gap-3 gap-10'>
+            <div className='w-full lg:px-20 px-5 pt-[32px] bg-gray-100 grid lg:grid-cols-[auto,auto,auto,auto,auto] grid-cols-1 justify-between items-start lg:gap-3 gap-10'>
                 <div className='flex flex-col justify-center item-start gap-10 grow'>
                     <div className='flex flex-col justify-center items-start gap-4'>
                         <h1 className='text-4xl font-bold text-themegreen underline italic'>CyberDrive Shop</h1>
@@ -48,19 +48,8 @@ const Footer = () => {
                 </div>
 
                 <div>
-                    <h1 className='text-black text-xl font-semibold capitalize'>Useful Links</h1>
-                    <ul className='mt-8 flex flex-col justify-center items-start gap-2'>
-                        <li className='text-gray-500 cursor-pointer hover:text-black'>Home</li>
-                        <li className='text-gray-500 cursor-pointer hover:text-black'>Home</li>
-                        <li className='text-gray-500 cursor-pointer hover:text-black'>Home</li>
-                        <li className='text-gray-500 cursor-pointer hover:text-black'>Home</li>
-                        <li className='text-gray-500 cursor-pointer hover:text-black'>Home</li>
-                    </ul>
-                </div>
-                <div>
-                    <h1 className='text-black text-xl font-semibold capitalize'>Useful Links</h1>
-                    <ul className='mt-8 flex flex-col justify-center items-start gap-2'>
-                        <li className='text-gray-500 cursor-pointer hover:text-black'>Home</li>
+                    <h1 className='text-black text-xl font-semibold capitalize mb-2'>Useful Links</h1>
+                    <ul className='flex flex-col justify-center items-start gap-2'>
                         <li className='text-gray-500 cursor-pointer hover:text-black'>Home</li>
                         <li className='text-gray-500 cursor-pointer hover:text-black'>Home</li>
                         <li className='text-gray-500 cursor-pointer hover:text-black'>Home</li>
@@ -68,9 +57,8 @@ const Footer = () => {
                     </ul>
                 </div>
                 <div>
-                    <h1 className='text-black text-xl font-semibold capitalize'>Useful Links</h1>
-                    <ul className='mt-8 flex flex-col justify-center items-start gap-2'>
-                        <li className='text-gray-500 cursor-pointer hover:text-black'>Home</li>
+                    <h1 className='text-black text-xl font-semibold capitalize mb-2'>Useful Links</h1>
+                    <ul className='flex flex-col justify-center items-start gap-2'>
                         <li className='text-gray-500 cursor-pointer hover:text-black'>Home</li>
                         <li className='text-gray-500 cursor-pointer hover:text-black'>Home</li>
                         <li className='text-gray-500 cursor-pointer hover:text-black'>Home</li>
@@ -78,9 +66,8 @@ const Footer = () => {
                     </ul>
                 </div>
                 <div>
-                    <h1 className='text-black text-xl font-semibold capitalize'>Useful Links</h1>
-                    <ul className='mt-8 flex flex-col justify-center items-start gap-2'>
-                        <li className='text-gray-500 cursor-pointer hover:text-black'>Home</li>
+                    <h1 className='text-black text-xl font-semibold capitalize mb-2'>Useful Links</h1>
+                    <ul className='flex flex-col justify-center items-start gap-2'>
                         <li className='text-gray-500 cursor-pointer hover:text-black'>Home</li>
                         <li className='text-gray-500 cursor-pointer hover:text-black'>Home</li>
                         <li className='text-gray-500 cursor-pointer hover:text-black'>Home</li>

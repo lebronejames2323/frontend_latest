@@ -12,13 +12,24 @@ function Register() {
     if (!loading) {
       setLoading(true);
       const formdata = new FormData(e.target);
+      
+      const password = formdata.get("password");
+      if (password.length < 8) {
+        toast.error("Password must be at least 8 characters long.");
+        setLoading(false);
+        return;
+      }
+
       register(formdata)
       .then((res) => {
       if (res?.ok) {
-      toast.success(res?.message ?? "Registered!");
-      navigate("/login");
+          toast.success(res?.message ?? "Registered!");
+          navigate("/login");
+      } else if (res?.errors) {
+          if (res.errors.username) toast.error("Username is already taken");
+          if (res.errors.email) toast.error("Email is already in use");
       } else {
-      toast.error(res?.message ?? "Something went wrong!");
+          toast.error(res?.message ?? "Something went wrong!");
       }
       })
       .finally(() => {

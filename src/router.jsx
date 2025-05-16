@@ -6,7 +6,7 @@ import CategoryPage from "./pages/CategoryPage";
 import AccountPage from "./pages/AccountPage";
 import CartPage from "./pages/CartPage";
 import WishlistPage from "./pages/WishlistPage";
-import ProductPage from "./Pages/ProductPage";
+import ProductPage from "./pages/ProductPage";
 import AddProduct from './admin/AddProduct'
 import AddCategory from './admin/AddCategory'
 import ProductList from './admin/ProductList'

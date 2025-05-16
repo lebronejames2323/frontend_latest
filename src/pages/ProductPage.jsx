@@ -159,71 +159,73 @@ const ProductPage = () => {
       </div>
 
       <div className="mt-8">
-        <RecommendedProducts />
       </div>
 
-      <div className="my-8 w-[1040px] bg-white shadow-lg rounded-lg p-6">
-        <h2 className="text-xl font-bold text-center mb-6">Customer Reviews</h2>
+      <div className="my-8 w-full max-w-[1040px] bg-white shadow-lg rounded-lg p-4 sm:p-6 mx-auto">
+        <h2 className="text-lg sm:text-xl font-bold text-center mb-4 sm:mb-6">Customer Reviews</h2>
+
         {reviews.length === 0 ? (
-          <p className="text-center text-gray-500">No reviews yet for this product</p>
+            <p className="text-center text-gray-500">No reviews yet for this product</p>
         ) : (
-          reviews.map((review) => (
-            <div key={review.id} className="border-t py-6">
-              <div className="flex items-start gap-6">
-                
-                <div className="flex-1">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-gray-300 rounded-full flex items-center justify-center text-gray-700 font-bold">
-                      {review.user.profile.first_name.charAt(0).toUpperCase()}
-                    </div>
-                    <div>
-                      <p className="font-semibold text-lg">{review.user.profile.first_name}</p>
-                      <p className="text-sm text-gray-500">{new Date(review.created_at).toISOString().slice(0, 16).replace('T', ' ')}</p>
-                    </div>
-                  </div>
+            reviews.map((review) => (
+                <div key={review.id} className="border-t py-4 sm:py-6">
+                    <div className="flex flex-col sm:flex-row items-start gap-4 sm:gap-6">
+                        
+                        <div className="flex-1">
+                            <div className="flex items-center gap-2 sm:gap-3">
+                                <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gray-300 rounded-full flex items-center justify-center text-gray-700 font-bold">
+                                    {review.user.profile.first_name.charAt(0).toUpperCase()}
+                                </div>
+                                <div>
+                                    <p className="font-semibold text-base sm:text-lg">{review.user.profile.first_name}</p>
+                                    <p className="text-xs sm:text-sm text-gray-500">
+                                        {new Date(review.created_at).toISOString().slice(0, 16).replace('T', ' ')}
+                                    </p>
+                                </div>
+                            </div>
 
-                  <p className="text-yellow-500 mt-2 text-lg">{'⭐'.repeat(review.products[0]?.pivot.star_rating)}</p>
-                  <p className="text-gray-700 mt-2">{review.products[0]?.pivot.review_text}</p>
+                            <p className="text-yellow-500 mt-1 sm:mt-2 text-base sm:text-lg">{'⭐'.repeat(review.products[0]?.pivot.star_rating)}</p>
+
+                            <p className="text-gray-700 mt-2 text-sm sm:text-base">{review.products[0]?.pivot.review_text}</p>
+                        </div>
+
+                        {review.products?.some(product => product.pivot.extension) && (
+                            <div className="w-24 sm:w-32 flex-shrink-0">
+                                {review.products?.map((product) => 
+                                    product.pivot.extension ? (
+                                        <img 
+                                            key={`${review.id}-${product.id}`}
+                                            src={`${imageUrl3}/${review.id}-${product.id}.${product.pivot.extension}`} 
+                                            alt="Review Image"
+                                            className="w-full h-[80px] sm:h-[100px] object-cover border rounded-md"
+                                        />
+                                    ) : null
+                                )}
+                            </div>
+                        )}
+                    </div>
                 </div>
-
-                {review.products?.some(product => product.pivot.extension) && (
-                  <div className="w-32 flex-shrink-0">
-                    {review.products?.map((product) => 
-                      product.pivot.extension ? (
-                        <img 
-                          key={`${review.id}-${product.id}`}
-                          src={`${imageUrl3}/${review.id}-${product.id}.${product.pivot.extension}`} 
-                          alt="Review Image"
-                          className="w-full h-[100px] object-cover border"
-                        />
-                      ) : null
-                    )}
-                  </div>
-                )}
-
-              </div>
-            </div>
-          ))
+            ))
         )}
-
+        
         {lastPage > 1 && (
-          <div className="flex justify-center gap-4 mt-8">
-            <button 
-              onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
-              className={`px-3 py-1 bg-themegreen text-white rounded-md disabled:opacity-50 ${currentPage === 1 ? "opacity-50 cursor-not-allowed" : ""}`}
-              disabled={currentPage === 1}
-            >
-              <MdArrowBackIosNew />
-            </button>
-            <span className="text-lg font-semibold py-1">Page {currentPage} of {lastPage}</span>
-            <button 
-              onClick={() => setCurrentPage(prev => prev + 1)}
-              className={`px-3 py-1 bg-themegreen text-white rounded-md disabled:opacity-50 ${currentPage >= lastPage ? "opacity-50 cursor-not-allowed" : ""}`}
-              disabled={currentPage >= lastPage}
-            >
-              <MdArrowForwardIos />
-            </button>
-          </div>
+            <div className="flex justify-center gap-4 mt-6 sm:mt-8">
+                <button 
+                    onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                    className={`px-2 sm:px-3 py-1 bg-themegreen text-white rounded-md ${currentPage === 1 ? "opacity-50 cursor-not-allowed" : ""}`}
+                    disabled={currentPage === 1}
+                >
+                    <MdArrowBackIosNew />
+                </button>
+                <span className="text-base sm:text-lg font-semibold py-1">Page {currentPage} of {lastPage}</span>
+                <button 
+                    onClick={() => setCurrentPage(prev => prev + 1)}
+                    className={`px-2 sm:px-3 py-1 bg-themegreen text-white rounded-md ${currentPage >= lastPage ? "opacity-50 cursor-not-allowed" : ""}`}
+                    disabled={currentPage >= lastPage}
+                >
+                    <MdArrowForwardIos />
+                </button>
+            </div>
         )}
       </div>
     </div>    
