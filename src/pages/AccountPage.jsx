@@ -183,68 +183,75 @@ function AccountPage() {
             }
         </div>
 
-        <div className='pt-5 p-7'>
-            <div className="mx-auto">
-                <div className="bg-themegreen text-white p-4 rounded-t-lg">
-                <h2 className="text-2xl font-bold pl-2">Order Details</h2>
+        <div className="pt-5 px-4 sm:p-7">
+            <div className="mx-auto w-full">
+                <div className="bg-themegreen text-white p-3 sm:p-4 rounded-t-lg">
+                    <h2 className="text-lg sm:text-2xl font-bold pl-2">Order Details</h2>
                 </div>
             </div>
 
-            <div className="p-8 bg-white rounded-b-lg max-h-[700px] overflow-y-auto">
-                <div className="mx-auto p-4">
+            <div className="p-4 sm:p-8 bg-white rounded-b-lg max-h-[700px] overflow-y-auto">
+                <div className="mx-auto">
                     {orders.length > 0 ? (
-                    orders.map(order => {
-                        const orderTotal = order.products.reduce(
-                        (total, product) =>
-                        total + Number(product.price) * product.pivot.quantity, 0
-                        );
-                    return (
-                        <div key={order.id} className='flex-col mb-5 rounded-md border shadow-md'>
-                        <div className="flex justify-between px-5 py-3 border-b">
-                            <h1 className="text-lg font-semibold">{new Date(order.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric'})}</h1>
-                            <h1 className="text-lg">{order.order_status} | Total: ₱{orderTotal.toLocaleString()}</h1>
-                        </div>
-                        {order.products.map(product => (
-                            <div key={`${order.id}-${product.id}`} className="bg-white p-5 flex items-center justify-between space-x-4 mx-5">
-                                
-                                <div className="flex items-center space-x-4 w-[350px]">
-                                    <div className="w-28 h-28 flex-shrink-0">
-                                        <img
-                                        src={`${imageUrl1}/${product.id}.${product.extension}`}
-                                        alt={product.name}
-                                        className="w-full h-full object-cover rounded-md"
-                                        />
+                        orders.map(order => {
+                            const orderTotal = order.products.reduce(
+                                (total, product) =>
+                                    total + Number(product.price) * product.pivot.quantity, 0
+                            );
+
+                            return (
+                                <div key={order.id} className='flex flex-col mb-5 rounded-md border shadow-md'>
+                                    <div className="flex flex-col sm:flex-row justify-between px-4 sm:px-5 py-3 border-b text-center sm:text-left">
+                                        <h1 className="text-sm sm:text-lg font-semibold">
+                                            {new Date(order.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric'})}
+                                        </h1>
+                                        <h1 className="text-sm sm:text-lg">
+                                            {order.order_status} | Total: ₱{orderTotal.toLocaleString()}
+                                        </h1>
                                     </div>
-                                    <div>
-                                        <h2 className="text-lg font-semibold text-gray-800">{product.name}</h2>
-                                        <p className="text-sm text-gray-600">
-                                            Payment: Cash on Delivery
-                                        </p>
-                                        <p className="text-sm text-gray-600">Order ID: {order.order_id}</p>
-                                    </div>
-                                </div>
 
-                                <div  className="flex items-center space-x-2 w-[150px] justify-center">
-                                    <h2 onClick={() => handleProductClick(product.id)} className="text-base font-semibold cursor-pointer">Rate this product</h2>
-                                </div>
+                                    {order.products.map(product => (
+                                        <div key={`${order.id}-${product.id}`} className="bg-white p-4 sm:p-5 flex flex-col sm:flex-row items-center justify-between gap-4 sm:space-x-4 mx-4 sm:mx-5">
+                                            
+                                            <div className="w-[120px] h-[120px] sm:w-28 sm:h-28 flex-shrink-0">
+                                                <img
+                                                    src={`${imageUrl1}/${product.id}.${product.extension}`}
+                                                    alt={product.name}
+                                                    className="w-full h-full object-cover rounded-md"
+                                                />
+                                            </div>
 
-                                <div className="flex items-center space-x-6 w-[200px] justify-end">
-                                    <h2 className="text-base text-gray-600">Quantity: {product.pivot.quantity}</h2>
-                                    <h2 className="text-base font-semibold text-themegreen">₱{(product.price * product.pivot.quantity).toLocaleString()}</h2>
-                                </div>
+                                            <div className="flex-1 text-center sm:text-left">
+                                                <h2 className="text-base sm:text-lg font-semibold text-gray-800">{product.name}</h2>
+                                                <p className="text-xs sm:text-sm text-gray-600">
+                                                    Payment: Cash on Delivery
+                                                </p>
+                                                <p className="text-xs sm:text-sm text-gray-600">Order ID: {order.order_id}</p>
+                                            </div>
 
-                            </div>
-                        ))}
-                        </div>
-                        );
-                    })
+                                            <div className="w-full sm:w-[150px] text-center sm:text-left">
+                                                <h2 onClick={() => handleProductClick(product.id)} className="text-sm sm:text-base font-semibold cursor-pointer">Rate this product</h2>
+                                            </div>
+
+                                            <div className="flex flex-col sm:flex-row items-center sm:justify-end w-full sm:w-[200px] gap-1 sm:space-x-6">
+                                                <h2 className="text-xs sm:text-base text-gray-600">Quantity: {product.pivot.quantity}</h2>
+                                                <h2 className="text-sm sm:text-base font-semibold text-themegreen">
+                                                    ₱{(product.price * product.pivot.quantity).toLocaleString()}
+                                                </h2>
+                                            </div>
+
+                                        </div>
+                                    ))}
+                                </div>
+                            );
+                        })
                     ) : (
-                    <p className="text-center text-gray-600">No orders yet for your account.</p>
+                        <p className="text-center text-gray-600 text-sm sm:text-base">No orders yet for your account.</p>
                     )}
                 </div>
             </div>
-
         </div>
+
         <CustomModal open={openModal} handleClose={closeUpdateModal}>
             <div className="w-full">
                 <div className="bg-themegreen text-white p-4 rounded-t-xl">

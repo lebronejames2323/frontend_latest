@@ -136,30 +136,30 @@ function Header() {
 
     return (
         <>
-        <nav className='w-full flex justify-between items-center gap-4 lg:px-16 px-4 py-5 sticky top-0 z-50 shadow-lg'>
+        <nav className='w-full flex justify-between items-center gap-4 lg:px-16 px-6 py-5 sticky top-0 z-50 shadow-lg'>
             <h1 className='text-black font-bold lg:text-[30px] text-3xl italic cursor-pointer hidden lg:block'>CyberDrive</h1>
             <ul className='lg:flex justify-center items-center gap-10 hidden'>
-                {['Home', 'Category', 'Featured', 'Contact'].map((item, index) => (
+                <li>
+                    <a
+                        href="/all-products"
+                        className="text-black text-sm uppercase font-semibold px-5 py-2 rounded-lg hover:bg-themegreen hover:text-white"
+                    >
+                        Products
+                    </a>
+                </li>
+                {['Category', 'Featured', 'Contact'].map((item, index) => (
                     <li key={index}>
                         <ScrollLink
                             to={item.toLowerCase()}
                             spy={true}
                             smooth={true}
                             offset={-100}
-                            className="text-black text-sm uppercase font-semibold px-3 py-2 rounded-lg hover:bg-themegreen hover:text-white cursor-pointer"
+                            className="text-black text-sm uppercase font-semibold px-5 py-2 rounded-lg hover:bg-themegreen hover:text-white cursor-pointer"
                         >
                             {item}
                         </ScrollLink>
                     </li>
                 ))}
-                <li>
-                    <a
-                        href="/all-products"
-                        className="text-black text-sm uppercase font-semibold px-3 py-2 rounded-lg hover:bg-themegreen hover:text-white"
-                    >
-                        Products
-                    </a>
-                </li>
             </ul>
 
     
@@ -306,10 +306,10 @@ function Header() {
                 <ul className='flex flex-col justify-center items-center gap-2 w-full'>
                     <li className='w-full text-center'>
                         <a href="/all-products" className="text-white uppercase font-semibold p-3 rounded-lg hover:bg-themeyellow hover:text-black w-full block">
-                            All Products
+                            Products
                         </a>
                     </li>
-                    {['Products'].map((item, index) => (
+                    {['Featured'].map((item, index) => (
                         <ScrollLink key={index} className='text-white uppercase font-semibold p-3 rounded-lg hover:bg-themeyellow hover:text-black w-full text-center' to={item.toLowerCase()} spy={true} offset={-100} smooth={true}>
                             {item}
                         </ScrollLink>

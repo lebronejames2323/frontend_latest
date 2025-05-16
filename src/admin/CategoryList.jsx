@@ -121,7 +121,7 @@ const CategoryList = () => {
       <div className="flex w-full">
         <Sidebar className="fixed top-[50px] left-0 bottom-0 w-[18%] z-40" />
         <div className="w-[70%] mx-auto ml-max[max(5vw,25px)] my-8 text-gray-600 text-base">
-          <p className="mb-2">All Categories</p>
+          <p className="mb-5">All Categories</p>
           <div className="w-[90%]">
             <div className="hidden md:grid grid-cols-[1fr_2fr_2fr_2fr] items-center py-1 px-2">
               <b className="text-center">Image</b>

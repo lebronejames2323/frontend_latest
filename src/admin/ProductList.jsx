@@ -137,7 +137,7 @@ const ProductsList = () => {
       <div className="flex w-full">
         <Sidebar className="fixed top-[50px] left-0 bottom-0 w-[18%] z-40" />
         <div className="w-[70%] mx-auto ml-max[max(5vw,25px)] my-8 text-gray-600 text-base">
-          <p className="mb-2">All Items</p>
+          <p className="mb-5">All Items</p>
           <div className="mb-10">
           <div className="hidden md:grid grid-cols-[1fr_2fr_1fr_1fr_1fr_1fr] items-center py-1 px-2">
             <b className="text-center">Image</b>
@@ -206,7 +206,7 @@ const ProductsList = () => {
               value={updateData.description}
               onChange={handleUpdateInputChange}
               className="border rounded-md p-3 w-full focus:outline-none focus:ring-2"
-              rows="1"
+              rows="2"
               style={{ resize: "none", overflow: "hidden" }}
               onInput={(e) => {
                 e.target.style.height = "auto"; 

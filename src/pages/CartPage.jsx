@@ -74,128 +74,130 @@ const CartPage = () => {
     return (
         <div className="min-h-screen bg-gray-50">
 
-            <div className="w-full h-[80px] bg-white shadow-lg fixed top-0 left-0 z-50">
-                <div className="w-full h-full lg:px-10 px-5 flex items-center justify-between">
-                <button 
-                    onClick={() => navigate('/')}
-                    className="w-[105px] items-center justify-center flex gap-1 text-themegreen hover:text-themeyellow"
-                >
-                    <FaArrowLeft className='mr-1 w-[20px] h-[20px]' />
-                    <span className="text-base font-semibold">Back</span>
-                </button>
-                <h1 className="text-2xl font-bold text-gray-900">Cart Page</h1>
-                <div className="w-[105px]"></div>
-                </div>
-            </div>
+    <div className="w-full h-[70px] sm:h-[80px] bg-white shadow-lg fixed top-0 left-0 z-50">
+        <div className="w-full h-full px-4 sm:px-10 flex items-center justify-between">
+            <button 
+                onClick={() => navigate('/')}
+                className="flex items-center gap-1 text-themegreen hover:text-themeyellow"
+            >
+                <FaArrowLeft className='w-5 h-5 sm:w-[20px] sm:h-[20px]' />
+                <span className="text-sm sm:text-base font-semibold">Back</span>
+            </button>
+            <h1 className="text-lg sm:text-2xl font-bold text-gray-900">Cart Page</h1>
+            <div className="w-[105px]"></div>
+        </div>
+    </div>
 
-            <div className="container px-4 pt-24 pb-12 mx-auto max-w-7xl">
-                <div className="grid lg:grid-cols-[1fr,400px] gap-6">
-                    <div className="overflow-hidden bg-white shadow-sm rounded-xl">
-                        <div className="px-6 pt-6 pb-2">
-                            <div className="divide-y">
-                            <h2 className="mb-4 text-xl font-bold text-gray-900">Cart Items</h2>
-                            {carts.length > 0 ? (
-                                carts.map(cart => (
-                                    <div key={cart.id}>
-                                        {cart.products.map(product => (
-                                            <div key={product.id} className="flex items-center gap-4 py-4">
-                                                <div className="w-[10%] h-[10%] mr-4">
-                                                    <img
-                                                        src={`${imageUrl1}/${product.id}.${product.extension}`}
-                                                        alt={product.name}
-                                                        className="w-full h-full object-cover rounded-md"
-                                                    />
-                                                </div>
-                                                <div className="flex-grow">
-                                                    <h3 className="text-lg font-medium text-gray-800">{product.name}</h3>
-                                                    <p className="text-sm text-gray-400">₱{Number(product.price).toLocaleString()}  ({product.stock} stock)</p>
-                                                </div>
-                                                <div className="flex items-center justify-center gap-4">
-                                                    <div className="flex items-center border rounded-lg">
-                                                        <button 
-                                                            className="p-2 hover:bg-gray-100"
-                                                            onClick={() => handleUpdateQuantity(cart.id, product.id, Math.max(1, product.pivot.quantity - 1))}
-                                                        >
-                                                            <FaMinus className="w-3 h-3" />
-                                                        </button>
-                                                        <span className="w-12 text-center">{product.pivot.quantity}</span>
-                                                        <button 
-                                                            className={`p-2 hover:bg-gray-100 ${product.pivot.quantity >= product.stock ? "cursor-not-allowed" : ""}`}
-                                                            onClick={() => {
-                                                                if (product.pivot.quantity < product.stock) {
-                                                                    handleUpdateQuantity(cart.id, product.id, product.pivot.quantity + 1);
-                                                                }
-                                                            }}
-                                                            disabled={product.pivot.quantity >= product.stock}
-                                                        >
-                                                            <FaPlus className="w-3 h-3" />
-                                                        </button>
-                                                    </div>
-                                                    <button
-                                                        className="p-2 text-themered rounded-lg hover:text-opacity-50"
-                                                        onClick={() => handleDeleteCart(cart.id, product.id)}
+    <div className="container px-4 pt-20 sm:pt-24 pb-12 mx-auto max-w-7xl">
+        <div className="grid grid-cols-1 lg:grid-cols-[1fr,400px] gap-6">
+            <div className="overflow-hidden bg-white shadow-sm rounded-xl">
+                <div className="px-4 sm:px-6 pt-4 sm:pt-6 pb-2">
+                    <div className="divide-y">
+                        <h2 className="mb-4 text-lg sm:text-xl font-bold text-gray-900">Cart Items</h2>
+                        {carts.length > 0 ? (
+                            carts.map(cart => (
+                                <div key={cart.id}>
+                                    {cart.products.map(product => (
+                                        <div key={product.id} className="flex flex-col sm:flex-row items-center gap-4 py-4 border-t">
+                                            
+                                            <div className="w-[120px] h-[120px] sm:w-[10%] sm:h-[10%]">
+                                                <img
+                                                    src={`${imageUrl1}/${product.id}.${product.extension}`}
+                                                    alt={product.name}
+                                                    className="w-full h-full object-cover rounded-md"
+                                                />
+                                            </div>
+
+                                            <div className="flex-grow text-center sm:text-left">
+                                                <h3 className="text-sm sm:text-lg font-medium text-gray-800">{product.name}</h3>
+                                                <p className="text-xs sm:text-sm text-gray-400">
+                                                    ₱{Number(product.price).toLocaleString()} ({product.stock} stock)
+                                                </p>
+                                            </div>
+
+                                            <div className="flex items-center justify-center gap-2 sm:gap-4">
+                                                <div className="flex items-center border rounded-lg">
+                                                    <button 
+                                                        className="p-2 hover:bg-gray-100"
+                                                        onClick={() => handleUpdateQuantity(cart.id, product.id, Math.max(1, product.pivot.quantity - 1))}
                                                     >
-                                                        <FaTrashAlt className="w-5 h-5" />
+                                                        <FaMinus className="w-3 h-3" />
+                                                    </button>
+                                                    <span className="w-8 sm:w-12 text-center">{product.pivot.quantity}</span>
+                                                    <button 
+                                                        className={`p-2 hover:bg-gray-100 ${product.pivot.quantity >= product.stock ? "cursor-not-allowed" : ""}`}
+                                                        onClick={() => {
+                                                            if (product.pivot.quantity < product.stock) {
+                                                                handleUpdateQuantity(cart.id, product.id, product.pivot.quantity + 1);
+                                                            }
+                                                        }}
+                                                        disabled={product.pivot.quantity >= product.stock}
+                                                    >
+                                                        <FaPlus className="w-3 h-3" />
                                                     </button>
                                                 </div>
+                                                <button
+                                                    className="p-2 text-themered rounded-lg hover:text-opacity-50"
+                                                    onClick={() => handleDeleteCart(cart.id, product.id)}
+                                                >
+                                                    <FaTrashAlt className="w-5 h-5" />
+                                                </button>
                                             </div>
-                                        ))}
-                                    </div>
-                                ))
-                            ) : (
-                            <div className="py-12 text-center">
-                            <h2 className="mb-2 text-2xl font-bold text-gray-900">Your cart is empty</h2>
-                            <p className="mb-6 text-gray-600">Looks like you haven't added any items to your cart yet.</p>
-                            <button onClick={() => navigate('/')} className="px-4 py-2 font-semibold text-white transition-colors rounded-lg bg-themegreen hover:bg-themeyellow hover:text-black">
-                                Continue Shopping
-                            </button>
-                            </div>
-                            )}
-                            </div>
-                        </div>
-                    </div>
-            
-
-                    <div className="space-y-6">
-                        <div className="sticky bg-white shadow-sm rounded-xl h-fit top-24">
-                            <div className="p-6">
-                                <h2 className="mb-4 text-xl font-bold text-gray-900">Order Summary</h2>
-                                <div className="space-y-4">
-                                    <div className="flex justify-between text-gray-600">
-                                        <span>Total Items:</span>
-                                        <span>{carts.reduce((total, cart) => 
-                                        total + cart.products.reduce((subtotal, product) => subtotal + product.pivot.quantity, 0) , 0)}</span>
-                                    </div>
-                                    <div className="flex justify-between text-gray-600">
-                                        <span>Shipping</span>
-                                        <span>Free</span>
-                                    </div>
-                                    <div className="pt-4 border-t">
-                                        <div className="flex justify-between text-lg font-bold">
-                                            <span>Total</span>
-                                            <span className="text-themegreen">₱{carts.flatMap(cart => cart.products).reduce((total, product) => total + product.price * product.pivot.quantity, 0).toLocaleString()}</span>
                                         </div>
-                                    </div>
-                                    <button 
-                                        onClick={handlePlaceOrder}
-                                        disabled={loading2}
-                                        className="w-full text-lg py-3 font-semibold text-white transition-colors rounded-lg bg-themegreen hover:bg-themeyellow hover:text-black disabled:opacity-50 disabled:cursor-not-allowed"
-                                    >
-                                        {loading2 ? "Processing..." : "Place order"}
-                                    </button>
+                                    ))}
                                 </div>
+                            ))
+                        ) : (
+                            <div className="py-8 text-center">
+                                <h2 className="mb-2 text-lg sm:text-2xl font-bold text-gray-900">Your cart is empty</h2>
+                                <p className="text-sm sm:text-base text-gray-600">Looks like you haven't added any items to your cart yet.</p>
+                                <button onClick={() => navigate('/')} className="mt-4 px-4 py-2 font-semibold text-white transition-colors rounded-lg bg-themegreen hover:bg-themeyellow hover:text-black">
+                                    Continue Shopping
+                                </button>
                             </div>
-                        </div>
+                        )}
                     </div>
-
                 </div>
             </div>
 
-            {showReceipt && lastOrder && (
-                <OrderReceipt order={lastOrder} onClose={closeReceipt} />
-            )}
-
+            <div className="space-y-6">
+                <div className="sticky bg-white shadow-sm rounded-xl h-fit top-24">
+                    <div className="p-4 sm:p-6">
+                        <h2 className="mb-4 text-lg sm:text-xl font-bold text-gray-900">Order Summary</h2>
+                        <div className="space-y-3 sm:space-y-4">
+                            <div className="flex justify-between text-sm sm:text-gray-600">
+                                <span>Total Items:</span>
+                                <span>{carts.reduce((total, cart) => 
+                                total + cart.products.reduce((subtotal, product) => subtotal + product.pivot.quantity, 0) , 0)}</span>
+                            </div>
+                            <div className="flex justify-between text-sm sm:text-gray-600">
+                                <span>Shipping</span>
+                                <span>Free</span>
+                            </div>
+                            <div className="pt-3 sm:pt-4 border-t">
+                                <div className="flex justify-between text-base sm:text-lg font-bold">
+                                    <span>Total</span>
+                                    <span className="text-themegreen">₱{carts.flatMap(cart => cart.products).reduce((total, product) => total + product.price * product.pivot.quantity, 0).toLocaleString()}</span>
+                                </div>
+                            </div>
+                            <button 
+                                onClick={handlePlaceOrder}
+                                disabled={loading2}
+                                className="w-full text-base sm:text-lg py-2 sm:py-3 font-semibold text-white transition-colors rounded-lg bg-themegreen hover:bg-themeyellow hover:text-black disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                                {loading2 ? "Processing..." : "Place order"}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
+    </div>
+
+    {showReceipt && lastOrder && (
+        <OrderReceipt order={lastOrder} onClose={closeReceipt} />
+    )}
+</div>
     );
 };
 

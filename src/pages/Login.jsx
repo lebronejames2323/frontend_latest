@@ -14,12 +14,21 @@ function Login() {
   if (!loading) {
   setLoading(true);
   const formdata = new FormData(e.target);
+
   login(formdata)
   .then((res) => {
   if (res?.ok) {
-  setCookie("token", res?.others?.token);
-  navigate("/");
-  } else {toast.error(res?.message ?? "Something went wrong!");}
+    setCookie("token", res?.others?.token);
+    navigate("/");
+  } else {
+    if (res?.message?.toLowerCase().includes("unauthorized")) {
+      toast.error("Incorrect Username or Password");
+    } else if (res?.message?.toLowerCase().includes("unauthorized")) {
+      toast.error("Incorrect password");
+    } else {
+      toast.error(res?.message ?? "Something went wrong!");
+    }
+  }
   })
   .finally(() => {
   setLoading(false);
