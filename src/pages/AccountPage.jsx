@@ -9,6 +9,7 @@ import { toast } from "react-toastify";
 import { imageUrl1 } from '../api/configuration';
 import { index } from "../api/auth";
 import { fetchOrders } from '../api/product-fetch';
+import { cancelOrder } from "../api/product-actions";
 import { url } from "../api/configuration";
 
 function AccountPage() {
@@ -18,7 +19,9 @@ function AccountPage() {
     const [openModal, setOpenModal] = useState(false);
     const [loading, setLoading] = useState(false);
     const [orders, setOrders] = useState([]);
-    const [formData, setFormData] = useState({});
+    const [showCancelConfirm, setShowCancelConfirm] = useState(false);
+    const [selectedOrderId, setSelectedOrderId] = useState(null);
+    const [formData, setFormData] = useState({ username: "", email: "", first_name: "", last_name: "", phone_number: "", address: "", second_address: "", third_address: "", });
 
     const refreshOrders = () => {
     fetchOrders(cookies.token).then((res) => {
@@ -28,6 +31,11 @@ function AccountPage() {
 
     useEffect(refreshOrders, []);
 
+
+    const handleCancelOrder = (orderId) => {
+        setSelectedOrderId(orderId);
+        setShowCancelConfirm(true);
+    };
     
     const refreshUser = async () => {
         setLoading(true);
@@ -41,8 +49,9 @@ function AccountPage() {
         last_name: response.data.profile.last_name,
         phone_number: response.data.profile.phone_number,
         address: response.data.profile.address,
+        second_address: response.data.profile.second_address,
+        third_address: response.data.profile.third_address,
         });
-        }catch (error){
         }finally{
         setLoading(false);
         }
@@ -78,9 +87,6 @@ function AccountPage() {
         toast.success(result.message ?? "Profile updated successfully!");
         setOpenModal(false);
         refreshUser();
-        } else if (result.errors) {
-        if (result.errors.username) toast.error("Username is already taken");
-        if (result.errors.email) toast.error("Email is already in use");
         } else {
         toast.error(result.message ?? "Failed to update profile!");
         }
@@ -173,7 +179,7 @@ function AccountPage() {
                     </div>
 
                     <div className="sm:col-span-2">
-                    <p className="font-bold text-gray-700">Address:</p>
+                    <p className="font-bold text-gray-700">Default Address:</p>
                     <p className="text-gray-600">{user.profile.address}</p>
                     </div>
                 </div>
@@ -221,17 +227,54 @@ function AccountPage() {
                                                 />
                                             </div>
 
-                                            <div className="flex-1 text-center sm:text-left">
+                                            <div className="w-[25%] text-center sm:text-left">
                                                 <h2 className="text-base sm:text-lg font-semibold text-gray-800">{product.name}</h2>
                                                 <p className="text-xs sm:text-sm text-gray-600">
-                                                    Payment: Cash on Delivery
+                                                    Payment: {order.payment_method}
                                                 </p>
                                                 <p className="text-xs sm:text-sm text-gray-600">Order ID: {order.order_id}</p>
                                             </div>
 
-                                            <div className="w-full sm:w-[150px] text-center sm:text-left">
-                                                <h2 onClick={() => handleProductClick(product.id)} className="text-sm sm:text-base font-semibold cursor-pointer">Rate this product</h2>
+                                            <div className="w-full flex-1 sm:w-[150px] text-center justify-center flex sm:text-left">
+                                            {order.order_status === "Delivered" ? (
+                                                <h2 onClick={() => handleProductClick(product.id)} className="text-sm sm:text-base font-semibold cursor-pointer" >
+                                                Rate this product
+                                                </h2>
+                                            ) : order.order_status === "Order Placed" ? (
+                                                <h2 onClick={() => handleCancelOrder(order.id)} className="text-sm sm:text-base font-semibold text-red-500 cursor-pointer mt-2">
+                                                Cancel Order
+                                                </h2>
+                                            ) : null}
                                             </div>
+
+                                            {showCancelConfirm && (
+                                            <div className="fixed inset-0 bg-black bg-opacity-10 flex items-center justify-center z-[1000]">
+                                                <div className="bg-white p-6 rounded-lg shadow-md w-96 text-center relative z-[1001]">
+                                                <h2 className="text-xl font-semibold text-gray-700">Cancel Order Confirmation</h2>
+                                                <p className="text-base text-gray-600 mt-2">
+                                                    Are you sure you want to cancel this order? This action cannot be undone.
+                                                </p>
+                                                <div className="mt-4 flex justify-center gap-5">
+                                                    <button 
+                                                    className="px-4 py-2 bg-themered text-white rounded-lg hover:bg-opacity-70"
+                                                    onClick={async () => {
+                                                        await cancelOrder(selectedOrderId, cookies);
+                                                        refreshOrders();
+                                                        setShowCancelConfirm(false);
+                                                    }}
+                                                    >
+                                                    Confirm
+                                                    </button>
+                                                    <button 
+                                                    className="px-4 py-2 bg-gray-400 rounded-lg text-white hover:bg-opacity-60"
+                                                    onClick={() => setShowCancelConfirm(false)}
+                                                    >
+                                                    Cancel
+                                                    </button>
+                                                </div>
+                                                </div>
+                                            </div>
+                                            )}
 
                                             <div className="flex flex-col sm:flex-row items-center sm:justify-end w-full sm:w-[200px] gap-1 sm:space-x-6">
                                                 <h2 className="text-xs sm:text-base text-gray-600">Quantity: {product.pivot.quantity}</h2>
@@ -276,34 +319,44 @@ function AccountPage() {
                             className="border rounded-md p-3 w-full focus:outline-none focus:ring-2 focus:ring-themegreen"
                         />
                         <input
-                            required
                             name="first_name"
                             placeholder="First Name"
-                            value={formData.first_name}
+                            value={formData.first_name || ""}
                             onChange={handleInputChange}
                             className="border rounded-md p-3 w-full focus:outline-none focus:ring-2 focus:ring-themegreen"
                         />
                         <input
-                            required
                             name="last_name"
                             placeholder="Last Name"
-                            value={formData.last_name}
+                            value={formData.last_name || ""}
                             onChange={handleInputChange}
                             className="border rounded-md p-3 w-full focus:outline-none focus:ring-2 focus:ring-themegreen"
                         />
                         <input
-                            required
                             name="phone_number"
                             placeholder="Contact"
-                            value={formData.phone_number}
+                            value={formData.phone_number || ""}
                             onChange={handleInputChange}
                             className="border rounded-md p-3 w-full focus:outline-none focus:ring-2 focus:ring-themegreen"
                         />
                         <input
-                            required
                             name="address"
-                            placeholder="Address"
-                            value={formData.address}
+                            placeholder="Default Address"
+                            value={formData.address || ""}
+                            onChange={handleInputChange}
+                            className="border rounded-md p-3 w-full focus:outline-none focus:ring-2 focus:ring-themegreen"
+                        />
+                        <input
+                            name="second_address"
+                            placeholder="Second Address"
+                            value={formData.second_address || ""}
+                            onChange={handleInputChange}
+                            className="border rounded-md p-3 w-full focus:outline-none focus:ring-2 focus:ring-themegreen"
+                        />
+                        <input
+                            name="third_address"
+                            placeholder="Third Address"
+                            value={formData.third_address || ""}
                             onChange={handleInputChange}
                             className="border rounded-md p-3 w-full focus:outline-none focus:ring-2 focus:ring-themegreen"
                         />

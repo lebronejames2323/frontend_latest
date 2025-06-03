@@ -18,6 +18,7 @@ const Hero = () => {
     waitForAnimate: false,
     autoplay: true,
     autoplaySpeed: 3000,
+    arrows: false,
     // pauseOnHover: true 
     };
 

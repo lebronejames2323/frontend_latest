@@ -17,7 +17,7 @@ function Category() {
 
     const navigate = useNavigate();
     const handleCategoryClick = (categoryName) => {
-    navigate(`/category/${categoryName.toLowerCase()}`);
+    navigate(`/category/${categoryName}`);
     };
 
     const settings = {

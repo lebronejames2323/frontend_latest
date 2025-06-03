@@ -45,6 +45,29 @@ export const getCategories = async () => {
   return await res.json();
 }; 
 
+export const getCategoriesData = async () => {
+  const res = await fetch(`${url}/categories/with-sold-count`, {
+    method: "GET",
+    headers: {
+      Accept: "application/json",
+    },
+  });
+
+  return await res.json();
+}; 
+
+export const fetchSalesData = async (token) => {
+  const res = await fetch(`${url}/products/sales-data`, {
+    method: "GET",
+    headers: {
+      Accept: "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  return await res.json();
+};
+
 export const fetchAdminOrders = async (token) => {
   try {
     const res = await fetch(`${url}/orders/admin/orders`, {
@@ -77,7 +100,25 @@ export const fetchOrders = async (token) => {
   return await res.json();
 };
 
-export const fetchCarts = async (token) => {
+export const fetchRecentOrders = async (token) => {
+  const res = await fetch(`${url}/orders/admin/recent-orders`, {
+    method: "GET",
+    headers: {
+      Accept: "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  return await res.json();
+};
+
+export const fetchCarts = async (cookies) => {
+  const token = cookies.token;
+  
+  if (!token || token === "undefined" || token.trim() === "") {
+    return { guestCart: cookies.guestCart || {} };
+  }
+
   const res = await fetch(`${url}/carts`, {
     method: "GET",
     headers: {

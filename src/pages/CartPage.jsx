@@ -6,49 +6,95 @@ import { imageUrl1 } from '../api/configuration';
 import { fetchCarts } from '../api/product-fetch';
 import { deleteProductFromCart, placeOrder, updateProductQuantity } from '../api/product-actions';
 import OrderReceipt from '../components/OrderReceipt';
+import { index } from '../api/auth';
 
 const CartPage = () => {
     const navigate = useNavigate();
     const [carts, setCarts] = useState([]);
-    const [cookies] = useCookies();
+    const [cookies, setCookie] = useCookies(["guestCart"]);
     const [loading, setLoading] = useState(false);
     const [loading2, setLoading2] = useState(false);
     const [showReceipt, setShowReceipt] = useState(false);
     const [lastOrder, setLastOrder] = useState(null);
+    const [user, setUser] = useState(null);
+    const [showConfirm, setShowConfirm] = useState(false);
+    const [deliveryAddress, setDeliveryAddress] = useState("");
+    const [paymentMethod, setPaymentMethod] = useState("Cash on Delivery");
+
 
     const token = cookies.token;
     const isAuthenticated = token && token !== 'undefined' && token.trim() !== '';
-  
-    if (!isAuthenticated) {
-      return (
-        <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50">
-        <p className="text-xl font-medium mb-6">You are not logged in.</p>
-        <button
-            className="bg-themegreen hover:bg-themeyellow text-white font-semibold px-6 py-2 rounded-lg"
-            onClick={() => navigate('/')}
-        >
-            Go back
-        </button>
-        </div>
-      );
-    }
 
-    const refreshCarts = () => {
+    const refreshUsers = () => {
+        if (!token || token === 'undefined' || token.trim() === '') {
+            return;
+        }
+        index(cookies.token).then((res) => {
+        setUser(res?.data || null);
+        });
+    };
+
+    useEffect(refreshUsers, []);
+  
+    const refreshCarts = async () => {
         setLoading(true);
-        fetchCarts(cookies.token).then((res) => {
-        setCarts(res?.data);
+        const res = await fetchCarts(cookies);
+
+        if (!isAuthenticated) {
+        setCarts(Object.entries(res.guestCart).map(([id, data]) => ({
+            id,
+            quantity: data.quantity,
+        })));
+        } else {
+        setCarts(res?.data || []);
+        }
+
         setLoading(false);
-        })
-      };
-    
-    useEffect(refreshCarts, []);
+    };
+
+    useEffect(() => {
+        refreshCarts();
+    }, []);
+
+
+
+    const handleDeleteFromCookies = (productId) => {
+        console.log("Deleting product ID:", productId);
+        let guestCart = { ...cookies.guestCart };
+        delete guestCart[productId];
+
+        setCookie("guestCart", guestCart, { path: "/", expires: new Date(Date.now() + 86400000) });
+
+        setCarts(Object.entries(guestCart).map(([id, data]) => ({
+            id,
+            quantity: data.quantity,
+        })));
+    };
+
+    const handleUpdateQuantityInCookies = (productId, newQuantity) => {
+        if (newQuantity < 1) return;
+
+        let guestCart = { ...cookies.guestCart };
+
+        if (guestCart[productId]) {
+            guestCart[productId].quantity = Math.min(newQuantity, guestCart[productId].stock);
+        }
+
+        setCookie("guestCart", guestCart, { path: "/", expires: new Date(Date.now() + 86400000) });
+
+        setCarts(Object.entries(guestCart).map(([id, data]) => ({
+            id,
+            quantity: data.quantity,
+        })));
+    };
+
 
     const closeReceipt = () => {
         setShowReceipt(false);
     };
 
     const handlePlaceOrder = async () => {
-        await placeOrder(carts, cookies, setLoading2, setLastOrder, setCarts, setShowReceipt);
+        setShowConfirm(true);
     };
     
     const handleUpdateQuantity = async (cartId, productId, newQuantity) => {
@@ -74,130 +120,244 @@ const CartPage = () => {
     return (
         <div className="min-h-screen bg-gray-50">
 
-    <div className="w-full h-[70px] sm:h-[80px] bg-white shadow-lg fixed top-0 left-0 z-50">
-        <div className="w-full h-full px-4 sm:px-10 flex items-center justify-between">
-            <button 
-                onClick={() => navigate('/')}
-                className="flex items-center gap-1 text-themegreen hover:text-themeyellow"
-            >
-                <FaArrowLeft className='w-5 h-5 sm:w-[20px] sm:h-[20px]' />
-                <span className="text-sm sm:text-base font-semibold">Back</span>
-            </button>
-            <h1 className="text-lg sm:text-2xl font-bold text-gray-900">Cart Page</h1>
-            <div className="w-[105px]"></div>
-        </div>
-    </div>
+            <div className="w-full h-[70px] sm:h-[80px] bg-white shadow-lg fixed top-0 left-0 z-50">
+                <div className="w-full h-full px-4 sm:px-10 flex items-center justify-between">
+                    <button 
+                        onClick={() => navigate('/')}
+                        className="flex items-center gap-1 text-themegreen hover:text-themeyellow"
+                    >
+                        <FaArrowLeft className='w-5 h-5 sm:w-[20px] sm:h-[20px]' />
+                        <span className="text-sm sm:text-base font-semibold">Back</span>
+                    </button>
+                    <h1 className="text-lg sm:text-2xl font-bold text-gray-900">Cart Page</h1>
+                    <div className="w-[105px]"></div>
+                </div>
+            </div>
 
-    <div className="container px-4 pt-20 sm:pt-24 pb-12 mx-auto max-w-7xl">
-        <div className="grid grid-cols-1 lg:grid-cols-[1fr,400px] gap-6">
-            <div className="overflow-hidden bg-white shadow-sm rounded-xl">
-                <div className="px-4 sm:px-6 pt-4 sm:pt-6 pb-2">
-                    <div className="divide-y">
-                        <h2 className="mb-4 text-lg sm:text-xl font-bold text-gray-900">Cart Items</h2>
-                        {carts.length > 0 ? (
-                            carts.map(cart => (
-                                <div key={cart.id}>
-                                    {cart.products.map(product => (
-                                        <div key={product.id} className="flex flex-col sm:flex-row items-center gap-4 py-4 border-t">
-                                            
-                                            <div className="w-[120px] h-[120px] sm:w-[10%] sm:h-[10%]">
-                                                <img
-                                                    src={`${imageUrl1}/${product.id}.${product.extension}`}
-                                                    alt={product.name}
-                                                    className="w-full h-full object-cover rounded-md"
-                                                />
+            <div className="container px-4 pt-20 sm:pt-24 pb-12 mx-auto max-w-7xl">
+                <div className="grid grid-cols-1 lg:grid-cols-[1fr,400px] gap-6">
+                    <div className="overflow-hidden bg-white shadow-sm rounded-xl">
+                        <div className="px-4 sm:px-6 pt-4 sm:pt-6 pb-2">
+                            <div className="divide-y">
+                                <h2 className="mb-4 text-lg sm:text-xl font-bold text-gray-900">Cart Items</h2>
+                                {carts.length > 0 ? (
+                                    isAuthenticated
+                                        ? carts.map(cart => (
+                                            <div key={cart.id}>
+                                                {cart.products.map(product => (
+                                                    <div key={product.id} className="flex items-center gap-4 py-4 border-t">
+                                                        <div className="w-[120px] h-[120px] sm:w-[10%] sm:h-[10%]">
+                                                            <img
+                                                                src={`${imageUrl1}/${product.id}.${product.extension}`}
+                                                                alt={product.name}
+                                                                className="w-full h-full object-cover rounded-md"
+                                                            />
+                                                        </div>
+
+                                                        <div className="flex-grow text-center sm:text-left">
+                                                            <h3 className="text-sm sm:text-lg font-medium text-gray-800">{product.name}</h3>
+                                                            <p className="text-xs sm:text-sm text-gray-400">
+                                                                ₱{Number(product.price).toLocaleString()} ({product.stock} stock)
+                                                            </p>
+                                                        </div>
+
+                                                        <div className="flex items-center justify-center gap-2 sm:gap-4">
+                                                            <div className="flex items-center border rounded-lg">
+                                                                <button 
+                                                                    className="p-2 hover:bg-gray-100"
+                                                                    onClick={() => handleUpdateQuantity(cart.id, product.id, Math.max(1, product.pivot.quantity - 1))}
+                                                                >
+                                                                    <FaMinus className="w-3 h-3" />
+                                                                </button>
+                                                                <span className="w-8 sm:w-12 text-center">{product.pivot.quantity}</span>
+                                                                <button 
+                                                                    className={`p-2 hover:bg-gray-100 ${product.pivot.quantity >= product.stock ? "cursor-not-allowed" : ""}`}
+                                                                    onClick={() => {
+                                                                        if (product.pivot.quantity < product.stock) {
+                                                                            handleUpdateQuantity(cart.id, product.id, product.pivot.quantity + 1);
+                                                                        }
+                                                                    }}
+                                                                    disabled={product.pivot.quantity >= product.stock}
+                                                                >
+                                                                    <FaPlus className="w-3 h-3" />
+                                                                </button>
+                                                            </div>
+                                                            <button
+                                                                className="p-2 text-themered rounded-lg hover:text-opacity-50"
+                                                                onClick={() => handleDeleteCart(cart.id, product.id)}
+                                                            >
+                                                                <FaTrashAlt className="w-5 h-5" />
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                ))}
                                             </div>
+                                        ))
+                                        : Object.entries(cookies.guestCart || {}).map(([id, product]) => (
+                                            <div key={id} className="flex items-center gap-4 py-4 border-t">
+                                                <div className="w-[120px] h-[120px] sm:w-[10%] sm:h-[10%]">
+                                                    <img src={`${imageUrl1}/${id}.${product.extension}`} alt="Product Image" />
+                                                </div>
 
-                                            <div className="flex-grow text-center sm:text-left">
-                                                <h3 className="text-sm sm:text-lg font-medium text-gray-800">{product.name}</h3>
-                                                <p className="text-xs sm:text-sm text-gray-400">
-                                                    ₱{Number(product.price).toLocaleString()} ({product.stock} stock)
-                                                </p>
-                                            </div>
-
-                                            <div className="flex items-center justify-center gap-2 sm:gap-4">
+                                                <div className="flex-grow text-center sm:text-left">
+                                                    <h3 className="text-sm sm:text-lg font-medium text-gray-800">{product.name}</h3>
+                                                    <p className="text-xs sm:text-sm text-gray-400">
+                                                        ₱{Number(product.price).toLocaleString()}
+                                                    </p>
+                                                </div>
                                                 <div className="flex items-center border rounded-lg">
                                                     <button 
                                                         className="p-2 hover:bg-gray-100"
-                                                        onClick={() => handleUpdateQuantity(cart.id, product.id, Math.max(1, product.pivot.quantity - 1))}
+                                                        onClick={() => handleUpdateQuantityInCookies(id, product.quantity - 1)}
                                                     >
                                                         <FaMinus className="w-3 h-3" />
                                                     </button>
-                                                    <span className="w-8 sm:w-12 text-center">{product.pivot.quantity}</span>
+                                                    
+                                                    <span className="w-8 sm:w-12 text-center">{product.quantity}</span>
+
                                                     <button 
-                                                        className={`p-2 hover:bg-gray-100 ${product.pivot.quantity >= product.stock ? "cursor-not-allowed" : ""}`}
-                                                        onClick={() => {
-                                                            if (product.pivot.quantity < product.stock) {
-                                                                handleUpdateQuantity(cart.id, product.id, product.pivot.quantity + 1);
-                                                            }
-                                                        }}
-                                                        disabled={product.pivot.quantity >= product.stock}
+                                                        className={`p-2 hover:bg-gray-100 ${product.quantity >= product.stock ? "cursor-not-allowed" : ""}`}
+                                                        onClick={() => handleUpdateQuantityInCookies(id, product.quantity + 1)}
+                                                        disabled={product.quantity >= product.stock}
                                                     >
                                                         <FaPlus className="w-3 h-3" />
                                                     </button>
                                                 </div>
                                                 <button
                                                     className="p-2 text-themered rounded-lg hover:text-opacity-50"
-                                                    onClick={() => handleDeleteCart(cart.id, product.id)}
+                                                    onClick={() => handleDeleteFromCookies(id)}
                                                 >
                                                     <FaTrashAlt className="w-5 h-5" />
                                                 </button>
                                             </div>
-                                        </div>
-                                    ))}
-                                </div>
-                            ))
-                        ) : (
-                            <div className="py-8 text-center">
-                                <h2 className="mb-2 text-lg sm:text-2xl font-bold text-gray-900">Your cart is empty</h2>
-                                <p className="text-sm sm:text-base text-gray-600">Looks like you haven't added any items to your cart yet.</p>
-                                <button onClick={() => navigate('/')} className="mt-4 px-4 py-2 font-semibold text-white transition-colors rounded-lg bg-themegreen hover:bg-themeyellow hover:text-black">
-                                    Continue Shopping
-                                </button>
+                                        ))
+                                ) : (
+                                    <div className="py-8 text-center">
+                                        <h2 className="mb-2 text-lg sm:text-2xl font-bold text-gray-900">Your cart is empty</h2>
+                                        <p className="text-sm sm:text-base text-gray-600">Looks like you haven't added any items to your cart yet.</p>
+                                        <button onClick={() => navigate('/')} className="mt-4 px-4 py-2 font-semibold text-white transition-colors rounded-lg bg-themegreen hover:bg-themeyellow hover:text-black">
+                                            Continue Shopping
+                                        </button>
+                                    </div>
+                                )}    
                             </div>
-                        )}
+                        </div>
                     </div>
-                </div>
-            </div>
 
-            <div className="space-y-6">
-                <div className="sticky bg-white shadow-sm rounded-xl h-fit top-24">
-                    <div className="p-4 sm:p-6">
-                        <h2 className="mb-4 text-lg sm:text-xl font-bold text-gray-900">Order Summary</h2>
-                        <div className="space-y-3 sm:space-y-4">
-                            <div className="flex justify-between text-sm sm:text-gray-600">
-                                <span>Total Items:</span>
-                                <span>{carts.reduce((total, cart) => 
-                                total + cart.products.reduce((subtotal, product) => subtotal + product.pivot.quantity, 0) , 0)}</span>
-                            </div>
-                            <div className="flex justify-between text-sm sm:text-gray-600">
-                                <span>Shipping</span>
-                                <span>Free</span>
-                            </div>
-                            <div className="pt-3 sm:pt-4 border-t">
-                                <div className="flex justify-between text-base sm:text-lg font-bold">
-                                    <span>Total</span>
-                                    <span className="text-themegreen">₱{carts.flatMap(cart => cart.products).reduce((total, product) => total + product.price * product.pivot.quantity, 0).toLocaleString()}</span>
+                    <div className="space-y-6">
+                        <div className="sticky bg-white shadow-sm rounded-xl h-fit top-24">
+                            <div className="p-4 sm:p-6">
+                                <h2 className="mb-4 text-lg sm:text-xl font-bold text-gray-900">Order Summary</h2>
+                                <div className="space-y-3 sm:space-y-4">
+                                    <div className="flex justify-between text-sm sm:text-gray-600">
+                                        <span>Total Items:</span>
+                                        <span>
+                                            {isAuthenticated
+                                                ? carts.reduce((total, cart) => total + cart.products.reduce((subtotal, product) => subtotal + product.pivot.quantity, 0), 0)
+                                                : Object.values(cookies.guestCart || {}).reduce((total, product) => total + product.quantity, 0)}
+                                        </span>
+                                    </div>
+                                    <div className="flex justify-between text-sm sm:text-gray-600">
+                                        <span>Shipping</span>
+                                        <span>Free</span>
+                                    </div>
+                                    <div className="pt-3 sm:pt-4 border-t">
+                                        <div className="flex justify-between text-base sm:text-lg font-bold">
+                                            <span>Total</span>
+                                            <span className="text-themegreen">
+                                                ₱{isAuthenticated
+                                                    ? carts.flatMap(cart => cart.products)
+                                                        .reduce((total, product) => total + (Number(product.price) || 0) * (Number(product.pivot.quantity) || 0), 0)
+                                                    : Object.values(cookies.guestCart || {})
+                                                        .reduce((total, product) => total + (Number(product.price) || 0) * (Number(product.quantity) || 0), 0)
+                                                .toLocaleString()}
+                                            </span>                                                                                                                                                                                                                                                                                                     
+                                        </div>
+                                    </div>
+                                    {user ? (
+                                    <>
+                                    {user.profile.address || user.profile.second_address || user.profile.third_address ? (
+                                    <select 
+                                        className="w-full p-2 border rounded-lg"
+                                        value={deliveryAddress} 
+                                        onChange={(e) => setDeliveryAddress(e.target.value)}
+                                    >
+                                        <option value="">Select Delivery Address</option>
+                                        {user.profile.address && <option value={user.profile.address}>{user.profile.address}</option>}
+                                        {user.profile.second_address && <option value={user.profile.second_address}>{user.profile.second_address}</option>}
+                                        {user.profile.third_address && <option value={user.profile.third_address}>{user.profile.third_address}</option>}
+                                    </select>
+                                    ) : (
+                                    <button 
+                                        onClick={() => navigate('/account')} 
+                                        className="w-full p-2 border rounded-lg bg-themegreen text-white hover:bg-themeyellow"
+                                    >
+                                        Add Delivery Option
+                                    </button>
+                                    )}
+
+                                    <select 
+                                        className="w-full p-2 border rounded-lg mt-2"
+                                        value={paymentMethod || "Cash on Delivery"} 
+                                        onChange={(e) => setPaymentMethod(e.target.value)}
+                                    >
+                                        <option value="Cash on Delivery">Cash on Delivery</option>
+                                        <option value="Credit Card">Credit Card</option>
+                                        <option value="PayPal">PayPal</option>
+                                    </select>
+                                    <button 
+                                        onClick={handlePlaceOrder}
+                                        disabled={loading2}
+                                        className="w-full text-base sm:text-lg py-2 sm:py-3 font-semibold text-white transition-colors rounded-lg bg-themegreen hover:bg-themeyellow hover:text-black disabled:opacity-50 disabled:cursor-not-allowed"
+                                    >
+                                        {loading2 ? "Processing..." : "Place order"}
+                                    </button>
+                                    {showConfirm && (
+                                    <div className="fixed inset-0 bg-black bg-opacity-20 flex items-center justify-center z-[1000]">
+                                        <div className="bg-white p-6 rounded-lg shadow-md w-96 text-center">
+                                        <h2 className="text-xl font-semibold text-gray-700">Confirm Your Order</h2>
+                                        <p className="text-base text-gray-600 mt-2">
+                                            Are you sure you want to place this order?
+                                        </p>
+                                        <div className="mt-4 flex justify-center gap-5">
+                                            <button 
+                                            className="px-4 py-2 bg-themegreen text-white rounded-lg hover:bg-themeyellow hover:text-black"
+                                            onClick={async () => {
+                                                await placeOrder(carts, cookies, setLoading2, setLastOrder, setCarts, setShowReceipt, deliveryAddress, paymentMethod);
+                                                setShowConfirm(false);
+                                            }}
+                                            >
+                                            Confirm
+                                            </button>
+                                            <button 
+                                            className="px-4 py-2 bg-gray-400 rounded-lg text-white hover:bg-opacity-60"
+                                            onClick={() => setShowConfirm(false)}
+                                            >
+                                            Cancel
+                                            </button>
+                                        </div>
+                                        </div>
+                                    </div>
+                                    )}
+                                    </>
+                                    ) : (
+                                    <button 
+                                        onClick={() => navigate('/login')}
+                                        className="w-full text-base sm:text-lg py-2 sm:py-3 font-semibold text-white transition-colors rounded-lg bg-themegreen hover:bg-themeyellow hover:text-black disabled:opacity-50 disabled:cursor-not-allowed"
+                                    >
+                                        Place order
+                                    </button>
+                                    )}
                                 </div>
                             </div>
-                            <button 
-                                onClick={handlePlaceOrder}
-                                disabled={loading2}
-                                className="w-full text-base sm:text-lg py-2 sm:py-3 font-semibold text-white transition-colors rounded-lg bg-themegreen hover:bg-themeyellow hover:text-black disabled:opacity-50 disabled:cursor-not-allowed"
-                            >
-                                {loading2 ? "Processing..." : "Place order"}
-                            </button>
                         </div>
                     </div>
                 </div>
             </div>
+            {showReceipt && lastOrder && (
+                <OrderReceipt order={lastOrder} onClose={closeReceipt} />
+            )}
         </div>
-    </div>
-
-    {showReceipt && lastOrder && (
-        <OrderReceipt order={lastOrder} onClose={closeReceipt} />
-    )}
-</div>
     );
 };
 

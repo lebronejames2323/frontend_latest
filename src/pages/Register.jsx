@@ -2,9 +2,12 @@ import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { register } from "../api/auth";
 import { toast } from "react-toastify";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
 
 function Register() {
   const [loading, setLoading] = useState(false);
+  const [showPassword1, setShowPassword1] = useState(false);
+  const [showPassword2, setShowPassword2] = useState(false);
   const navigate = useNavigate();
 
   const onFormSubmit = (e) => {
@@ -60,57 +63,35 @@ function Register() {
         />
         </div>
 
-        <div>
+        <div className="relative">
         <input
         required name="password"
-        placeholder="Password" type="password"
+        placeholder="Password" type={showPassword1 ? "text" : "password"}
         className="border rounded-md p-3 w-full"/>
+        <button
+          type="button"
+          onClick={() => setShowPassword1((prev) => !prev)}
+          className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-600"
+        >
+          {showPassword1 ? <FaEyeSlash /> : <FaEye />}
+        </button>
         </div>
 
-        <div>
+        <div className="relative">
         <input
         required
-        type="password"
+        type={showPassword2 ? "text" : "password"}
         name="password_confirmation"
         placeholder="Repeat Password"
         className="border rounded-md p-3 w-full"
         />
-        </div>
-
-        <div>
-        <input
-        required
-        name="first_name"
-        placeholder="First Name"
-        className="border rounded-md p-3 w-full"
-        />
-        </div>
-
-        <div>
-        <input
-        required
-        name="last_name"
-        placeholder="Last Name"
-        className="border rounded-md p-3 w-full"
-        />
-        </div>
-
-        <div>
-        <input
-        required
-        name="phone_number"
-        placeholder="Contact"
-        className="border rounded-md p-3 w-full"
-        />
-        </div>
-
-        <div>
-        <input
-        required
-        name="address"
-        placeholder="Address"
-        className="border rounded-md p-3 w-full"
-        />
+        <button
+          type="button"
+          onClick={() => setShowPassword2((prev) => !prev)}
+          className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-600"
+        >
+          {showPassword2 ? <FaEyeSlash /> : <FaEye />}
+        </button>
         </div>
 
         <div className="flex justify-center">

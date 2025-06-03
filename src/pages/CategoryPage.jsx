@@ -60,22 +60,21 @@ const CategoryPage = () => {
 
 
     return (
-        <div className="min-h-screen bg-gray-100">
+        <div className="w-full lg:px-20 px-5 py-[80px] bg-gray-100 flex flex-col justify-center items-center gap-4">
           <div className="w-full h-[80px] bg-white shadow-lg fixed top-0 left-0 z-50">
           <div className="w-full h-full lg:px-10 px-5 flex items-center">
-              <button 
-              onClick={() => navigate('/')}
-              className="w-[105px] items-center justify-center flex gap-1 text-themegreen hover:text-themeyellow"
-              >
-              <FaArrowLeft className='mr-1 w-[20px] h-[20px]'/>
-              <h1 className='text-base font-semibold'>Back</h1>
-              </button>
-              <h1 className=" flex-grow text-center text-2xl font-bold capitalize">{categoryName}</h1>
-              <button onClick={handleCartClick} className="w-[105px] justify-center items-center flex gap-1 text-themegreen hover:text-themeyellow"><h1 className="text-base font-semibold">Cart </h1><FaShoppingCart className='w-[22px] h-[22px]'/></button>
+            <button 
+            onClick={() => navigate('/')}
+            className="w-[105px] items-center justify-center flex gap-1 text-themegreen hover:text-themeyellow"
+            >
+            <FaArrowLeft className='mr-1 w-[20px] h-[20px]'/>
+            <h1 className='text-base font-semibold'>Back</h1>
+            </button>
+            <h1 className=" flex-grow text-center text-2xl font-bold capitalize">{categoryName}</h1>
+            <button onClick={handleCartClick} className="w-[105px] justify-center items-center flex gap-1 text-themegreen hover:text-themeyellow"><h1 className="text-base font-semibold">Cart </h1><FaShoppingCart className='w-[22px] h-[22px]'/></button>
           </div>
           </div>
 
-          <div className='px-5 pt-20'>
           <div className="w-full grid lg:grid-cols-4 grid-cols-1 justify-center items-center gap-10 mt-10">
             {
               category?.products?.map((product) => (
@@ -117,7 +116,6 @@ const CategoryPage = () => {
                 </div>
               ))
             }
-          </div>
           </div>
         </div>
     );

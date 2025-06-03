@@ -11,7 +11,7 @@ import { addToWishlist } from '../api/product-actions';
 
 function Productsgrid() {
   const [products, setProducts] = useState([]);
-  const [cookies] = useCookies();
+  const [cookies, setCookie] = useCookies(["guestCart", "guestWishlist"]);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   
@@ -24,13 +24,34 @@ function Productsgrid() {
 
   useEffect(refreshProducts, []);
 
-  const handleAddToCart = async (productId, stock) => {
-    await addToCart(productId, cookies, setLoading, stock);
+  const handleAddToCart = async (productOrId, stock = null) => {
+    console.log("cookies.token:", cookies.token);
+    console.log("Product passed:", productOrId);
+
+    if (cookies.token === "undefined" || !cookies.token) {
+      console.log("Adding to cart as guest");
+      await addToCart(productOrId?.id, cookies, setCookie, setLoading, productOrId?.stock, productOrId?.price, productOrId?.extension, productOrId?.name);
+    } else {
+      console.log("Adding to cart as logged-in user");
+      await addToCart(productOrId, cookies, setCookie, setLoading, stock);
+      
+    }
   };
 
-  const handleAddToWishlist = async (productId) => {
-    await addToWishlist(productId, cookies, setLoading);
+const handleAddToWishlist = async (productOrId) => {
+    console.log("cookies.token:", cookies.token);
+    console.log("Product passed:", productOrId);
+
+    if (cookies.token === "undefined" || !cookies.token) {
+      console.log("Adding to wishlist as guest");
+      await addToWishlist(productOrId?.id, cookies, setCookie, setLoading, productOrId?.stock, productOrId?.price, productOrId?.extension, productOrId?.name);
+      
+    } else {
+      console.log("Adding to wishlist as logged-in user");
+      await addToWishlist(productOrId, cookies, setCookie, setLoading);
+    }
   };
+
   
 
   const handleViewMoreClick = () => {
@@ -40,6 +61,7 @@ function Productsgrid() {
   const handleProductClick = (productId) => {
   navigate(`/product/${productId}`);
   };
+
 
   return (
     <div id="featured" className="w-full lg:px-20 px-5 py-[80px] bg-gray-100 flex flex-col justify-center items-center gap-4">
@@ -54,10 +76,18 @@ function Productsgrid() {
               <div onClick={() => handleProductClick(product.id)} className={`bg-themegreen hover:bg-themeyellow hover:text-black rounded-full p-3 text-white ${loading ? "opacity-50 cursor-not-allowed" : ""}`} disabled={loading}>
               <MdOutlineRemoveRedEye />
               </div>
-              <div onClick={() => { handleAddToWishlist(product.id) }} className={`bg-themegreen hover:bg-themeyellow hover:text-black rounded-full p-3 text-white ${loading ? "opacity-50 cursor-not-allowed" : ""}`} disabled={loading}>
+              <div onClick={() => { cookies.token === "undefined" || !cookies.token 
+                ? handleAddToWishlist(product)
+                : handleAddToWishlist(product.id)
+               }}  
+              className={`bg-themegreen hover:bg-themeyellow hover:text-black rounded-full p-3 text-white ${loading ? "opacity-50 cursor-not-allowed" : ""}`} disabled={loading}>
               <FaRegHeart />
               </div>
-              <div onClick={() => { handleAddToCart(product.id, product.stock) }} className={`bg-themegreen hover:bg-themeyellow hover:text-black rounded-full p-3 text-white ${loading ? "opacity-50 cursor-not-allowed" : ""}`} disabled={loading}>
+              <div onClick={() => { cookies.token === "undefined" || !cookies.token
+                ? handleAddToCart(product)
+                : handleAddToCart(product.id, product.stock)
+              }} 
+              className={`bg-themegreen hover:bg-themeyellow hover:text-black rounded-full p-3 text-white ${loading ? "opacity-50 cursor-not-allowed" : ""}`} disabled={loading}>
               <MdAddShoppingCart />
               </div>
               </div>

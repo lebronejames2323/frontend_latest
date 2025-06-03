@@ -14,6 +14,8 @@ import Orders from './admin/Orders'
 import CategoryList from "./admin/CategoryList";
 import AllProductsPage from "./pages/AllProductsPage";
 import OrderReview from "./pages/OrderReview";
+import CheckoutPage from "./pages/CheckoutPage";
+import Dashboard from "./admin/Dashboard";
 
 export const router = createBrowserRouter([
   {
@@ -75,5 +77,13 @@ export const router = createBrowserRouter([
   {
   path: "/order-review/:productId",
     element: <OrderReview />,
+  },
+  {
+  path: "/checkout-page",
+    element: <CheckoutPage />,
+  },
+  {
+  path: "/admin-dashboard",
+    element: <Dashboard />,
   },
 ]);

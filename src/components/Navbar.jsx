@@ -27,7 +27,7 @@ const Navbar = () => {
 
   return (
     <div className='flex items-center py-4 px-[4%] justify-between'>
-      <img onClick={handleHomeClick} className='w-[max(15%,80px)] cursor-pointer' src={cyberdrive} alt="" />
+      <img title="Home" onClick={handleHomeClick} className='w-[max(15%,80px)] cursor-pointer' src={cyberdrive} alt="" />
       <button onClick={logout} className={`px-5 py-2 sm:px-7 sm:py-2 rounded-full text-xs sm:text-sm text-white bg-themegreen hover:bg-themeyellow ${loading ? "opacity-50 cursor-not-allowed" : ""}`} disabled={loading}>Logout</button>
     </div>
   );

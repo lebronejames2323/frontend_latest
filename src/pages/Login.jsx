@@ -3,9 +3,12 @@ import { Link, useNavigate } from "react-router-dom";
 import { login } from "../api/auth";
 import { toast } from "react-toastify";
 import { useCookies } from "react-cookie";
+import { transferGuestDataToUser } from '../api/product-actions';
+import { FaEye, FaEyeSlash } from "react-icons/fa";
 
 function Login() {
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
 
   const [cookies, setCookie] = useCookies();
@@ -16,9 +19,12 @@ function Login() {
   const formdata = new FormData(e.target);
 
   login(formdata)
-  .then((res) => {
+  .then(async (res) => {
   if (res?.ok) {
-    setCookie("token", res?.others?.token);
+    const token = res?.others?.token;
+    setCookie("token", token);
+    await transferGuestDataToUser(res?.others?.token, cookies, setCookie);
+    console.log("Cookies after transferGuestDataToUser:", cookies);
     navigate("/");
   } else {
     if (res?.message?.toLowerCase().includes("unauthorized")) {
@@ -49,13 +55,20 @@ function Login() {
         className="border rounded-md p-3 w-full"
         />
         </div>
-        <div>
+        <div className="relative">
         <input
         name="password"
-        type="password"
+        type={showPassword ? "text" : "password"}
         placeholder="Password"
         className="border rounded-md p-3 w-full"
         />
+        <button
+          type="button"
+          onClick={() => setShowPassword((prev) => !prev)}
+          className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-600"
+        >
+          {showPassword ? <FaEyeSlash /> : <FaEye />}
+        </button>
         </div>
         <div className="flex justify-center">
         <button

@@ -68,7 +68,7 @@ function Header() {
     navigate(`/register`);
     };
     const handleAdminClick = () => {
-    navigate(`/add-product`);
+    navigate(`/admin-dashboard`);
     };        
 
 

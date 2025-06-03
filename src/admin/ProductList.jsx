@@ -25,6 +25,7 @@ const ProductsList = () => {
   category_id: "",
   stock: "",
   image: null,
+  additional_images: [],
   });
 
   const refreshProducts = () => {
@@ -52,6 +53,12 @@ const ProductsList = () => {
     category_id: product.category_id,
     stock: product.stock,
     image: null,
+    additional_images: [
+      product.extension2 ? `${imageUrl1}/${product.id}-0.${product.extension2}` : null,
+      product.extension3 ? `${imageUrl1}/${product.id}-1.${product.extension3}` : null,
+      product.extension4 ? `${imageUrl1}/${product.id}-2.${product.extension4}` : null,
+      product.extension5 ? `${imageUrl1}/${product.id}-3.${product.extension5}` : null,
+    ].filter(Boolean),
     });
     setUpdateModalOpen(true);
   };
@@ -84,6 +91,12 @@ const ProductsList = () => {
     if (updateData.image) {
       formData.append("image", updateData.image);
     }
+
+    updateData.additional_images.forEach((img, index) => {
+      if (img instanceof File) {
+        formData.append(`additional_images[${index}]`, img);
+      }
+    });
 
     const response = await fetch(
     `${url}/products/${selectedProduct.id}`,
@@ -245,6 +258,7 @@ const ProductsList = () => {
               onChange={handleUpdateInputChange}
               className="border rounded-md p-3 w-full focus:outline-none focus:ring-2"
             />
+
             <label className="block">
               <span className="text-gray-700">Update Image</span>
               <div className="mt-1 flex items-center">
@@ -271,6 +285,45 @@ const ProductsList = () => {
                 />
               </div>
             </label>
+            <label className="block">
+  <span className="text-gray-700">Update Additional Images</span>
+  <div className="mt-1 flex flex-wrap gap-2">
+    {updateData.additional_images.map((img, idx) => (
+      <div key={idx} className="relative">
+        <img
+          className="w-20 h-20 object-contain rounded-lg"
+          src={img instanceof File ? URL.createObjectURL(img) : img}
+          alt={`Additional ${idx}`}
+        />
+        <button
+          type="button"
+          className="absolute top-0 right-0 bg-red-500 text-white rounded-full p-1"
+          onClick={() =>
+            setUpdateData((prev) => ({
+              ...prev,
+              additional_images: prev.additional_images.filter((_, index) => index !== idx),
+            }))
+          }
+        >
+          ✖
+        </button>
+      </div>
+    ))}
+    <input
+      type="file"
+      name="additional_images"
+      accept="image/*"
+      multiple
+      onChange={(e) =>
+        setUpdateData((prev) => ({
+          ...prev,
+          additional_images: [...prev.additional_images, ...Array.from(e.target.files)],
+        }))
+      }
+      className="w-full max-w-xs text-sm text-gray-900 border border-gray-300 rounded-md cursor-pointer bg-gray-50 focus:outline-none"
+    />
+  </div>
+</label>
             <div className="flex justify-center">
               <button
                 type="submit"

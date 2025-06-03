@@ -69,7 +69,10 @@ const Orders = () => {
           {orders.length > 0 ? (
             orders.map(order => (
               
-                <div key={order.id} className='grid grid-cols-1 sm:grid-cols-[0.5fr_2fr_1fr_1fr_1fr] lg:grid-cols[0.5fr_2fr_1fr_1fr_1fr] gap-3 items-start border-2 border-gray-200 p-5 md:p-8 my-3 md:my-4 text-xs sm:text-sm text-gray-700'>
+                <div key={order.id} className={`grid grid-cols-1 sm:grid-cols-[0.5fr_2fr_1fr_1fr_1fr] lg:grid-cols[0.5fr_2fr_1fr_1fr_1fr] gap-3 items-start border-2 p-5 md:p-8 my-3 md:my-4 text-xs sm:text-sm ${
+                  order.deleted_at ? "bg-gray-100 text-gray-500 opacity-70 border-gray-300" : "border-gray-200 text-gray-700"}`}
+                >
+
                   <img className= 'w-12'src={parcel_icon} alt="" />
                   <div>
 
@@ -97,17 +100,21 @@ const Orders = () => {
                   </div>
                   <p className='text-sm sm:text-[15px]'>Total: ₱{order.products.reduce( (total, product) => total + product.price * product.pivot.quantity, 0)}</p>
                   <div>
-                    <select
-                      className="p-2 font-semibold bg-gray-100"
-                      onChange={(e) => updateOrderStatus(order.id, e.target.value)}
-                      defaultValue={order.order_status}
-                    >
-                      <option value="Order Placed">Order Placed</option>
-                      <option value="Packing Order">Packing Order</option>
-                      <option value="Order Shipped">Order Shipped</option>
-                      <option value="Out for Delivery">Out for Delivery</option>
-                      <option value="Delivered">Delivered</option>
-                    </select>
+                    {order.deleted_at ? (
+                      <p className="text-red-500 font-bold">Order Canceled</p>
+                    ) : (
+                      <select
+                        className="p-2 font-semibold bg-gray-100"
+                        onChange={(e) => updateOrderStatus(order.id, e.target.value)}
+                        defaultValue={order.order_status}
+                      >
+                        <option value="Order Placed">Order Placed</option>
+                        <option value="Packing Order">Packing Order</option>
+                        <option value="Order Shipped">Order Shipped</option>
+                        <option value="Out for Delivery">Out for Delivery</option>
+                        <option value="Delivered">Delivered</option>
+                      </select>
+                    )}
                   </div>
                 </div>
                 

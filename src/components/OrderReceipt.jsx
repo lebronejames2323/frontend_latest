@@ -52,7 +52,7 @@ const OrderReceipt = ({ order, onClose }) => {
                     </div>
                     <div className="p-3 bg-gray-50 rounded-xl">
                         <p className="text-sm text-gray-500">Payment Method</p>
-                        <p className="font-semibold">Cash on Delivery</p>
+                        <p className="font-semibold">{order.payment_method}</p>
                     </div>
                     </div>
 
@@ -66,14 +66,14 @@ const OrderReceipt = ({ order, onClose }) => {
                         <FaMapMarkerAlt className="text-themegreen" />
                         <div>
                             <p className="text-sm text-gray-500">Delivery Address</p>
-                            <p className="font-medium">{user.profile.phone_number || 'Default Address'}</p>
+                            <p className="font-medium">{order.delivery_address || 'Default Address'}</p>
                         </div>
                         </div>
                         <div className="flex items-center gap-3">
                         <FaPhone className="text-themegreen" />
                         <div>
                             <p className="text-sm text-gray-500">Contact Number</p>
-                            <p className="font-medium">{user.profile.address || 'Default Phone'}</p>
+                            <p className="font-medium">{user.profile.phone_number || 'Default Phone'}</p>
                         </div>
                         </div>
                     </div>

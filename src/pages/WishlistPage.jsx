@@ -11,26 +11,12 @@ import { deleteProductFromWishlist } from '../api/product-actions';
 const WishlistPage = () => {
     const navigate = useNavigate();
     const [wishlists, setWishlists] = useState([]);
-    const [cookies] = useCookies();
+    const [cookies, setCookie] = useCookies(["guestWishlist"]);
     const [loading, setLoading] = useState(false);
     const [loading2, setLoading2] = useState(false);
     
     const token = cookies.token;
     const isAuthenticated = token && token !== 'undefined' && token.trim() !== '';
-
-    if (!isAuthenticated) {
-        return (
-            <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50">
-                <p className="text-xl font-medium mb-6">You are not logged in.</p>
-                <button
-                    className="bg-themegreen hover:bg-themeyellow text-white font-semibold px-6 py-2 rounded-lg"
-                    onClick={() => navigate('/')}
-                >
-                    Go back
-                </button>
-            </div>
-        );
-    }
 
     const handleCartClick = () => {
         navigate(`/cart`);
@@ -38,7 +24,16 @@ const WishlistPage = () => {
 
     const refreshWishlists = () => {
         setLoading(true);
-        fetchWishlists(token)
+
+        if (!isAuthenticated) {
+            const guestWishlist = cookies.guestWishlist || {};
+            setWishlists(Object.entries(guestWishlist).map(([id, data]) => ({
+                id,
+                ...data
+            })));
+            setLoading(false);
+        } else {
+            fetchWishlists(token)
             .then((res) => {
                 setWishlists(res?.data || []);
                 setLoading(false);
@@ -47,11 +42,27 @@ const WishlistPage = () => {
                 toast.error("Error fetching wishlists");
                 setLoading(false);
             });
+        }
     };
 
     useEffect(() => {
         refreshWishlists();
-    }, [token]);
+    }, []);
+
+
+    const handleDeleteFromCookies = (productId) => {
+        console.log("Deleting product ID:", productId);
+        let guestWishlist = { ...cookies.guestWishlist };
+        delete guestWishlist[productId];
+
+        setCookie("guestWishlist", guestWishlist, { path: "/", expires: new Date(Date.now() + 86400000) });
+
+        setWishlists(Object.entries(guestWishlist).map(([id, data]) => ({
+            id,
+            quantity: data.quantity,
+        })));
+    };
+
 
     const handleProductClick = (productId) => {
         navigate(`/product/${productId}`);
@@ -99,10 +110,11 @@ const WishlistPage = () => {
 
                     <div className="p-4 sm:p-5 pt-[80px] sm:pt-[100px] flex-grow overflow-auto">
                         {wishlists.length > 0 ? (
-                            wishlists.map(wishlist => (
-                                <div key={wishlist.id} className="bg-white shadow-sm hover:shadow-md cursor-pointer rounded-lg mb-4 sm:mb-5 p-4 sm:p-5">
-                                    {(wishlist.products || []).map(product => (
-                                        <div key={product.id} className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6">
+                        isAuthenticated
+                            ? wishlists.map(wishlist => (
+                                wishlist.products.map(product => (
+                                    <div key={product.id} className="bg-white shadow-sm hover:shadow-md cursor-pointer rounded-lg mb-4 sm:mb-5 p-4 sm:p-5">
+                                        <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6 py-4">
                                             <div 
                                                 onClick={() => handleProductClick(product.id)} 
                                                 className="w-[140px] h-[140px] sm:w-[190px] sm:h-[170px]"
@@ -115,7 +127,7 @@ const WishlistPage = () => {
                                             </div>
                                             
                                             <div onClick={() => handleProductClick(product.id)} className="flex-grow text-center sm:text-left">
-                                                <h3 className="text-base sm:text-xl font-semibold">{product.name}</h3>
+                                                <h3 className="text-base sm:text-xl font-semibold text-gray-800">{product.name}</h3>
                                                 <p className="text-sm sm:text-lg font-semibold text-themegreen">
                                                     Price: ₱{Number(product.price).toLocaleString()}
                                                 </p>
@@ -124,38 +136,70 @@ const WishlistPage = () => {
                                                 </h3>
                                             </div>
 
-                                            <div className="mt-2 flex flex-col sm:flex-row items-center justify-center gap-2">
+                                            <div className="flex items-center justify-center gap-2 sm:gap-4">
                                                 <button
-                                                    className={`w-full sm:w-auto bg-themegreen hover:bg-themeyellow hover:text-black text-white font-semibold px-3 sm:px-4 py-2 rounded-lg transition ${loading2 ? "opacity-50 cursor-not-allowed" : ""}`}
-                                                    disabled={loading2}
+                                                    className="w-full sm:w-auto bg-themegreen hover:bg-themeyellow hover:text-black text-white font-semibold px-3 sm:px-4 py-2 rounded-lg"
                                                     onClick={() => handleAddToCart(product.id, product.stock)}
                                                 >
                                                     Add to Cart
                                                 </button>
                                                 <button
-                                                    className={`w-full sm:w-auto hover:bg-opacity-70 bg-themered text-white px-3 sm:px-4 py-2 rounded-lg transition ${loading2 ? "opacity-50 cursor-not-allowed" : ""}`}
-                                                    disabled={loading2}
+                                                    className="w-full sm:w-auto bg-themered hover:bg-opacity-50 text-white font-semibold px-3 sm:px-4 py-2 rounded-lg"
                                                     onClick={() => handleDeleteWishlist(wishlist.id, product.id)}
                                                 >
                                                     Delete
                                                 </button>
                                             </div>
                                         </div>
-                                    ))}
+                                    </div>
+                                ))
+                            ))
+                            : Object.entries(cookies.guestWishlist || {}).map(([id, product]) => (
+                                <div key={id} className="bg-white shadow-sm hover:shadow-md cursor-pointer rounded-lg mb-4 sm:mb-5 p-4 sm:p-5">
+                                    <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6 py-4">
+                                        <div 
+                                            onClick={() => handleProductClick(id)} 
+                                            className="w-[140px] h-[140px] sm:w-[190px] sm:h-[170px]"
+                                        >
+                                            <img src={`${imageUrl1}/${id}.${product.extension}`} alt="Product Image" className="w-full h-full object-cover rounded-md" />
+                                        </div>
+
+                                        <div onClick={() => handleProductClick(id)} className="flex-grow text-center sm:text-left">
+                                            <h3 className="text-base sm:text-xl font-semibold text-gray-800">{product.name}</h3>
+                                            <p className="text-sm sm:text-lg font-semibold text-themegreen">
+                                                Price: ₱{Number(product.price).toLocaleString()}
+                                            </p>
+                                        </div>
+
+                                        <div className="flex items-center justify-center gap-2 sm:gap-4">
+                                            <button
+                                                className="w-full sm:w-auto bg-themegreen hover:bg-themeyellow hover:text-black text-white font-semibold px-3 sm:px-4 py-2 rounded-lg"
+                                                onClick={() => handleAddToCart(id, product.stock)}
+                                            >
+                                                Add to Cart
+                                            </button>
+                                            <button
+                                                className="w-full sm:w-auto bg-themered hover:bg-opacity-50 text-white font-semibold px-3 sm:px-4 py-2 rounded-lg"
+                                                onClick={() => handleDeleteFromCookies(id)}
+                                            >
+                                                Delete
+                                            </button>
+                                        </div>
+                                    </div>
                                 </div>
                             ))
-                        ) : (
-                            <div className="flex flex-col items-center justify-center text-center min-h-[50vh]">
-                                <h2 className="text-lg sm:text-2xl font-bold text-gray-900">Your Wishlist is Empty</h2>
-                                <p className="text-sm sm:text-gray-600 mt-2">Start adding products to keep track of what you love!</p>
-                                <button 
-                                    onClick={() => navigate('/')} 
-                                    className="mt-4 sm:mt-5 px-4 sm:px-6 py-2 sm:py-3 bg-themegreen text-white rounded-lg hover:bg-themeyellow hover:text-black transition-all transform hover:scale-105"
-                                >
-                                    Explore Products
-                                </button>
-                            </div>
-                        )}
+                    ) : (
+                        <div className="flex flex-col items-center justify-center text-center min-h-[50vh]">
+                            <h2 className="text-lg sm:text-2xl font-bold text-gray-900">Your Wishlist is Empty</h2>
+                            <p className="text-sm sm:text-gray-600 mt-2">Start adding products to keep track of what you love!</p>
+                            <button 
+                                onClick={() => navigate('/')} 
+                                className="mt-4 sm:mt-5 px-4 sm:px-6 py-2 sm:py-3 bg-themegreen text-white rounded-lg hover:bg-themeyellow hover:text-black transition-all transform hover:scale-105"
+                            >
+                                Explore Products
+                            </button>
+                        </div>
+                    )}
                     </div>
                 </div>
             </div>

@@ -1,5 +1,29 @@
 import { url } from "./configuration";
 
+export const getNewUsersCount = async (token) => {
+  const res = await fetch(`${url}/user/user-count`, {
+    method: "GET",
+    headers: {
+      Accept: "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  return await res.json();
+};
+
+export const getUserAddresses = async (userId, token) => {
+  const res = await fetch(`${url}/user/${userId}/addresses`, {
+    method: "GET",
+    headers: {
+      Accept: "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  return await res.json();
+};
+
 export const checkToken = async (token) => {
   const res = await fetch(`${url}/user`, {
     headers: {

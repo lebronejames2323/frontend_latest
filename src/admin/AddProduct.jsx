@@ -9,11 +9,11 @@ import { useCookies } from "react-cookie";
 import { url } from "../api/configuration";
 
 
-
 const AddProduct = () => {
   const [categories, setCategories] = useState([]);
   const [cookies] = useCookies();
-  const [image1, setImage1] = useState(false);
+  const [image1, setImage1] = useState(null);
+  const [carouselImages, setCarouselImages] = useState([null, null, null, null]); // Now only 4 images
   const [productName, setProductName] = useState('');
   const [productDescription, setProductDescription] = useState('');
   const [productCategory, setProductCategory] = useState('');
@@ -21,51 +21,62 @@ const AddProduct = () => {
   const [productStock, setProductStock] = useState('');
   const [loading, setLoading] = useState(false);
 
+  // Handles the form submission
   const onSubmitHandler = async (event) => {
     event.preventDefault();
     
     const formData = new FormData();
-    formData.append("image", image1); 
+    formData.append("image", image1); // Thumbnail image
+
+    carouselImages.forEach((img, index) => {
+      if (img) {
+        formData.append(`additional_images[${index}]`, img); // Matching backend field name
+      }
+    });
+
     formData.append("name", productName);
     formData.append("description", productDescription);
     formData.append("category_id", productCategory);
     formData.append("price", productPrice);
     formData.append("stock", parseInt(productStock, 10));
-    
-    try{
-    setLoading(true);
-    const response = await fetch(`${url}/products`,{
-      method: "POST",
-      headers:{
-      Accept: "application/json",
-      Authorization: `Bearer ${cookies.token}`,
-    },
-      body: formData,
-    });
 
-    if (response.ok){
-      toast.success("Product added successfully!");
-    }else{
-      const errorData = await response.json();
-      toast.error(`Error adding product: ${errorData.message}`);
+    // Debugging: Check FormData before sending
+    for (const pair of formData.entries()) {
+      console.log(pair[0], pair[1]);
     }
-    }catch (error){
+
+    try {
+      setLoading(true);
+      const response = await fetch(`${url}/products`, {
+        method: "POST",
+        headers: {
+          "Accept": "application/json",
+          "Authorization": `Bearer ${cookies.token}`,
+        },
+        body: formData,
+      });
+
+      response.ok ? toast.success("Product added successfully!") : toast.error("Error adding product");
+    } catch (error) {
       toast.error("An error occurred while adding the product.");
-    }finally{
+    } finally {
       setLoading(false);
     }
   };
-  
-  
-  const refreshCategories = () => {
-  getCategories().then((res) => {
-  setCategories(res?.data);
-  });
+
+  useEffect(() => {
+    getCategories().then((res) => setCategories(res?.data));
+  }, []);
+
+  const handleImageChange = (e, index) => {
+    if (e.target.files[0]) {
+      const updatedImages = [...carouselImages];
+      updatedImages[index] = e.target.files[0];
+      setCarouselImages(updatedImages);
+    }
   };
-  
-  useEffect(refreshCategories, []);
 
-
+  // Inline styles
   const inputStyle = {
     border: '2px solid #c2c2c2',
     outlineColor: '#000',
@@ -74,118 +85,122 @@ const AddProduct = () => {
     resize: "none",
     overflow: "hidden"
   };
-  
 
   return (
     <div className='bg-grey-50 min-h-screen'>
       <Navbar />
-      <hr/>
+      <hr />
       <div className='flex w-full'>
-        <Sidebar/>
+        <Sidebar />
         <div className='w-[70%] mx-auto ml-max[max(5vw,25px)] my-8 text-gray-600 text-base'>
           <form
             onSubmit={onSubmitHandler}
             className="flex flex-col w-full items-start gap-3"
           >
-            <div>
-              <p>Upload Image</p>
-            </div>
-            <div className="flex gap-2">
-            <label className="cursor-pointer" htmlFor="image1">
-              <img
-                className="w-20"
-                src={image1 ? URL.createObjectURL(image1) : upload_area}
-                alt=""
-              />
-              <input
-                onChange={(e) => setImage1(e.target.files[0])}
-                type="file"
-                id="image1"
-                hidden
-              />
+
+            <p>Thumbnail Image</p>
+            <label>
+              <img className="w-20" src={image1 ? URL.createObjectURL(image1) : upload_area} alt="Thumbnail" />
+              <input type="file" hidden onChange={(e) => setImage1(e.target.files[0])} />
             </label>
-            </div>
-            <div>
-            <p className="mb-2">Product name</p>
-            <input
-            style={inputStyle}
-              className="w-full max-w-[500px] px-3 py-2"
-              type="text"
-              placeholder="Type Here"
-              value={productName}
-              onChange={(e) => setProductName(e.target.value)}
-              required
-            />
-            </div>
-            <div className="w-full">
-            <p className="mb-2">Product Description</p>
-            <textarea
-            style={inputStyle}
-              className="w-full max-w-[500px] px-3 py-2"
-              type="text"
-              placeholder="Write description here"
-              value={productDescription}
-              onChange={(e) => {
-                setProductDescription(e.target.value);
-                e.target.style.height = "auto";
-                e.target.style.height = e.target.scrollHeight + "px";
-              }}
-              required
-            />
-            </div>
-            <div className="flex flex-col sm:flex-row gap-2 w-full sm:gap-8">
-            <div>
-            <p className="mb-2">Product Category</p>
-            <select
-            style={inputStyle}
-              className="w-full px-3 py-2"
-              value={productCategory}
-              onChange={(e) => setProductCategory(e.target.value)}
-            >
-              <option value="">Select a category</option>
-              {categories.map((category) => (
-                <option key={category.id} value={category.id}>
-                  {category.name}
-                </option>
+
+            {/* Additional Images */}
+            <p>Product Images (Optional)</p>
+            <div className="flex gap-3 flex-wrap">
+              {carouselImages.map((img, index) => (
+                <label key={index}>
+                  <img className="w-20 h-20 border" src={img ? URL.createObjectURL(img) : upload_area} alt={`carousel-${index}`} />
+                  <input type="file" hidden onChange={(e) => handleImageChange(e, index)} />
+                </label>
               ))}
-            </select>
             </div>
-            </div>
+
             <div>
-            <p className="mb-2">Product Price</p>
-            <input
-            style={inputStyle}
-              className="w-full px-3 py-2 sm:w-[120px]"
-              placeholder="0"
-              value={productPrice}
-              onChange={(e) => setProductPrice(e.target.value)}
-            />
+              <p className="mb-2">Product Name</p>
+              <input
+                style={inputStyle}
+                className="w-full max-w-[500px] px-3 py-2"
+                type="text"
+                placeholder="Type Here"
+                value={productName}
+                onChange={(e) => setProductName(e.target.value)}
+                required
+              />
             </div>
+
+            <div className="w-full">
+              <p className="mb-2">Product Description</p>
+              <textarea
+                style={inputStyle}
+                className="w-full max-w-[500px] px-3 py-2"
+                placeholder="Write description here"
+                value={productDescription}
+                onChange={(e) => {
+                  setProductDescription(e.target.value);
+                  e.target.style.height = "auto";
+                  e.target.style.height = e.target.scrollHeight + "px";
+                }}
+                required
+              />
+            </div>
+
+            <div className="flex flex-col sm:flex-row gap-2 w-full sm:gap-8">
+              <div>
+                <p className="mb-2">Product Category</p>
+                <select
+                  style={inputStyle}
+                  className="w-full px-3 py-2"
+                  value={productCategory}
+                  onChange={(e) => setProductCategory(e.target.value)}
+                >
+                  <option value="">Select a category</option>
+                  {categories.map((category) => (
+                    <option key={category.id} value={category.id}>
+                      {category.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+
             <div>
-            <p className="mb-2">Product Stock</p>
-            <input
-            style={inputStyle}
-              className="w-full px-3 py-2 sm:w-[120px]"
-              type="number"
-              placeholder="0"
-              value={productStock}
-              onChange={(e) => setProductStock(e.target.value)}
-              required
-            />
+              <p className="mb-2">Product Price</p>
+              <input
+                style={inputStyle}
+                className="w-full px-3 py-2 sm:w-[120px]"
+                placeholder="0"
+                value={productPrice}
+                onChange={(e) => setProductPrice(e.target.value)}
+              />
             </div>
+
+            <div>
+              <p className="mb-2">Product Stock</p>
+              <input
+                style={inputStyle}
+                className="w-full px-3 py-2 sm:w-[120px]"
+                type="number"
+                placeholder="0"
+                value={productStock}
+                onChange={(e) => setProductStock(e.target.value)}
+                required
+              />
+            </div>
+
             <div className="mt-4">
-            <button
-              type="submit"
-              className={`bg-themegreen text-white px-5 py-2 rounded-md hover:bg-themeyellow ${loading ? "opacity-50 cursor-not-allowed" : ""}`} disabled={loading}
-            >
-              Add
-            </button>
+              <button
+                type="submit"
+                className={`bg-themegreen text-white px-5 py-2 rounded-md hover:bg-themeyellow ${loading ? "opacity-50 cursor-not-allowed" : ""}`}
+                disabled={loading}
+              >
+                Add
+              </button>
             </div>
           </form>
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default withAuth(AddProduct)
+export default withAuth(AddProduct);

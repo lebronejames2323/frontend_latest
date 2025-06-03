@@ -3,11 +3,23 @@ import { NavLink } from 'react-router-dom'
 import { CiCirclePlus } from "react-icons/ci";
 import { LiaCalendarCheckSolid } from "react-icons/lia";
 import { PiPackage } from "react-icons/pi";
+import { MdOutlineDashboard } from "react-icons/md";
 
 const Sidebar = () => {
   return (
     <div className='w-[18%] min-h-screen border-r-2'>
         <div className='flex flex-col gap-4 pt-6 pl-[20%] text-[15px]'>
+
+          <NavLink className='flex items-center gap-3 border border-gray-300 border-r-0 px-3 rounded-l' to = "/admin-dashboard"
+          style={({ isActive }) => ({
+            backgroundColor: isActive ? '#90EE90' : 'transparent',
+            borderColor: isActive ? '#32CD32' : 'transparent',
+          })}
+          >
+            <MdOutlineDashboard className='w-7 h-7'/>
+            <p className='hidden md:block'>Dashboard</p>
+
+          </NavLink>
 
           <NavLink className='flex items-center gap-3 border border-gray-300 border-r-0 px-3 rounded-l' to = "/add-category"
           style={({ isActive }) => ({
@@ -15,50 +27,50 @@ const Sidebar = () => {
             borderColor: isActive ? '#32CD32' : 'transparent',
           })}
           >
-              <CiCirclePlus className='w-7 h-7'/>
-              <p className='hidden md:block'>Add Categories</p>
+            <CiCirclePlus className='w-7 h-7'/>
+            <p className='hidden md:block'>Add Categories</p>
 
-            </NavLink>
+          </NavLink>
 
-            <NavLink className='flex items-center gap-3 border border-gray-300 border-r-0 px-3 rounded-l' to = "/add-product"
-            style={({ isActive }) => ({
-              backgroundColor: isActive ? '#90EE90' : 'transparent',
-              borderColor: isActive ? '#32CD32' : 'transparent',
-            })}
-            >
-              <CiCirclePlus className='w-7 h-7'/>
-              <p className='hidden md:block'>Add Products</p>
+          <NavLink className='flex items-center gap-3 border border-gray-300 border-r-0 px-3 rounded-l' to = "/add-product"
+          style={({ isActive }) => ({
+            backgroundColor: isActive ? '#90EE90' : 'transparent',
+            borderColor: isActive ? '#32CD32' : 'transparent',
+          })}
+          >
+            <CiCirclePlus className='w-7 h-7'/>
+            <p className='hidden md:block'>Add Products</p>
 
-            </NavLink>
-            <NavLink className='flex items-center gap-3 border border-gray-300 border-r-0 px-3 rounded-l' to = "/category-list"
-            style={({ isActive }) => ({
-              backgroundColor: isActive ? '#90EE90' : 'transparent',
-              borderColor: isActive ? '#32CD32' : 'transparent',
-            })}
-            >
-              <LiaCalendarCheckSolid className='w-7 h-7'/>
-              <p className='hidden md:block'>Category List</p>
-            </NavLink>
-            <NavLink className='flex items-center gap-3 border border-gray-300 border-r-0 px-3 rounded-l' to = "/product-list"
-            style={({ isActive }) => ({
-              backgroundColor: isActive ? '#90EE90' : 'transparent',
-              borderColor: isActive ? '#32CD32' : 'transparent',
-            })}
-            >
-              <LiaCalendarCheckSolid className='w-7 h-7'/>
-              <p className='hidden md:block'>Product List</p>
+          </NavLink>
+          <NavLink className='flex items-center gap-3 border border-gray-300 border-r-0 px-3 rounded-l' to = "/category-list"
+          style={({ isActive }) => ({
+            backgroundColor: isActive ? '#90EE90' : 'transparent',
+            borderColor: isActive ? '#32CD32' : 'transparent',
+          })}
+          >
+            <LiaCalendarCheckSolid className='w-7 h-7'/>
+            <p className='hidden md:block'>Category List</p>
+          </NavLink>
+          <NavLink className='flex items-center gap-3 border border-gray-300 border-r-0 px-3 rounded-l' to = "/product-list"
+          style={({ isActive }) => ({
+            backgroundColor: isActive ? '#90EE90' : 'transparent',
+            borderColor: isActive ? '#32CD32' : 'transparent',
+          })}
+          >
+            <LiaCalendarCheckSolid className='w-7 h-7'/>
+            <p className='hidden md:block'>Product List</p>
 
-            </NavLink>
-            <NavLink className='flex items-center gap-3 border border-gray-300 border-r-0 px-3 rounded-l' to = "/order"
-            style={({ isActive }) => ({
-              backgroundColor: isActive ? '#90EE90' : 'transparent',
-              borderColor: isActive ? '#32CD32' : 'transparent',
-            })}
-            >
-              <PiPackage className='w-7 h-7'/>
-              <p className='hidden md:block'>Orders</p>
+          </NavLink>
+          <NavLink className='flex items-center gap-3 border border-gray-300 border-r-0 px-3 rounded-l' to = "/order"
+          style={({ isActive }) => ({
+            backgroundColor: isActive ? '#90EE90' : 'transparent',
+            borderColor: isActive ? '#32CD32' : 'transparent',
+          })}
+          >
+            <PiPackage className='w-7 h-7'/>
+            <p className='hidden md:block'>Orders</p>
 
-            </NavLink>
+          </NavLink>
 
         </div>
     </div>
