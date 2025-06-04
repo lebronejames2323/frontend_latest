@@ -8,7 +8,7 @@ import { index, logout as Logout } from '../api/auth';
 import { useCookies } from 'react-cookie';
 import { toast } from "react-toastify";
 import { imageUrl1 } from '../api/configuration';
-import { getProducts } from "../api/product-fetch";
+import { getAllProducts } from "../api/product-fetch";
 
 function Header() {
 
@@ -85,11 +85,12 @@ function Header() {
           searchDebounceRef.current = setTimeout(async () => {
             setIsSearching(true);
             try {
-            const response = await getProducts();
+            const response = await getAllProducts();
     
             const filteredProducts = response?.data.filter(product =>
             product.name.toLowerCase().includes(query.toLowerCase()) ||
-            (product.category?.name || '').toLowerCase().includes(query.toLowerCase())
+            (product.category?.name || '').toLowerCase().includes(query.toLowerCase())||
+            product.description.toLowerCase().includes(query.toLowerCase())
             );
     
             setSearchResults(filteredProducts);

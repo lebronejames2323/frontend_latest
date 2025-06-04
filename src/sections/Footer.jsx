@@ -1,3 +1,4 @@
+import React, { useState } from "react";
 import client1 from '../assets/client1.png'
 import client2 from '../assets/client2.png'
 import client3 from '../assets/client3.png'
@@ -10,9 +11,23 @@ import pay3 from '../assets/pay-3.jpg'
 import pay4 from '../assets/pay-4.jpg'
 import { Link } from 'react-scroll';
 import { FaArrowUp } from 'react-icons/fa'
+import TermsOfService from '../components/TermsOfService';
+import CancellationPolicyModal from '../components/CancellationPolicyModal';
+import PrivacyPolicyModal from '../components/PrivacyPolicyModal';
+import OrderAndPaymentModal from '../components/OrderAndPaymentModal';
+import OurCompanyModal from '../components/OurCompanyModal';
+import DeliveryModal from '../components/DeliveryModal';
+import FAQsModal from '../components/FAQsModal';
 
 
 const Footer = () => {
+    const [showTermsModal, setShowTermsModal] = useState(false);
+    const [showPolicyModal, setShowPolicyModal] = useState(false);
+    const [showPrivacyModal, setShowPrivacyModal] = useState(false);
+    const [showOrderModal, setShowOrderModal] = useState(false);
+    const [showCompanyModal, setShowCompanyModal] = useState(false);
+    const [showDeliveryModal, setShowDeliveryModal] = useState(false);
+    const [showFAQsModal, setShowFAQsModal] = useState(false);
 
     return (
         <div id='contact' className='w-full flex flex-col justify-center items-center'>
@@ -50,28 +65,18 @@ const Footer = () => {
                 <div>
                     <h1 className='text-black text-xl font-semibold capitalize mb-2'>Useful Links</h1>
                     <ul className='flex flex-col justify-center items-start gap-2'>
-                        <li className='text-gray-500 cursor-pointer hover:text-black'>Home</li>
-                        <li className='text-gray-500 cursor-pointer hover:text-black'>Home</li>
-                        <li className='text-gray-500 cursor-pointer hover:text-black'>Home</li>
-                        <li className='text-gray-500 cursor-pointer hover:text-black'>Home</li>
+                        <li onClick={() => setShowTermsModal(true)} className='text-gray-500 cursor-pointer hover:text-black'>Terms and Service</li>
+                        <li onClick={() => setShowPolicyModal(true)} className='text-gray-500 cursor-pointer hover:text-black'>Cancellation Policy</li>
+                        <li onClick={() => setShowPrivacyModal(true)} className='text-gray-500 cursor-pointer hover:text-black'>Privacy Policy</li>
+                        <li onClick={() => setShowOrderModal(true)} className='text-gray-500 cursor-pointer hover:text-black'>Order and Payment</li>
                     </ul>
                 </div>
                 <div>
                     <h1 className='text-black text-xl font-semibold capitalize mb-2'>Useful Links</h1>
                     <ul className='flex flex-col justify-center items-start gap-2'>
-                        <li className='text-gray-500 cursor-pointer hover:text-black'>Home</li>
-                        <li className='text-gray-500 cursor-pointer hover:text-black'>Home</li>
-                        <li className='text-gray-500 cursor-pointer hover:text-black'>Home</li>
-                        <li className='text-gray-500 cursor-pointer hover:text-black'>Home</li>
-                    </ul>
-                </div>
-                <div>
-                    <h1 className='text-black text-xl font-semibold capitalize mb-2'>Useful Links</h1>
-                    <ul className='flex flex-col justify-center items-start gap-2'>
-                        <li className='text-gray-500 cursor-pointer hover:text-black'>Home</li>
-                        <li className='text-gray-500 cursor-pointer hover:text-black'>Home</li>
-                        <li className='text-gray-500 cursor-pointer hover:text-black'>Home</li>
-                        <li className='text-gray-500 cursor-pointer hover:text-black'>Home</li>
+                        <li onClick={() => setShowCompanyModal(true)} className='text-gray-500 cursor-pointer hover:text-black'>Our Company</li>
+                        <li onClick={() => setShowDeliveryModal(true)} className='text-gray-500 cursor-pointer hover:text-black'>Delivery</li>
+                        <li onClick={() => setShowFAQsModal(true)} className='text-gray-500 cursor-pointer hover:text-black'>FAQs</li>
                     </ul>
                 </div>
             </div>
@@ -86,13 +91,6 @@ const Footer = () => {
                     <img src={pay3} alt="" className='w-[50px] rounded-lg'/>
                     <img src={pay4} alt="" className='w-[50px] rounded-lg'/>
                     </div>
-                    <div className='lg:w-[60%] w-full flex lg:flex-row flex-col justify-center items-center gap-4 flex-grow'>
-                        <h1 className='text-black font-semibold text-2xl'>Subscribe Newsletter</h1>
-                        <div>
-                        <input type="email" placeholder='Enter valid email' className='lg:w-auto w-full capitalize px-6 py-3 rounded-l-lg'/>
-                        <button className='bg-themegreen lg:w-auto w-full text-white hover:bg-themeyellow hover:text-black px-6 py-3 rounded-r-lg font-semibold'>SUBMIT</button>
-                        </div>
-                    </div>
 
                     <div className='lg:w-[20%] w-full'>
                     <p className='text-gray-500 lg:text-end text-center'>2025 Powered by MFI Polytechnic</p>
@@ -105,6 +103,13 @@ const Footer = () => {
                     <FaArrowUp className='w-[35px] h-[35px]'/>
                 </div>
             </Link>
+            <TermsOfService isOpen={showTermsModal} onClose={() => setShowTermsModal(false)} />
+            <CancellationPolicyModal isOpen={showPolicyModal} onClose={() => setShowPolicyModal(false)} />
+            <PrivacyPolicyModal isOpen={showPrivacyModal} onClose={() => setShowPrivacyModal(false)} />
+            <OrderAndPaymentModal isOpen={showOrderModal} onClose={() => setShowOrderModal(false)} />
+            <OurCompanyModal isOpen={showCompanyModal} onClose={() => setShowCompanyModal(false)} />
+                <DeliveryModal isOpen={showDeliveryModal} onClose={() => setShowDeliveryModal(false)} />
+                    <FAQsModal isOpen={showFAQsModal} onClose={() => setShowFAQsModal(false)} />
         </div>
     )
 }

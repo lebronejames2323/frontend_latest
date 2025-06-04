@@ -73,7 +73,7 @@ const OrderReceipt = ({ order, onClose }) => {
                         <FaPhone className="text-themegreen" />
                         <div>
                             <p className="text-sm text-gray-500">Contact Number</p>
-                            <p className="font-medium">{user.profile.phone_number || 'Default Phone'}</p>
+                            <p className="font-medium">{order.phone_number}</p>
                         </div>
                         </div>
                     </div>

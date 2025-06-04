@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { getCategories } from '../api/product-fetch';
+import { getCategories, getProductRating } from '../api/product-fetch';
 import { useCookies } from 'react-cookie';
 import { imageUrl1 } from '../api/configuration';
 import { FaShoppingCart, FaArrowLeft } from 'react-icons/fa';
 import { MdAddShoppingCart } from 'react-icons/md';
-import { FaRegHeart } from 'react-icons/fa';
+import { FaRegHeart, FaStar } from 'react-icons/fa';
 import { MdOutlineRemoveRedEye } from 'react-icons/md';
 import { addToCart } from '../api/product-actions';
 import { addToWishlist } from '../api/product-actions';
@@ -14,7 +14,8 @@ const CategoryPage = () => {
     const { categoryName } = useParams();
     const navigate = useNavigate();
     const [category, setCategory] = useState(null);
-    const [cookies] = useCookies();
+    const [ratings, setRatings] = useState({});
+    const [cookies, setCookie] = useCookies();
     const [loading, setLoading] = useState(false);
     const [loading2, setLoading2] = useState(false);
 
@@ -27,19 +28,58 @@ const CategoryPage = () => {
     };
 
 
-    const handleAddToCart = async (productId, stock) => {
-      await addToCart(productId, cookies, setLoading2, stock);
+    const handleAddToCart = async (productOrId, stock = null) => {
+      console.log("cookies.token:", cookies.token);
+      console.log("Product passed:", productOrId);
+  
+      if (cookies.token === "undefined" || !cookies.token) {
+        console.log("Adding to cart as guest");
+        await addToCart(productOrId?.id, cookies, setCookie, setLoading2, productOrId?.stock, productOrId?.price, productOrId?.extension, productOrId?.name);
+      } else {
+        console.log("Adding to cart as logged-in user");
+        await addToCart(productOrId, cookies, setCookie, setLoading2, stock);
+      }
     };
-
-    const handleAddToWishlist = async (productId) => {
-      await addToWishlist(productId, cookies, setLoading2);
+  
+    const handleAddToWishlist = async (productOrId) => {
+      console.log("cookies.token:", cookies.token);
+      console.log("Product passed:", productOrId);
+  
+      if (cookies.token === "undefined" || !cookies.token) {
+        console.log("Adding to wishlist as guest");
+        await addToWishlist(productOrId?.id, cookies, setCookie, setLoading2, productOrId?.stock, productOrId?.price, productOrId?.extension, productOrId?.name);
+        
+      } else {
+        console.log("Adding to wishlist as logged-in user");
+        await addToWishlist(productOrId, cookies, setCookie, setLoading2);
+      }
     };
-
 
     const refreshCategory = async () => {
       setLoading(true);
-      const res = await getCategories(categoryName);
-      setCategory(res?.data?.find((cat) => cat.name.toLowerCase() === categoryName.toLowerCase()));
+
+      try {
+        const res = await getCategories(categoryName);
+        const selectedCategory = res?.data?.find((cat) => cat.name.toLowerCase() === categoryName.toLowerCase());
+
+        if (selectedCategory?.products) {
+          const ratingsRes = await getProductRating();
+
+          const ratingsMap = Object.fromEntries(
+            ratingsRes.map(rating => [rating.product_id, rating.average_rating])
+          );
+
+          selectedCategory.products = selectedCategory.products.map(product => ({
+            ...product,
+            averageRating: ratingsMap[product.id] || 0,
+          }));
+        }
+
+        setCategory(selectedCategory);
+      } catch (error) {
+        console.error("Error fetching category or ratings:", error);
+      }
+
       setLoading(false);
     };
 
@@ -79,15 +119,14 @@ const CategoryPage = () => {
             {
               category?.products?.map((product) => (
                 <div key={product.id} id="product-box" className="flex flex-col justify-center items-center gap-2 bg-white p-4 rounded-lg cursor-pointer relative shadow-md border">
-                  
                   <div id="icons" className="flex justify-center items-center gap-2 absolute top-[20px]">
                     <div onClick={() => handleProductClick(product.id)} className={`bg-themegreen hover:bg-themeyellow hover:text-black rounded-full p-3 text-white ${loading2 ? "opacity-50 cursor-not-allowed" : ""}`} disabled={loading2}>
                       <MdOutlineRemoveRedEye />
                     </div>
-                    <div onClick={() => { handleAddToWishlist(product.id) }} className={`bg-themegreen hover:bg-themeyellow hover:text-black rounded-full p-3 text-white ${loading2 ? "opacity-50 cursor-not-allowed" : ""}`} disabled={loading2}>
+                    <div onClick={() => { cookies.token === "undefined" || !cookies.token ? handleAddToWishlist(product) : handleAddToWishlist(product.id) }} className={`bg-themegreen hover:bg-themeyellow hover:text-black rounded-full p-3 text-white ${loading2 ? "opacity-50 cursor-not-allowed" : ""}`} disabled={loading2}>
                       <FaRegHeart />
                     </div>
-                    <div onClick={() => { handleAddToCart(product.id, product.stock) }} className={`bg-themegreen hover:bg-themeyellow hover:text-black rounded-full p-3 text-white ${loading2 ? "opacity-50 cursor-not-allowed" : ""}`} disabled={loading2}>
+                    <div onClick={() => { cookies.token === "undefined" || !cookies.token ? handleAddToCart(product) : handleAddToCart(product.id, product.stock) }} className={`bg-themegreen hover:bg-themeyellow hover:text-black rounded-full p-3 text-white ${loading2 ? "opacity-50 cursor-not-allowed" : ""}`} disabled={loading2}>
                       <MdAddShoppingCart />
                     </div>
                   </div>
@@ -110,7 +149,12 @@ const CategoryPage = () => {
                     <h3 className={`text-base font-semibold ${product.stock === 0 ? 'text-red-600' : 'text-gray-600'}`}>
                       {product.stock === 0 ? 'Out of Stock' : `(${product.stock} ${product.stock === 1 ? 'stock' : 'stocks'} left)`}
                     </h3>
-                    <button className="bg-themeyellow text-black px-4 py-2 rounded-lg text-[13px] font-semibold">HOT ITEM</button>
+                    <div className="flex items-center">
+                      {[...Array(5)].map((_, i) => (
+                        <FaStar key={i} className={`text-xl ${i < Math.round(product.averageRating) ? "text-themeyellow" : "text-gray-300"}`} />
+                      ))}
+                      {/* <p>{product.averageRating ?? "No rating available"}</p> */}
+                    </div>
                     </div>
                   </div>
                 </div>

@@ -24,6 +24,18 @@ export const getUserAddresses = async (userId, token) => {
   return await res.json();
 };
 
+export const deleteUserAddress = async (addressId, token) => {
+  const response = await fetch(`${url}/user/addresses/${addressId}`, {
+    method: "DELETE",
+    headers: {
+      Accept: "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  return await response.json();
+};
+
 export const checkToken = async (token) => {
   const res = await fetch(`${url}/user`, {
     headers: {

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { FaArrowLeft } from 'react-icons/fa';
-import { getProducts } from '../api/product-fetch';
+import { getAllProducts } from '../api/product-fetch';
 import { useCookies } from 'react-cookie';
 import { imageUrl1, url } from '../api/configuration';
 import { toast } from 'react-toastify';
@@ -22,7 +22,7 @@ const OrderReview = () => {
     setLoading(true);
     const numericProductId = Number(productId);
 
-    getProducts().then((res) => {
+    getAllProducts().then((res) => {
       const filteredProduct = res?.data.filter(product => product.id === numericProductId);
       setProducts(filteredProduct);
       setLoading(false);

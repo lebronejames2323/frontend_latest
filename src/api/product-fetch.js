@@ -1,7 +1,7 @@
 import { url } from "./configuration";
 
-export const getProducts = async () => {
-  const res = await fetch(`${url}/products`, {
+export const getAllProducts = async () => {
+  const res = await fetch(`${url}/products/get-all`, {
     method: "GET",
     headers: {
       Accept: "application/json",
@@ -9,6 +9,31 @@ export const getProducts = async () => {
   });
 
   return await res.json();
+};
+
+export const getProducts = async ({ page = 1, search = "", category = "" }) => {
+  const queryParams = new URLSearchParams({ page });
+
+  if (search) queryParams.append("search", search);
+  if (category) queryParams.append("category", category);
+
+  try {
+    const res = await fetch(`${url}/products?${queryParams.toString()}`, {
+      method: "GET",
+      headers: {
+        Accept: "application/json",
+      },
+    });
+
+    if (!res.ok) {
+      return { data: [], pagination: {} };
+    }
+
+    return await res.json();
+  } catch (error) {
+    console.error("Error fetching products:", error);
+    return { data: [], pagination: {} };
+  }
 };
 
 export const getSpecificProduct = async (productId) => {
@@ -33,6 +58,16 @@ export const featuredProducts = async () => {
   return await res.json();
 };
 
+export const recommendedProducts = async () => {
+  const res = await fetch(`${url}/recommended-products`, {
+    method: "GET",
+    headers: {
+      Accept: "application/json",
+    },
+  });
+
+  return await res.json();
+};
 
 export const getCategories = async () => {
   const res = await fetch(`${url}/categories`, {
@@ -68,9 +103,15 @@ export const fetchSalesData = async (token) => {
   return await res.json();
 };
 
-export const fetchAdminOrders = async (token) => {
+export const fetchAdminOrders = async (token, status = "", dateRange = "all_time", search = "", page = 1) => {
+  const queryParams = new URLSearchParams({ page });
+
+  if (status) queryParams.append("status", status);
+  if (dateRange) queryParams.append("date_range", dateRange);
+  if (search) queryParams.append("search", search);
+
   try {
-    const res = await fetch(`${url}/orders/admin/orders`, {
+    const res = await fetch(`${url}/orders/admin/orders?${queryParams.toString()}`, {
       method: "GET",
       headers: {
         Accept: "application/json",
@@ -79,12 +120,12 @@ export const fetchAdminOrders = async (token) => {
     });
 
     if (!res.ok) {
-      return { data: [] };
+      return { data: [], pagination: {} };
     }
 
     return await res.json();
   } catch (error) {
-    return { data: [] };
+    return { data: [], pagination: {} };
   }
 };
 
@@ -155,4 +196,15 @@ export const getProductReviews = async (productId, page = 1) => {
   const data = await res.json();
 
   return data;
+};
+
+export const getProductRating = async (productId) => {
+  const res = await fetch(`${url}/product-ratings?product_id=${productId}`, {
+    method: "GET",
+    headers: {
+      Accept: "application/json",
+    },
+  });
+
+  return await res.json();
 };

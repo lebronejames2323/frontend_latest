@@ -3,18 +3,27 @@ import { Link, useNavigate } from "react-router-dom";
 import { register } from "../api/auth";
 import { toast } from "react-toastify";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
+import TermsOfService from '../components/TermsOfService';
 
 function Register() {
   const [loading, setLoading] = useState(false);
   const [showPassword1, setShowPassword1] = useState(false);
   const [showPassword2, setShowPassword2] = useState(false);
   const navigate = useNavigate();
+  const [acceptTerms, setAcceptTerms] = useState(false);
+  const [showTermsModal, setShowTermsModal] = useState(false);
 
   const onFormSubmit = (e) => {
     e.preventDefault();
     if (!loading) {
       setLoading(true);
       const formdata = new FormData(e.target);
+      
+      if (!acceptTerms) {
+        toast.error("You must accept the Terms of Service.");
+        setLoading(false);
+        return;
+      }
       
       const password = formdata.get("password");
       if (password.length < 8) {
@@ -102,6 +111,26 @@ function Register() {
         {loading ? "Registering..." : "Register"}
         </button>
         </div>
+        
+        <div className="flex items-center justify-center text-sm">
+          <input
+            id="terms"
+            type="checkbox"
+            className="mr-2"
+            checked={acceptTerms}
+            onChange={() => setAcceptTerms(!acceptTerms)}
+          />
+          <label htmlFor="terms" className="text-gray-700">
+            I accept the{" "}
+            <button
+              type="button"
+              onClick={() => setShowTermsModal(true)}
+              className="text-themegreen hover:underline"
+            >
+              Terms of Service
+            </button>
+          </label>
+        </div>
 
         <div className="text-center">
         <Link to="/login" className="text-themegreen text-base">
@@ -110,6 +139,7 @@ function Register() {
         </div>
         </form>
       </div>
+      <TermsOfService isOpen={showTermsModal} onClose={() => setShowTermsModal(false)} />
       </div>
   );
 }

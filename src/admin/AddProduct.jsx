@@ -13,7 +13,7 @@ const AddProduct = () => {
   const [categories, setCategories] = useState([]);
   const [cookies] = useCookies();
   const [image1, setImage1] = useState(null);
-  const [carouselImages, setCarouselImages] = useState([null, null, null, null]); // Now only 4 images
+  const [carouselImages, setCarouselImages] = useState([null, null, null, null]);
   const [productName, setProductName] = useState('');
   const [productDescription, setProductDescription] = useState('');
   const [productCategory, setProductCategory] = useState('');
@@ -21,16 +21,15 @@ const AddProduct = () => {
   const [productStock, setProductStock] = useState('');
   const [loading, setLoading] = useState(false);
 
-  // Handles the form submission
   const onSubmitHandler = async (event) => {
     event.preventDefault();
     
     const formData = new FormData();
-    formData.append("image", image1); // Thumbnail image
+    formData.append("image", image1);
 
     carouselImages.forEach((img, index) => {
       if (img) {
-        formData.append(`additional_images[${index}]`, img); // Matching backend field name
+        formData.append(`additional_images[${index}]`, img);
       }
     });
 
@@ -40,7 +39,6 @@ const AddProduct = () => {
     formData.append("price", productPrice);
     formData.append("stock", parseInt(productStock, 10));
 
-    // Debugging: Check FormData before sending
     for (const pair of formData.entries()) {
       console.log(pair[0], pair[1]);
     }
@@ -76,7 +74,6 @@ const AddProduct = () => {
     }
   };
 
-  // Inline styles
   const inputStyle = {
     border: '2px solid #c2c2c2',
     outlineColor: '#000',
@@ -104,7 +101,6 @@ const AddProduct = () => {
               <input type="file" hidden onChange={(e) => setImage1(e.target.files[0])} />
             </label>
 
-            {/* Additional Images */}
             <p>Product Images (Optional)</p>
             <div className="flex gap-3 flex-wrap">
               {carouselImages.map((img, index) => (

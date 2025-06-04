@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { MdAddShoppingCart } from 'react-icons/md';
-import { FaRegHeart } from 'react-icons/fa';
+import { FaRegHeart, FaStar } from 'react-icons/fa';
 import { MdOutlineRemoveRedEye } from 'react-icons/md';
 import { imageUrl1 } from "../api/configuration";
-import { featuredProducts } from "../api/product-fetch";
+import { featuredProducts, getProductRating } from "../api/product-fetch";
 import { useCookies } from "react-cookie";
 import { useNavigate } from 'react-router-dom'
 import { addToCart } from '../api/product-actions';
@@ -12,17 +12,41 @@ import { addToWishlist } from '../api/product-actions';
 function Productsgrid() {
   const [products, setProducts] = useState([]);
   const [cookies, setCookie] = useCookies(["guestCart", "guestWishlist"]);
-  const [loading, setLoading] = useState(false);
+  const [loading2, setLoading2] = useState(false);
+  const [ratings, setRatings] = useState({});
   const navigate = useNavigate();
   
-  const refreshProducts = () => {
-    featuredProducts ().then((res) => {
-    setProducts(res?.data);
-    });
+  const refreshProducts = async () => {
+    setLoading2(true);
+
+    try {
+      const productRes = await featuredProducts();
+      const ratingsRes = await getProductRating();
+
+      if (productRes?.data && ratingsRes) {
+        const ratingsMap = Object.fromEntries(
+          ratingsRes.map(rating => [rating.product_id, rating.average_rating])
+        );
+
+        const updatedProducts = productRes.data.map(product => ({
+          ...product,
+          averageRating: ratingsMap[product.id] || 0,
+        }));
+
+        setRatings(ratingsMap);
+        setProducts(updatedProducts);
+      }
+    } catch (error) {
+      console.error("Error fetching products or ratings:", error);
+    }
+
+    setLoading2(false);
   };
   
 
-  useEffect(refreshProducts, []);
+  useEffect(() => {
+    refreshProducts();
+  }, []);
 
   const handleAddToCart = async (productOrId, stock = null) => {
     console.log("cookies.token:", cookies.token);
@@ -30,25 +54,24 @@ function Productsgrid() {
 
     if (cookies.token === "undefined" || !cookies.token) {
       console.log("Adding to cart as guest");
-      await addToCart(productOrId?.id, cookies, setCookie, setLoading, productOrId?.stock, productOrId?.price, productOrId?.extension, productOrId?.name);
+      await addToCart(productOrId?.id, cookies, setCookie, setLoading2, productOrId?.stock, productOrId?.price, productOrId?.extension, productOrId?.name);
     } else {
       console.log("Adding to cart as logged-in user");
-      await addToCart(productOrId, cookies, setCookie, setLoading, stock);
-      
+      await addToCart(productOrId, cookies, setCookie, setLoading2, stock);
     }
   };
 
-const handleAddToWishlist = async (productOrId) => {
+  const handleAddToWishlist = async (productOrId) => {
     console.log("cookies.token:", cookies.token);
     console.log("Product passed:", productOrId);
 
     if (cookies.token === "undefined" || !cookies.token) {
       console.log("Adding to wishlist as guest");
-      await addToWishlist(productOrId?.id, cookies, setCookie, setLoading, productOrId?.stock, productOrId?.price, productOrId?.extension, productOrId?.name);
+      await addToWishlist(productOrId?.id, cookies, setCookie, setLoading2, productOrId?.stock, productOrId?.price, productOrId?.extension, productOrId?.name);
       
     } else {
       console.log("Adding to wishlist as logged-in user");
-      await addToWishlist(productOrId, cookies, setCookie, setLoading);
+      await addToWishlist(productOrId, cookies, setCookie, setLoading2);
     }
   };
 
@@ -73,21 +96,21 @@ const handleAddToWishlist = async (productOrId) => {
             <div key={product.id} id="product-box" className="flex flex-col justify-center items-center gap-1 bg-white p-4 rounded-lg cursor-pointer relative shadow-md border">
               
             <div id="icons" className="flex justify-center items-center gap-2 absolute top-[20px]">
-              <div onClick={() => handleProductClick(product.id)} className={`bg-themegreen hover:bg-themeyellow hover:text-black rounded-full p-3 text-white ${loading ? "opacity-50 cursor-not-allowed" : ""}`} disabled={loading}>
+              <div onClick={() => handleProductClick(product.id)} className={`bg-themegreen hover:bg-themeyellow hover:text-black rounded-full p-3 text-white ${loading2 ? "opacity-50 cursor-not-allowed" : ""}`} disabled={loading2}>
               <MdOutlineRemoveRedEye />
               </div>
               <div onClick={() => { cookies.token === "undefined" || !cookies.token 
                 ? handleAddToWishlist(product)
                 : handleAddToWishlist(product.id)
                }}  
-              className={`bg-themegreen hover:bg-themeyellow hover:text-black rounded-full p-3 text-white ${loading ? "opacity-50 cursor-not-allowed" : ""}`} disabled={loading}>
+              className={`bg-themegreen hover:bg-themeyellow hover:text-black rounded-full p-3 text-white ${loading2 ? "opacity-50 cursor-not-allowed" : ""}`} disabled={loading2}>
               <FaRegHeart />
               </div>
               <div onClick={() => { cookies.token === "undefined" || !cookies.token
                 ? handleAddToCart(product)
                 : handleAddToCart(product.id, product.stock)
               }} 
-              className={`bg-themegreen hover:bg-themeyellow hover:text-black rounded-full p-3 text-white ${loading ? "opacity-50 cursor-not-allowed" : ""}`} disabled={loading}>
+              className={`bg-themegreen hover:bg-themeyellow hover:text-black rounded-full p-3 text-white ${loading2 ? "opacity-50 cursor-not-allowed" : ""}`} disabled={loading2}>
               <MdAddShoppingCart />
               </div>
               </div>
@@ -110,7 +133,12 @@ const handleAddToWishlist = async (productOrId) => {
                 <h3 className={`text-base font-semibold ${product.stock === 0 ? 'text-red-600' : 'text-gray-600'}`}>
                   {product.stock === 0 ? 'Out of Stock' : `(${product.stock} ${product.stock === 1 ? 'stock' : 'stocks'} left)`}
                 </h3>
-                <button className="bg-themeyellow text-black px-4 py-2 rounded-lg text-[13px] font-semibold">HOT ITEM</button>
+                <div className="flex items-center">
+                  {[...Array(5)].map((_, i) => (
+                    <FaStar key={i} className={`text-xl ${i < Math.round(ratings[product.id] || 0) ? "text-themeyellow" : "text-gray-300"}`} />
+                  ))}
+                  {/* <p>{product.averageRating ?? "No rating available"}</p> */}
+                </div>
               </div>
               </div>
             </div>

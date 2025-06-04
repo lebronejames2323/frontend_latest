@@ -9,12 +9,16 @@ import { getProducts } from "../api/product-fetch";
 import withAuth from "../high-order-component/withAuth";
 import { url } from "../api/configuration";
 import { getCategories } from "../api/product-fetch";
+import { MdArrowBackIosNew, MdArrowForwardIos } from "react-icons/md";
 
 const ProductsList = () => {
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
   const [cookies] = useCookies();
   const [loading, setLoading] = useState(false);
+  const [pagination, setPagination] = useState({});
+  const [currentPage, setCurrentPage] = useState(1);
+  const [searchFilters, setSearchFilters] = useState({ search: "", category: "", });
 
   const [updateModalOpen, setUpdateModalOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
@@ -28,13 +32,23 @@ const ProductsList = () => {
   additional_images: [],
   });
 
-  const refreshProducts = () => {
-    getProducts().then((res) => {
-    setProducts(res?.data);
+  const handleFilterChange = (e) => {
+    setSearchFilters({
+      search: e.target.value,
     });
+    setCurrentPage(1);
   };
 
-  useEffect(refreshProducts, []);
+  useEffect(() => {
+    refreshProducts();
+  }, [currentPage, searchFilters]);
+
+  const refreshProducts = () => {
+    getProducts({ page: currentPage, ...searchFilters }).then((res) => {
+      setProducts(res?.data);
+      setPagination(res?.pagination);
+    });
+  };
 
   const refreshCategories = () => {
     getCategories().then((res) => {
@@ -63,11 +77,6 @@ const ProductsList = () => {
     setUpdateModalOpen(true);
   };
 
-  const closeUpdateModal = () => {
-    setUpdateModalOpen(false);
-    setSelectedProduct(null);
-  };
-
   const handleUpdateInputChange = (e) => {
     const { name, value } = e.target;
     setUpdateData((prev) => ({
@@ -75,6 +84,12 @@ const ProductsList = () => {
     [name]: value,
     }));
   };
+
+  const closeUpdateModal = () => {
+    setUpdateModalOpen(false);
+    setSelectedProduct(null);
+  };
+
 
   const onUpdateFormSubmit = async (e) => {
     e.preventDefault();
@@ -150,48 +165,96 @@ const ProductsList = () => {
       <div className="flex w-full">
         <Sidebar className="fixed top-[50px] left-0 bottom-0 w-[18%] z-40" />
         <div className="w-[70%] mx-auto ml-max[max(5vw,25px)] my-8 text-gray-600 text-base">
-          <p className="mb-5">All Items</p>
-          <div className="mb-10">
-          <div className="hidden md:grid grid-cols-[1fr_2fr_1fr_1fr_1fr_1fr] items-center py-1 px-2">
-            <b className="text-center">Image</b>
-            <b className="pl-4">Name</b>
-            <b>Category</b>
-            <b>Price</b>
-            <b>Stock</b>
-            <b className="text-center">Action</b>
-          </div>
-          {products.map((product) => (
-            <div
-              key={product.id}
-              className="grid grid-cols-[1fr_3fr_1fr_1fr_1fr_1fr] md:grid-cols-[1fr_2fr_1fr_1fr_1fr_1fr] items-center gap-2 py-1 px-2 border text-sm hover:bg-gray-100"
-            >
-              <div className="justify-items-center">
-                <img
-                  className="w-1/2 h-auto object-contain rounded-lg"
-                  src={`${imageUrl1}/${product.id}.${product.extension}`}
-                  alt={product.name}
+            <div className="flex items-center justify-between mb-5 gap-4">
+              <p className="mb-0">All Products</p>
+              <div className="flex gap-4">
+                <input
+                  type="text"
+                  name="name"
+                  placeholder="Search by name"
+                  onChange={handleFilterChange}
+                  className="border p-2 rounded-md"
                 />
-              </div>
-              <p className="pl-4">{product.name}</p>
-              <p>{product.category?.name}</p>
-              <p>{product.price}</p>
-              <p>{product.stock}</p>
-              <div className="justify-center flex gap-2">
-                <button
-                  onClick={() => openUpdateModal(product)}
-                  className="hover:font-semibold hover:text-blue-500"
+                <select
+                  name="category"
+                  onChange={handleFilterChange}
+                  className="border p-2 rounded-md"
                 >
-                  Edit
-                </button>
-                <button
-                  onClick={() => deleteProduct(product.id)}
-                  className="hover:font-semibold hover:text-themered"
+                  <option value="">All Categories</option>
+                  {categories.map((category) => (
+                    <option key={category.id} value={category.id}>
+                      {category.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+            <div className="mb-10">
+            <div className="hidden md:grid grid-cols-[1fr_2fr_1fr_1fr_1fr_1fr] items-center py-1 px-2">
+              <b className="text-center">Image</b>
+              <b className="pl-4">Name</b>
+              <b>Category</b>
+              <b>Price</b>
+              <b>Stock</b>
+              <b className="text-center">Action</b>
+            </div>
+            {products.map((product) => (
+              <div
+                key={product.id}
+                className="grid grid-cols-[1fr_3fr_1fr_1fr_1fr_1fr] md:grid-cols-[1fr_2fr_1fr_1fr_1fr_1fr] items-center gap-2 py-1 px-2 border text-sm hover:bg-gray-100"
+              >
+                <div className="justify-items-center">
+                  <img
+                    className="w-[80px] h-[80px] object-contain rounded-lg"
+                    src={`${imageUrl1}/${product.id}.${product.extension}`}
+                    alt={product.name}
+                  />
+                </div>
+                <p className="pl-4">{product.name}</p>
+                <p>{product.category?.name}</p>
+                <p>{product.price}</p>
+                <p>{product.stock}</p>
+                <div className="justify-center flex gap-2">
+                  <button
+                    onClick={() => openUpdateModal(product)}
+                    className="hover:font-semibold hover:text-blue-500"
+                  >
+                    Edit
+                  </button>
+                  <button
+                    onClick={() => deleteProduct(product.id)}
+                    className="hover:font-semibold hover:text-themered"
+                  >
+                    Delete
+                  </button>
+                </div>
+                </div>
+              ))}
+            </div>
+            <div className="flex justify-center gap-4 mt-4">
+            {pagination?.last_page > 1 && (
+              <div className="flex justify-center gap-4 mt-6 sm:mt-8">
+                <button 
+                  onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                  className={`px-2 sm:px-3 py-1 bg-gray-400 text-white rounded-md ${currentPage === 1 ? "opacity-50 cursor-not-allowed" : ""}`}
+                  disabled={currentPage === 1}
                 >
-                  Delete
+                  <MdArrowBackIosNew />
+                </button>
+
+                <span className="text-base sm:text-lg font-semibold py-1">
+                  Page {currentPage} of {pagination?.last_page}
+                </span>
+
+                <button 
+                  onClick={() => setCurrentPage(prev => prev + 1)}
+                  className={`px-2 sm:px-3 py-1 bg-gray-400 text-white rounded-md ${currentPage >= pagination?.last_page ? "opacity-50 cursor-not-allowed" : ""}`}
+                  disabled={currentPage >= pagination?.last_page}
+                >
+                  <MdArrowForwardIos />
                 </button>
               </div>
-              </div>
-            ))}
+            )}
           </div>
         </div>
       </div>
@@ -286,44 +349,44 @@ const ProductsList = () => {
               </div>
             </label>
             <label className="block">
-  <span className="text-gray-700">Update Additional Images</span>
-  <div className="mt-1 flex flex-wrap gap-2">
-    {updateData.additional_images.map((img, idx) => (
-      <div key={idx} className="relative">
-        <img
-          className="w-20 h-20 object-contain rounded-lg"
-          src={img instanceof File ? URL.createObjectURL(img) : img}
-          alt={`Additional ${idx}`}
-        />
-        <button
-          type="button"
-          className="absolute top-0 right-0 bg-red-500 text-white rounded-full p-1"
-          onClick={() =>
-            setUpdateData((prev) => ({
-              ...prev,
-              additional_images: prev.additional_images.filter((_, index) => index !== idx),
-            }))
-          }
-        >
-          ✖
-        </button>
-      </div>
-    ))}
-    <input
-      type="file"
-      name="additional_images"
-      accept="image/*"
-      multiple
-      onChange={(e) =>
-        setUpdateData((prev) => ({
-          ...prev,
-          additional_images: [...prev.additional_images, ...Array.from(e.target.files)],
-        }))
-      }
-      className="w-full max-w-xs text-sm text-gray-900 border border-gray-300 rounded-md cursor-pointer bg-gray-50 focus:outline-none"
-    />
-  </div>
-</label>
+              <span className="text-gray-700">Update Additional Images</span>
+              <div className="mt-1 flex flex-wrap gap-2">
+                {updateData.additional_images.map((img, idx) => (
+                  <div key={idx} className="relative">
+                    <img
+                      className="w-20 h-20 object-contain rounded-lg"
+                      src={img instanceof File ? URL.createObjectURL(img) : img}
+                      alt={`Additional ${idx}`}
+                    />
+                    <button
+                      type="button"
+                      className="absolute top-0 right-0 bg-red-500 text-white rounded-full p-1"
+                      onClick={() =>
+                        setUpdateData((prev) => ({
+                          ...prev,
+                          additional_images: prev.additional_images.filter((_, index) => index !== idx),
+                        }))
+                      }
+                    >
+                      ✖
+                    </button>
+                  </div>
+                ))}
+                <input
+                  type="file"
+                  name="additional_images"
+                  accept="image/*"
+                  multiple
+                  onChange={(e) =>
+                    setUpdateData((prev) => ({
+                      ...prev,
+                      additional_images: [...prev.additional_images, ...Array.from(e.target.files)],
+                    }))
+                  }
+                  className="w-full max-w-xs text-sm text-gray-900 border border-gray-300 rounded-md cursor-pointer bg-gray-50 focus:outline-none"
+                />
+              </div>
+            </label>
             <div className="flex justify-center">
               <button
                 type="submit"

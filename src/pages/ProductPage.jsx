@@ -1,19 +1,23 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import {
-  FaArrowLeft, FaShoppingCart, FaMinus, FaPlus,
-  FaChevronLeft, FaChevronRight
-} from 'react-icons/fa';
+import { FaArrowLeft, FaShoppingCart, FaMinus, FaPlus, FaChevronLeft, FaChevronRight, FaStar } from 'react-icons/fa';
+import { MdArrowBackIosNew, MdArrowForwardIos } from "react-icons/md";
 import { getSpecificProduct, getProductReviews } from '../api/product-fetch';
 import { useCookies } from 'react-cookie';
-import { imageUrl1 } from '../api/configuration';
+import { imageUrl1, imageUrl3 } from '../api/configuration';
 import { addToCartWithQuantity, addToWishlist } from '../api/product-actions';
+import RecommendedProducts from '../components/RecommendedProducts';
+import { MdAddShoppingCart } from 'react-icons/md';
+import { FaRegHeart } from 'react-icons/fa';
+import { MdLocalShipping } from 'react-icons/md';
+import { HiBadgeCheck } from 'react-icons/hi';
+import { RiSecurePaymentLine } from 'react-icons/ri';
 
 const ProductPage = () => {
   const { productId } = useParams();
   const navigate = useNavigate();
   const [products, setProducts] = useState([]);
-  const [cookies] = useCookies();
+  const [cookies, setCookie] = useCookies();
   const [loading, setLoading] = useState(false);
   const [loading2, setLoading2] = useState(false);
   const [reviews, setReviews] = useState([]);
@@ -43,25 +47,52 @@ const ProductPage = () => {
     navigate("/cart");
   };
 
-  const handleAddToCart = async (productId, stock, quantity) => {
-    await addToCartWithQuantity(productId, cookies, setLoading2, stock, quantity);
+  const handleAddToCart = async (productOrId, stock = null, quantity) => {
+    console.log("cookies.token:", cookies.token);
+    console.log("Product passed:", productOrId);
+
+    if (cookies.token === "undefined" || !cookies.token) {
+      console.log("Adding to cart as guest");
+      await addToCartWithQuantity(productOrId?.id, cookies, setCookie, setLoading2, productOrId?.stock, quantity , productOrId?.price, productOrId?.extension, productOrId?.name);
+    } else {
+      console.log("Adding to cart as logged-in user");
+      await addToCartWithQuantity(productOrId, cookies, setCookie, setLoading2, stock, quantity);
+    }
   };
 
-  const handleAddToWishlist = async (productId) => {
-    await addToWishlist(productId, cookies, setLoading2);
+  const handleAddToWishlist = async (productOrId) => {
+    console.log("cookies.token:", cookies.token);
+    console.log("Product passed:", productOrId);
+
+    if (cookies.token === "undefined" || !cookies.token) {
+      console.log("Adding to wishlist as guest");
+      await addToWishlist(productOrId?.id, cookies, setCookie, setLoading2, productOrId?.stock, productOrId?.price, productOrId?.extension, productOrId?.name);
+      
+    } else {
+      console.log("Adding to wishlist as logged-in user");
+      await addToWishlist(productOrId, cookies, setCookie, setLoading2);
+    }
   };
 
   const refreshProducts = () => {
     setLoading(true);
     getSpecificProduct(productId)
       .then((res) => {
-        setProducts(res?.data ? [res.data] : []);
-        setLoading(false);
-      })
-      .catch(() => {
+      if (res?.data) {
+        setProducts([{ 
+          ...res.data, 
+          averageRating: res.average_rating, 
+          totalReviews: res.total_reviews 
+        }]);
+      } else {
         setProducts([]);
-        setLoading(false);
-      });
+      }
+      setLoading(false);
+    })
+    .catch(() => {
+      setProducts([]);
+      setLoading(false);
+    });
   };
 
   useEffect(refreshProducts, [productId]);
@@ -80,19 +111,20 @@ const ProductPage = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col items-center">
-      <div className="w-full h-[80px] bg-white shadow-lg fixed top-0 left-0 z-50 flex justify-between items-center px-5 lg:px-10">
-        <button onClick={() => navigate(-1)} className="flex items-center text-themegreen hover:text-themeyellow">
-          <FaArrowLeft className="mr-2" />
-          <span>Back</span>
+      <div className="w-full h-[80px] bg-white shadow-lg fixed top-0 left-0 z-50">
+      <div className="w-full h-full lg:px-10 px-5 flex items-center">
+        <button 
+        onClick={() => navigate('/')}
+        className="w-[105px] items-center justify-center flex gap-1 text-themegreen hover:text-themeyellow"
+        >
+        <FaArrowLeft className='mr-1 w-[20px] h-[20px]'/>
+        <h1 className='text-base font-semibold'>Back</h1>
         </button>
-        <h1 className="text-xl lg:text-2xl font-bold">Product Information</h1>
-        <button onClick={handleCartClick} className="flex items-center text-themegreen hover:text-themeyellow">
-          <span className="mr-2">Cart</span>
-          <FaShoppingCart />
-        </button>
+        <h1 className=" flex-grow text-center text-2xl font-bold capitalize">Product Information</h1>
+        <button onClick={handleCartClick} className="w-[105px] justify-center items-center flex gap-1 text-themegreen hover:text-themeyellow"><h1 className="text-base font-semibold">Cart </h1><FaShoppingCart className='w-[22px] h-[22px]'/></button>
+      </div>
       </div>
 
-      {/* Product Details */}
       <div className="w-full max-w-5xl mt-[100px] p-6 bg-white rounded-lg shadow-lg border">
         {products.map((product) => {
           const images = [
@@ -149,52 +181,120 @@ const ProductPage = () => {
                 )} 
               </div>
 
-              <div className="w-full lg:w-1/2 flex flex-col gap-5">
-                <h2 className="text-3xl font-bold">{product.name}</h2>
-                <h3 className="text-2xl text-themegreen font-semibold">₱{Number(product.price).toLocaleString()}</h3>
-                <p className="text-gray-600">{product.description}</p>
+              <div className="p-6 lg:p-8">
+                <div className="space-y-4">
+                  <div>
 
-                <div className="flex items-center gap-4">
-                  <div className="flex border rounded-lg">
-                    <button onClick={() => setQuantity(q => Math.max(1, q - 1))} className="p-2 hover:bg-gray-100">
-                      <FaMinus />
-                    </button>
-                    <span className="px-4">{quantity}</span>
+                    <p className="mb-1 text-sm font-medium text-themegreen">
+                      {product.category?.name}
+                    </p>
+                    <h1 className="mb-2 text-2xl font-bold text-gray-900">
+                      {product.name}
+                    </h1>
+
+                    <div className="flex items-center bg-white">
+                      <div className="flex items-center gap-1 text-lg border-black border-r pr-3">
+                        <span>({products[0]?.averageRating.toFixed(1)})</span>
+                        {[...Array(5)].map((_, i) => (
+                          <FaStar key={i} className={`text-lg ${i < Math.round(products[0]?.averageRating) ? "text-yellow-400" : "text-gray-300"}`} />
+                        ))}
+                      </div>
+
+                      <div className="text-gray-600 text-lg border-black border-r px-3">
+                        <span className="">{products[0]?.totalReviews} Reviews</span>
+                      </div>
+
+                      <div className="text-gray-600 text-lg pl-3">
+                        <span className="">{product.purchase_count} Sold</span>
+                      </div>
+                    </div>
+
+                  </div>
+                  <div className="border-t pt-4">
+                    <p className="text-3xl font-bold text-gray-900">
+                      ₱{Number(product.price).toLocaleString()}
+                    </p>
+                    <p className="mt-1 text-xs text-gray-500">
+                      Fast Shipping
+                    </p>
+                  </div>
+                  <div className="text-base text-gray-600">
+                    <p>{product.description || "No description available"}</p>
+                  </div>
+                  <div className="grid grid-cols-3 gap-2">
+                    <div className="flex flex-col items-center p-2 bg-gray-50 rounded-md">
+                      <MdLocalShipping className="w-5 h-5 mb-1 text-themegreen" />
+                      <p className="text-xs font-medium text-center">Free Shipping</p>
+                    </div>
+                    <div className="flex flex-col items-center p-2 bg-gray-50 rounded-md">
+                      <HiBadgeCheck className="w-5 h-5 mb-1 text-themegreen" />
+                      <p className="text-xs font-medium text-center">Good Quality</p>
+                    </div>
+                    <div className="flex flex-col items-center p-2 bg-gray-50 rounded-md">
+                      <RiSecurePaymentLine className="w-5 h-5 mb-1 text-themegreen" />
+                      <p className="text-xs font-medium text-center">Secure Payment</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-4">
+                    <div className="flex items-center border border-gray-200 rounded-md">
+                      <button
+                        className="flex items-center justify-center w-10 h-10 text-lg hover:bg-gray-100"
+                        onClick={() => setQuantity(q => Math.max(1, q - 1))}
+                      >
+                        <FaMinus className="text-sm" />
+                      </button>
+                      <span className="flex items-center justify-center w-10 h-10 font-medium border-x border-gray-200">
+                        {quantity}
+                      </span>
+                      <button
+                        className={`flex items-center justify-center w-10 h-10 text-lg hover:bg-gray-100 ${quantity >= product.stock ? "cursor-not-allowed" : ""}`}
+                        onClick={() => setQuantity(q => q + 1)}
+                        disabled={quantity >= product.stock}
+                      >
+                        <FaPlus className="text-sm" />
+                      </button>
+                    </div>
+
                     <button
-                      onClick={() => setQuantity(q => q + 1)}
-                      className={`p-2 hover:bg-gray-100 ${quantity >= product.stock ? "cursor-not-allowed" : ""}`}
-                      disabled={quantity >= product.stock}
+                      onClick={() =>
+                        cookies.token === "undefined" || !cookies.token
+                          ? handleAddToWishlist(product)
+                          : handleAddToWishlist(product.id)
+                      }
+                      className={`flex items-center justify-center w-10 h-10 bg-gray-100 rounded-md ${
+                        loading2 ? "opacity-50 cursor-not-allowed" : "hover:bg-gray-200"
+                      }`}
+                      disabled={loading2}
                     >
-                      <FaPlus />
+                      <FaRegHeart className="w-5 h-5 text-gray-600" />
                     </button>
                   </div>
-                  <span className={`text-lg font-medium ${product.stock === 0 ? 'text-red-600' : 'text-gray-500'}`}>
-                    {product.stock === 0 ? "Out of Stock" : `${product.stock} ${product.stock === 1 ? "stock" : "stocks"} left`}
-                  </span>
-                </div>
-
-                <div className="flex gap-3">
                   <button
-                    onClick={() => handleAddToCart(product.id, product.stock, quantity)}
-                    className={`bg-themegreen text-white px-6 py-2 rounded-lg ${loading2 ? "opacity-50 cursor-not-allowed" : "hover:bg-themeyellow hover:text-black"}`}
+                    onClick={() =>
+                      cookies.token === "undefined" || !cookies.token
+                        ? handleAddToCart(product)
+                        : handleAddToCart(product.id, product.stock, quantity)
+                    }
+                    className={`flex items-center justify-center w-full h-10 gap-2 text-sm font-semibold text-white rounded-md bg-themegreen ${
+                      loading2 ? "opacity-50 cursor-not-allowed" : "hover:bg-themeyellow hover:text-black"
+                    }`}
                     disabled={loading2}
                   >
+                    <MdAddShoppingCart className="w-5 h-5" />
                     Add to Cart
                   </button>
-                  <button
-                    onClick={() => handleAddToWishlist(product.id)}
-                    className={`bg-gray-200 px-6 py-2 rounded-lg ${loading2 ? "opacity-50 cursor-not-allowed" : "hover:bg-gray-300"}`}
-                    disabled={loading2}
-                  >
-                    Add to Wishlist
-                  </button>
+
                 </div>
               </div>
+
             </div>
           );
         })}
       </div>
 
+      <div className="mt-8">
+        <RecommendedProducts />
+      </div>
 
       <div className="my-8 w-full max-w-[1040px] bg-white shadow-lg rounded-lg p-4 sm:p-6 mx-auto">
         <h2 className="text-lg sm:text-xl font-bold text-center mb-4 sm:mb-6">Customer Reviews</h2>

@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from 'react'
 import { useCookies } from 'react-cookie';
-import { FaArrowLeft } from 'react-icons/fa';
+import { FaArrowLeft, FaPlus } from 'react-icons/fa';
 import { GoDotFill } from "react-icons/go";
 import { useNavigate } from 'react-router-dom';
 import profiles from '../assets/profilepic.png'
 import CustomModal from "../components/Modal"
 import { toast } from "react-toastify";
 import { imageUrl1 } from '../api/configuration';
-import { index } from "../api/auth";
+import { index, getUserAddresses } from "../api/auth";
 import { fetchOrders } from '../api/product-fetch';
 import { cancelOrder } from "../api/product-actions";
 import { url } from "../api/configuration";
@@ -15,6 +15,8 @@ import { url } from "../api/configuration";
 function AccountPage() {
     const navigate = useNavigate();
     const [user, setUser] = useState();
+    const [userAddresses, setUserAddresses] = useState([]);
+    const [isOpen, setIsOpen] = useState(false);
     const [cookies] = useCookies();
     const [openModal, setOpenModal] = useState(false);
     const [loading, setLoading] = useState(false);
@@ -22,6 +24,8 @@ function AccountPage() {
     const [showCancelConfirm, setShowCancelConfirm] = useState(false);
     const [selectedOrderId, setSelectedOrderId] = useState(null);
     const [formData, setFormData] = useState({ username: "", email: "", first_name: "", last_name: "", phone_number: "", address: "", second_address: "", third_address: "", });
+
+    const token = cookies.token;
 
     const refreshOrders = () => {
     fetchOrders(cookies.token).then((res) => {
@@ -41,6 +45,7 @@ function AccountPage() {
         setLoading(true);
         try{
         const response = await index(cookies.token);
+        const userData = response?.data || null;
         setUser(response.data);
         setFormData({
         username: response.data.username,
@@ -52,6 +57,9 @@ function AccountPage() {
         second_address: response.data.profile.second_address,
         third_address: response.data.profile.third_address,
         });
+        const addressesResponse = await getUserAddresses(userData.id, token);
+        console.log("User Addresses:", addressesResponse);
+        setUserAddresses(Array.isArray(addressesResponse.data) ? addressesResponse.data : []);
         }finally{
         setLoading(false);
         }
@@ -139,7 +147,7 @@ function AccountPage() {
         </div>
 
         <div className='flex flex-col lg:flex-row pt-20 p-7 gap-5'>
-            {user && (
+            {user && userAddresses && (
             <>
             <div className='w-full lg:w-[450px] h-auto bg-white flex justify-center items-center mx-auto mt-5 rounded-lg shadow-md p-5'>
                 <div className="">
@@ -160,7 +168,7 @@ function AccountPage() {
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-4 gap-x-8 p-9 bg-white rounded-b-lg shadow-md">
                     <div>
                     <p className="font-bold text-gray-700">Full Name:</p>
-                    <p className="text-gray-600">{user.profile.first_name} {user.profile.last_name}</p>
+                    <p className="text-gray-600">{user.profile.first_name || "No name added"} {user.profile.last_name}</p>
                     </div>
 
                     <div>
@@ -175,12 +183,12 @@ function AccountPage() {
 
                     <div>
                     <p className="font-bold text-gray-700">Phone:</p>
-                    <p className="text-gray-600">{user.profile.phone_number}</p>
+                    <p className="text-gray-600">{user.profile.phone_number || "No phone number added"}</p>
                     </div>
 
                     <div className="sm:col-span-2">
                     <p className="font-bold text-gray-700">Default Address:</p>
-                    <p className="text-gray-600">{user.profile.address}</p>
+                    <p className="text-gray-600">{user.profile.address || "No address added"}</p>
                     </div>
                 </div>
             </div>
@@ -207,13 +215,19 @@ function AccountPage() {
 
                             return (
                                 <div key={order.id} className='flex flex-col mb-5 rounded-md border shadow-md'>
-                                    <div className="flex flex-col sm:flex-row justify-between px-4 sm:px-5 py-3 border-b text-center sm:text-left">
-                                        <h1 className="text-sm sm:text-lg font-semibold">
-                                            {new Date(order.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric'})}
+                                    <div className="flex flex-col sm:flex-row justify-between items-center px-4 sm:px-5 py-3 border-b text-center sm:text-left">
+                                        <h1 className="text-sm sm:text-lg font-semibold mb-2 sm:mb-0">
+                                            {new Date(order.created_at).toLocaleDateString('en-US', {
+                                            year: 'numeric',
+                                            month: 'long',
+                                            day: 'numeric',
+                                            })}
                                         </h1>
-                                        <h1 className="text-sm sm:text-lg">
-                                            {order.order_status} | Total: ₱{orderTotal.toLocaleString()}
-                                        </h1>
+
+                                        <div className="flex flex-col sm:flex-row sm:items-center">
+                                            <h1 className="text-sm sm:text-lg border-r border-black pr-3">{order.order_status}</h1>
+                                            <h1 className="text-sm sm:text-lg pl-2">Total: ₱{orderTotal.toLocaleString()}</h1>
+                                        </div>
                                     </div>
 
                                     {order.products.map(product => (
@@ -346,20 +360,11 @@ function AccountPage() {
                             onChange={handleInputChange}
                             className="border rounded-md p-3 w-full focus:outline-none focus:ring-2 focus:ring-themegreen"
                         />
-                        <input
-                            name="second_address"
-                            placeholder="Second Address"
-                            value={formData.second_address || ""}
-                            onChange={handleInputChange}
-                            className="border rounded-md p-3 w-full focus:outline-none focus:ring-2 focus:ring-themegreen"
-                        />
-                        <input
-                            name="third_address"
-                            placeholder="Third Address"
-                            value={formData.third_address || ""}
-                            onChange={handleInputChange}
-                            className="border rounded-md p-3 w-full focus:outline-none focus:ring-2 focus:ring-themegreen"
-                        />
+                        {/* <button
+                            type="button" onClick={() => { setOpenModal(false); setIsOpen(true); }} className="flex items-center px-4 py-2 text-sm font-semibold bg-gray-300 rounded-lg hover:bg-opacity-75 w-full justify-center"
+                        >
+                            View Address
+                        </button> */}
                         <div className="flex justify-center">
                             <button
                                 type="submit"
@@ -370,9 +375,53 @@ function AccountPage() {
                             </button>
                         </div>
                     </form>
-                </div>
+                </div> 
             </div>
         </CustomModal>
+        {isOpen && (
+            <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+                <div className="bg-white p-6 rounded-lg shadow-lg max-w-md w-full">
+                <h2 className="text-lg font-bold text-gray-900">Delivery Address</h2>
+                <div className="mt-4 space-y-3">
+                    {userAddresses.length > 0 ? (
+                    userAddresses.map((address, index) => (
+                    <div
+                        key={index}
+                        className="p-3 border rounded-lg flex justify-between items-center"
+                    >
+                        <div className="cursor-pointer flex-grow">
+                        <p className="text-sm font-semibold">{address.full_name}</p>
+                        <p className="text-sm text-gray-700">{address.phone_number}</p>
+                        <p className="text-sm text-gray-700">{address.street_address} {address.barangay} {address.city} {address.province} {address.region} {address.postal_code}</p>
+                        </div>
+                        <button
+                        className="text-red-500 hover:text-red-700 text-sm font-bold"
+                        >
+                        ❌
+                        </button>
+                    </div>
+                    ))
+                    ) : (
+                    <p className="text-gray-500 text-center">No saved addresses.</p>
+                    )}
+                </div>
+                <div className="flex justify-end gap-4 mt-4">
+                    <button
+                    className="px-4 py-2 text-sm font-semibold bg-gray-300 rounded-lg hover:bg-opacity-75"
+                    onClick={() => setIsOpen(false)}
+                    >
+                    Cancel
+                    </button>
+                    <button
+                    className="px-4 py-2 text-sm font-semibold bg-themegreen text-white rounded-lg hover:bg-themeyellow hover:text-black"
+                    onClick={() => setIsOpen(false)}
+                    >
+                    Confirm Selection
+                    </button>
+                </div>
+                </div>
+            </div>
+            )}
     </div>
     </div>
   )

@@ -20,13 +20,14 @@ const Dashboard = () => {
     const [salesByCategory, setSalesByCategory] = useState([]);
     const [lastMonthOrdersCount, setLastMonthOrdersCount] = useState(0);
     const [monthlySalesData, setMonthlySalesData] = useState([]);
-    const [totalIncome, setTotalIncome] = useState([]);
+    const [totalRevenueAllTime, setTotalRevenueAllTime] = useState([]);
+    const [totalProductPriceAllTime, setTotalProductPriceAllTime] = useState([]);
     const [newUsersCount, setNewUsersCount] = useState(0);
 
 
     useEffect(() => {
         getNewUsersCount(cookies.token).then((res) => {
-            console.log("API Response:", res); // Debugging log
+            console.log("API Response:", res);
             setNewUsersCount(res?.data?.new_users_count ?? 0);
         });
     }, []);
@@ -34,9 +35,10 @@ const Dashboard = () => {
 
     useEffect(() => {
         fetchSalesData(cookies.token).then((data) => {
-            console.log("API Response:", data); // Debugging log
+            console.log("API Response:", data);
         setMonthlySalesData(Array.isArray(data.monthly_sales) ? data.monthly_sales : []);
-        setTotalIncome(data.total_income || 0);
+        setTotalRevenueAllTime(data.total_revenue || 0);
+        setTotalProductPriceAllTime(data.total_product_price || 0);
         });
     }, []);
     
@@ -54,7 +56,7 @@ const Dashboard = () => {
 
     const refreshOrders = () => {
         fetchRecentOrders(cookies.token).then((res) => {
-            console.log("Recent Orders API Response:", res); // Debugging log
+            console.log("Recent Orders API Response:", res);
 
         setOrders(Array.isArray(res?.data?.recent_orders) ? res.data.recent_orders : []);
         setLastMonthOrdersCount(res?.data?.last_month_orders_count ?? 0);
@@ -94,7 +96,7 @@ const Dashboard = () => {
         datasets: [
             {
                 label: "Monthly Sales",
-                data: monthlySalesData.map((entry) => entry.total_revenue), // Y-axis: Revenue
+                data: monthlySalesData.map((entry) => entry.monthly_revenue),
                 borderColor: "#3b82f6",
                 backgroundColor: "rgba(59,130,246,0.2)",
                 tension: 0.3,
@@ -140,8 +142,8 @@ const Dashboard = () => {
         datasets: [
             {
                 label: "Sales Distribution",
-                data: categories.map((category) => salesDataMap[category.name] ?? 0), // Use mapped data
-                backgroundColor: ["#3b82f6", "#f59e0b", "#10b981", "#e11d48", "#8b5cf6", "#ec4899", "#14b8a6", "#f43f5e"], // Tailwind colors
+                data: categories.map((category) => salesDataMap[category.name] ?? 0),
+                backgroundColor: ["#3b82f6", "#f59e0b", "#10b981", "#e11d48", "#8b5cf6", "#ec4899", "#14b8a6", "#f43f5e"],
                 borderWidth: 2,
             },
         ],
@@ -151,7 +153,7 @@ const Dashboard = () => {
         maintainAspectRatio: false,
         plugins: {
         legend: {
-            display: false, // Hides the default Chart.js legend
+            display: false,
         },
         },
     };
@@ -165,7 +167,6 @@ const Dashboard = () => {
             <Sidebar className="fixed top-[50px] left-0 bottom-0 w-[18%] z-40" />
             <div className="w-[80%] mx-auto ml-max[max(5vw,25px)] my-8 text-gray-600 text-base">
                 <div className="p-6 space-y-6 bg-gray-100 min-h-screen">
-                    {/* Top Stats */}
                     <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                         <div className="bg-purple-500 text-white p-4 rounded-xl shadow relative overflow-hidden">
                         <div className="absolute top-4 right-4 bg-white rounded-full p-2">
@@ -181,9 +182,9 @@ const Dashboard = () => {
                         <div className="absolute top-4 right-4 bg-white rounded-full p-2">
                             <FaDollarSign className="text-green-500 text-xl" />
                         </div>
-                        <h2 className="text-lg font-semibold">Total Income</h2>
-                        <p className="text-2xl font-bold">₱{totalIncome.toLocaleString()}</p>
-                        <span className="text-sm">Increased by 7.35%</span>
+                        <h2 className="text-lg font-semibold">Total Revenue</h2>
+                        <p className="text-2xl font-bold">₱{Number(totalRevenueAllTime).toLocaleString(undefined, { maximumFractionDigits: 0 })}</p>
+                        <span className="text-sm">All time</span>
                         <div className="mt-4 bg-white bg-opacity-30 h-16 rounded-md"></div>
                         </div>
 
@@ -192,8 +193,8 @@ const Dashboard = () => {
                             <FaChartLine className="text-blue-500 text-xl" />
                         </div>
                         <h2 className="text-lg font-semibold">Total Expense</h2>
-                        <p className="text-2xl font-bold">₱26,526</p>
-                        <span className="text-sm">Increased by 7.35%</span>
+                        <p className="text-2xl font-bold">₱{Number(totalProductPriceAllTime).toLocaleString(undefined, { maximumFractionDigits: 0 })}</p>
+                        <span className="text-sm">All time</span>
                         <div className="mt-4 bg-white bg-opacity-30 h-16 rounded-md"></div>
                         </div>
 
@@ -208,10 +209,8 @@ const Dashboard = () => {
                         </div>
                     </div>
 
-                    {/* Summary and Top Products */}
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
 
-                        {/* Summary */}
                         <div className="bg-white rounded-xl shadow p-6">
                             <div className="flex justify-between items-center mb-4">
                                 <h2 className="text-xl font-bold text-gray-800">Sales Overview</h2>
@@ -222,7 +221,6 @@ const Dashboard = () => {
                             </div>
                         </div>
 
-                        {/* Top Selling Products */}
                         <div className="bg-white p-6 rounded-xl shadow">
                             <h3 className="text-xl font-semibold mb-4">Top Selling Products</h3>
                             <div className="overflow-y-auto min-h-[300px] max-h-[310px]">
@@ -306,7 +304,7 @@ const Dashboard = () => {
                                                         </span>
                                                     </td>
                                                     <td className="px-4 py-3">
-                                                        <div>
+                                                        <div className="max-h-12 overflow-y-auto">
                                                             {order.products?.length > 0 ? (
                                                                 order.products.map(product => (
                                                                     <p className="py-0.5" key={`${order.id}-${product.id}`}>

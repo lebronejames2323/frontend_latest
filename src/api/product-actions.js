@@ -47,7 +47,7 @@ export const addToCart = async (productId, cookies, setCookie, setLoading2, prod
     if (addResponse.ok) {
       const message = addData.message || "Product added to cart successfully!";
 
-      if (message === "It's already in the cart.") {
+      if (message === "Its already in the cart.") {
         toast.error("Product is already in the cart.");
       } else {
         toast.success(message);
@@ -62,8 +62,30 @@ export const addToCart = async (productId, cookies, setCookie, setLoading2, prod
 
 
 
-export const addToCartWithQuantity = async (productId, cookies, setLoading2, productStock, quantity,) => {
+export const addToCartWithQuantity = async (productId, cookies, setCookie, setLoading2, productStock, quantity, productPrice = null, productExtension = null, productName = null) => {
   const token = cookies.token;
+
+  if (!token || token === "undefined" || token.trim() === "") {
+    let guestCart = cookies.guestCart || {};
+
+    if (guestCart[productId]) {
+      toast.error("Product is already in the cart.");
+      return;
+    }
+
+    guestCart[productId] = {
+      quantity: 1,
+      price: productPrice,
+      stock: productStock,
+      extension: productExtension,
+      name: productName,
+    };
+    setCookie("guestCart", guestCart, { path: "/", expires: new Date(Date.now() + 86400000) });
+
+    toast.success("Product added to cart!");
+    return;
+  }
+
   if (!token || token === "undefined" || token.trim() === "") {
     toast.error('You are not logged in.');
     return;
@@ -152,10 +174,15 @@ export const addToWishlist = async (productId, cookies, setCookie, setLoading2, 
     });
 
     const addData = await addResponse.json();
+    
     if (addResponse.ok) {
-      toast.success("Product added to wishlist successfully!");
-    } else {
-      toast.error("Failed to add product to wishlist.");
+      const message = addData.message || 'Product added to wishlist!';
+
+      if (message === "Its already in the wishlist.") {
+        toast.error("Product is already in the wishlist.");
+      } else {
+        toast.success(message);
+      }
     }
   } catch (error) {
     toast.error("An error occurred.");
@@ -238,7 +265,7 @@ export const deleteProductFromCart = async (cartId, productId, cookies, setLoadi
     
 
 
-export const placeOrder = async (carts, cookies, setLoading, setLastOrder, setCarts, setShowReceipt, deliveryAddress, paymentMethod) => {
+export const placeOrder = async (carts, cookies, setLoading, setLastOrder, setCarts, setShowReceipt, deliveryAddress, paymentMethod, fullName, phoneNumber) => {
   try {
     setLoading(true);
 
@@ -249,7 +276,7 @@ export const placeOrder = async (carts, cookies, setLoading, setLastOrder, setCa
       quantity: product.pivot.quantity,
     }));
 
-    console.log("Order Payload:", { products, deliveryAddress, paymentMethod });
+    console.log("Order Payload:", { products, deliveryAddress, paymentMethod, fullName, phoneNumber });
 
     const response = await fetch(`${url}/orders`, {
       method: "POST",
@@ -260,11 +287,13 @@ export const placeOrder = async (carts, cookies, setLoading, setLastOrder, setCa
       body: JSON.stringify({ 
         products, 
         delivery_address: deliveryAddress,
-        payment_method: paymentMethod
+        payment_method: paymentMethod,
+        full_name: fullName, 
+        phone_number: phoneNumber 
       }),
     });
 
-    console.log("Final Order Data:", JSON.stringify({ products, deliveryAddress, paymentMethod }, null, 2));
+    console.log("Final Order Data:", JSON.stringify({ products, deliveryAddress, paymentMethod, fullName, phoneNumber }, null, 2));
 
     if (!response.ok) {
       const errorData = await response.json();
@@ -297,7 +326,6 @@ export const placeOrder = async (carts, cookies, setLoading, setLastOrder, setCa
     setShowReceipt(true);
   }
 };
-
 
 
 

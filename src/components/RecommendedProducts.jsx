@@ -1,36 +1,19 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { imageUrl1, url } from "../api/configuration";
-import { useCookies } from "react-cookie";
+import { imageUrl1 } from "../api/configuration";
+import { recommendedProducts } from "../api/product-fetch";
 
-function RecommendedProducts({ excludeProductId = null }) {
+function RecommendedProducts() {
   const [products, setProducts] = useState([]);
-  const [cookies] = useCookies();
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const fetchRecommendedProducts = async () => {
-      try {
-        const response = await fetch(`${url}/recommended-products/${excludeProductId || ""}`, {
-          headers: {
-            Authorization: `Bearer ${cookies.token}`,
-          },
-        });
-
-        if (!response.ok) {
-          throw new Error("Failed to fetch recommendations");
-        }
-
-        const data = await response.json();
-        setProducts(data.data || []);
-      } catch (error) {
-        console.error("Error fetching recommendations:", error);
-        setProducts([]);
-      }
+    const refreshProducts = () => {
+      recommendedProducts().then((res) => {
+      setProducts(res?.data);
+      });
     };
 
-    fetchRecommendedProducts();
-    }, [excludeProductId, cookies.token]);
+    useEffect(refreshProducts, []);
 
     const viewProduct = (productId) => navigate(`/product/${productId}`);
 

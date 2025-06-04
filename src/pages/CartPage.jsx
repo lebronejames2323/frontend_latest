@@ -4,8 +4,7 @@ import { FaArrowLeft, FaMinus, FaPlus, FaTrashAlt } from 'react-icons/fa';
 import { useCookies } from 'react-cookie';
 import { imageUrl1 } from '../api/configuration';
 import { fetchCarts } from '../api/product-fetch';
-import { deleteProductFromCart, placeOrder, updateProductQuantity } from '../api/product-actions';
-import OrderReceipt from '../components/OrderReceipt';
+import { deleteProductFromCart, updateProductQuantity } from '../api/product-actions';
 import { index } from '../api/auth';
 
 const CartPage = () => {
@@ -14,12 +13,8 @@ const CartPage = () => {
     const [cookies, setCookie] = useCookies(["guestCart"]);
     const [loading, setLoading] = useState(false);
     const [loading2, setLoading2] = useState(false);
-    const [showReceipt, setShowReceipt] = useState(false);
-    const [lastOrder, setLastOrder] = useState(null);
     const [user, setUser] = useState(null);
     const [showConfirm, setShowConfirm] = useState(false);
-    const [deliveryAddress, setDeliveryAddress] = useState("");
-    const [paymentMethod, setPaymentMethod] = useState("Cash on Delivery");
 
 
     const token = cookies.token;
@@ -89,11 +84,7 @@ const CartPage = () => {
     };
 
 
-    const closeReceipt = () => {
-        setShowReceipt(false);
-    };
-
-    const handlePlaceOrder = async () => {
+    const handleCheckoutOrder = async () => {
         setShowConfirm(true);
     };
     
@@ -276,56 +267,23 @@ const CartPage = () => {
                                     </div>
                                     {user ? (
                                     <>
-                                    {user.profile.address || user.profile.second_address || user.profile.third_address ? (
-                                    <select 
-                                        className="w-full p-2 border rounded-lg"
-                                        value={deliveryAddress} 
-                                        onChange={(e) => setDeliveryAddress(e.target.value)}
-                                    >
-                                        <option value="">Select Delivery Address</option>
-                                        {user.profile.address && <option value={user.profile.address}>{user.profile.address}</option>}
-                                        {user.profile.second_address && <option value={user.profile.second_address}>{user.profile.second_address}</option>}
-                                        {user.profile.third_address && <option value={user.profile.third_address}>{user.profile.third_address}</option>}
-                                    </select>
-                                    ) : (
                                     <button 
-                                        onClick={() => navigate('/account')} 
-                                        className="w-full p-2 border rounded-lg bg-themegreen text-white hover:bg-themeyellow"
-                                    >
-                                        Add Delivery Option
-                                    </button>
-                                    )}
-
-                                    <select 
-                                        className="w-full p-2 border rounded-lg mt-2"
-                                        value={paymentMethod || "Cash on Delivery"} 
-                                        onChange={(e) => setPaymentMethod(e.target.value)}
-                                    >
-                                        <option value="Cash on Delivery">Cash on Delivery</option>
-                                        <option value="Credit Card">Credit Card</option>
-                                        <option value="PayPal">PayPal</option>
-                                    </select>
-                                    <button 
-                                        onClick={handlePlaceOrder}
-                                        disabled={loading2}
+                                        onClick={handleCheckoutOrder}
                                         className="w-full text-base sm:text-lg py-2 sm:py-3 font-semibold text-white transition-colors rounded-lg bg-themegreen hover:bg-themeyellow hover:text-black disabled:opacity-50 disabled:cursor-not-allowed"
                                     >
-                                        {loading2 ? "Processing..." : "Place order"}
+                                        Check out
                                     </button>
                                     {showConfirm && (
                                     <div className="fixed inset-0 bg-black bg-opacity-20 flex items-center justify-center z-[1000]">
                                         <div className="bg-white p-6 rounded-lg shadow-md w-96 text-center">
                                         <h2 className="text-xl font-semibold text-gray-700">Confirm Your Order</h2>
                                         <p className="text-base text-gray-600 mt-2">
-                                            Are you sure you want to place this order?
+                                            Are you sure this is all you want to checkout?
                                         </p>
                                         <div className="mt-4 flex justify-center gap-5">
                                             <button 
                                             className="px-4 py-2 bg-themegreen text-white rounded-lg hover:bg-themeyellow hover:text-black"
-                                            onClick={async () => {
-                                                await placeOrder(carts, cookies, setLoading2, setLastOrder, setCarts, setShowReceipt, deliveryAddress, paymentMethod);
-                                                setShowConfirm(false);
-                                            }}
+                                            onClick={() => navigate('/checkout-page')}
                                             >
                                             Confirm
                                             </button>
@@ -354,9 +312,6 @@ const CartPage = () => {
                     </div>
                 </div>
             </div>
-            {showReceipt && lastOrder && (
-                <OrderReceipt order={lastOrder} onClose={closeReceipt} />
-            )}
         </div>
     );
 };
