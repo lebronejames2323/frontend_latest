@@ -37,9 +37,6 @@ function TermsOfService({ isOpen, onClose }) {
             <strong>5. Changes to Terms</strong><br />
             We reserve the right to modify these terms at any time. Changes will be effective immediately upon posting.
           </p>
-          <p>
-            By continuing to use our service, you agree to any updated terms.
-          </p>
         </div>
       </div>
     </div>

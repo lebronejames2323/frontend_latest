@@ -253,7 +253,7 @@ const Dashboard = () => {
                         
                         <div className="bg-white rounded-xl shadow p-6 w-full max-w-lg">
                             {/* Title at the top */}
-                            <h2 className="text-xl font-bold text-gray-800 mb-4 text-center">Sold by Item Type</h2>
+                            <h2 className="text-xl font-bold text-gray-800 mb-4 text-center">Sold by Category Type</h2>
 
                             {/* Chart and Legend side by side */}
                             <div className="flex items-center">

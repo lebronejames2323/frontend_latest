@@ -10,19 +10,7 @@ function Login() {
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
-  const [acceptTerms, setAcceptTerms] = useState(false);
-  const [error, setError] = useState('');
   const [cookies, setCookie] = useCookies();
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (!acceptTerms) {
-      setError('You must accept the Terms of Service.');
-      return;
-    }
-    setError('');
-    onFormSubmit(e);
-  };
 
   const onFormSubmit = (e) => {
   e.preventDefault();

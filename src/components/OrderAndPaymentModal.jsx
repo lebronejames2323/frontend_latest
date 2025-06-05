@@ -26,11 +26,6 @@ const OrderAndPaymentModal = ({ isOpen, onClose }) => {
               </li>
 
               <li>
-                <strong>Bank Transfer</strong><br />
-                Pay via BPI or UnionBank through Xendit by providing bank details during checkout.
-              </li>
-
-              <li>
                 <strong>eWallets</strong><br />
                 Accepted wallets include GCash and GrabPay. Select Xendit at checkout and follow the wallet-specific steps.
               </li>

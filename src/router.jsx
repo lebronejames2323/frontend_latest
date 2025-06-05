@@ -16,6 +16,7 @@ import AllProductsPage from "./pages/AllProductsPage";
 import OrderReview from "./pages/OrderReview";
 import CheckoutPage from "./pages/CheckoutPage";
 import Dashboard from "./admin/Dashboard";
+import Contact from './pages/Contact';
 
 export const router = createBrowserRouter([
   {
@@ -85,5 +86,9 @@ export const router = createBrowserRouter([
   {
   path: "/admin-dashboard",
     element: <Dashboard />,
+  },
+  {
+    path: "/contact",
+    element: <Contact />,
   },
 ]);

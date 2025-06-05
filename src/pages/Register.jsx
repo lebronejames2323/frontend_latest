@@ -12,6 +12,7 @@ function Register() {
   const navigate = useNavigate();
   const [acceptTerms, setAcceptTerms] = useState(false);
   const [showTermsModal, setShowTermsModal] = useState(false);
+  const [cookies, setCookie] = useCookies(["userConsent"]);
 
   const onFormSubmit = (e) => {
     e.preventDefault();
@@ -20,7 +21,7 @@ function Register() {
       const formdata = new FormData(e.target);
       
       if (!acceptTerms) {
-        toast.error("You must accept the Terms of Service.");
+        toast.error("You must read and accept the Terms of Conditions.");
         setLoading(false);
         return;
       }
@@ -35,6 +36,7 @@ function Register() {
       register(formdata)
       .then((res) => {
       if (res?.ok) {
+          setCookie("userConsent", true, { path: "/", expires: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000) }); 
           toast.success(res?.message ?? "Registered!");
           navigate("/login");
       } else if (res?.errors) {

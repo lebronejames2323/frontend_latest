@@ -3,17 +3,19 @@ import { FaSearch, FaHeart, FaShoppingCart, FaBars } from 'react-icons/fa'
 import { FaTimes } from 'react-icons/fa';
 import { IoPerson } from 'react-icons/io5'
 import { Link as ScrollLink } from 'react-scroll'
+import { Link as RouterLink } from 'react-router-dom'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { index, logout as Logout } from '../api/auth';
 import { useCookies } from 'react-cookie';
 import { toast } from "react-toastify";
 import { imageUrl1 } from '../api/configuration';
 import { getAllProducts } from "../api/product-fetch";
+import CookiesModal from "../components/CookiesModal"
 
 function Header() {
 
     const [user, setUser] = useState(null);
-    const [cookies, removeCookie] = useCookies();
+    const [cookies, setCookie, removeCookie] = useCookies(["userConsent", "token"]);
     const navigate = useNavigate();
     const location = useLocation();
     const [searchQuery, setSearchQuery] = useState('');
@@ -24,7 +26,12 @@ function Header() {
     const [searchError, setSearchError] = useState('');
     const searchDebounceRef = useRef(null);
     const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const [showCookieModal, setShowCookieModal] = useState(!cookies.userConsent);
 
+    const handleAcceptCookies = () => {
+        setCookie("userConsent", true, { path: "/", expires: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000) });
+        setShowCookieModal(false);
+    };
 
     const toggleMenu = () => {
         setIsMenuOpen(!isMenuOpen);
@@ -148,6 +155,14 @@ function Header() {
                         Products
                     </a>
                 </li>
+                <li>
+                    <RouterLink
+                        to="/contact"
+                        className="text-black text-sm uppercase font-semibold px-5 py-2 rounded-lg hover:bg-themegreen hover:text-white cursor-pointer"
+                    >
+                        Contact
+                    </RouterLink>
+                </li>
                 {['Category', 'Featured', 'Contact'].map((item, index) => (
                     <li key={index}>
                         <ScrollLink
@@ -163,6 +178,7 @@ function Header() {
                 ))}
             </ul>
 
+{showCookieModal && <CookiesModal onAccept={handleAcceptCookies} />}+
     
             <div id='header-icons' className='lg:flex hidden justify-center items-center gap-6 text-black'>
                 <div className='relative items-center justify-center hidden gap-8 lg:flex'>
