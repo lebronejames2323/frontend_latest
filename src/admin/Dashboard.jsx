@@ -192,7 +192,7 @@ const Dashboard = () => {
                         <div className="absolute top-4 right-4 bg-white rounded-full p-2">
                             <FaChartLine className="text-blue-500 text-xl" />
                         </div>
-                        <h2 className="text-lg font-semibold">Total Expense</h2>
+                        <h2 className="text-lg font-semibold">Total Inventory Worth</h2>
                         <p className="text-2xl font-bold">₱{Number(totalProductPriceAllTime).toLocaleString(undefined, { maximumFractionDigits: 0 })}</p>
                         <span className="text-sm">All time</span>
                         <div className="mt-4 bg-white bg-opacity-30 h-16 rounded-md"></div>

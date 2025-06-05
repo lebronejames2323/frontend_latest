@@ -141,7 +141,7 @@ function AccountPage() {
                 <FaArrowLeft className='mr-1 w-[20px] h-[20px]'/>
                 <h1 className='text-base font-semibold'>Back</h1>
                 </button>
-                <h1 className="flex-grow text-center text-2xl font-bold">Account Page</h1>
+                <h1 className=" flex-grow text-center text-3xl italic font-bold capitalize">CyberDrive</h1>
                 <div className="w-[105px]"></div>
             </div>
         </div>

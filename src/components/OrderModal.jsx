@@ -50,7 +50,7 @@ const OrderModal = ({ order, isOpen, onClose }) => {
               />
               <span>{product.name}</span>
             </div>
-            <span className="font-semibold">₱{product.price * product.pivot.quantity}</span>
+            <span className="font-semibold">₱{product.price} x{product.pivot.quantity}</span>
           </li>
         ))}
       </ul>

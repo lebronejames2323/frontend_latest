@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { FaCreditCard, FaPlus } from "react-icons/fa";
+import { FaCreditCard, FaPlus, FaArrowLeft, } from "react-icons/fa";
 import { FaDeleteLeft } from "react-icons/fa6";
 import { useNavigate } from 'react-router-dom';
 import { useCookies } from 'react-cookie';
@@ -18,11 +18,6 @@ const regionsData = {
       "Quezon City": ["Bagong Pag-Asa", "Project 4", "Tandang Sora"],
       "Valenzuela City": ["Malinta", "Gen. T. de Leon", "Karuhatan"],
       "Pasig City": ["Bagong Ilog", "Manggahan", "Santolan"],
-    },
-    "Cavite": {
-      "Bacoor": ["Mambog", "Molino", "Talaba"],
-      "Imus": ["Alapan", "Bayan Luma", "Medicion"],
-      "Dasmariñas": ["Salitran", "Burol", "San Agustin"],
     },
   },
   "North Luzon": {
@@ -295,12 +290,21 @@ const CheckoutPage = () => {
     <div className="max-w-4xl mx-auto bg-gray-100">
       {user && userAddresses? (
       <>
+      <div className="w-full h-[80px] bg-white shadow-lg fixed top-0 left-0 z-50">
+            <div className="w-full h-full lg:px-10 px-5 flex items-center">
+              <button 
+              onClick={() => navigate('/')}
+              className="w-[105px] items-center justify-center flex gap-1 text-themegreen hover:text-themeyellow"
+              >
+              <FaArrowLeft className='mr-1 w-[20px] h-[20px]'/>
+              <h1 className='text-base font-semibold'>Back</h1>
+              </button>
+              <h1 className=" flex-grow text-center text-3xl italic font-bold capitalize">CyberDrive</h1>
+            </div>
+            </div>
         {/* Header */}
-        <div className="w-full bg-gradient-to-r bg-themegreen text-white text-center py-4 shadow-md">
-          <h1 className="text-2xl font-bold">Checkout</h1>
-        </div>
 
-        <div className='p-5'>
+        <div className='p-5 pt-20'>
           {/* Address Section */}
           <div className="mb-6 p-4 border shadow-sm bg-white">
             <h2 className="text-lg font-bold text-gray-900">Delivery Address</h2>

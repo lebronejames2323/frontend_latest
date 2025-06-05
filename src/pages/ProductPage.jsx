@@ -120,7 +120,7 @@ const ProductPage = () => {
         <FaArrowLeft className='mr-1 w-[20px] h-[20px]'/>
         <h1 className='text-base font-semibold'>Back</h1>
         </button>
-        <h1 className=" flex-grow text-center text-2xl font-bold capitalize">Product Information</h1>
+        <h1 className=" flex-grow text-center text-3xl italic font-bold capitalize">CyberDrive</h1>
         <button onClick={handleCartClick} className="w-[105px] justify-center items-center flex gap-1 text-themegreen hover:text-themeyellow"><h1 className="text-base font-semibold">Cart </h1><FaShoppingCart className='w-[22px] h-[22px]'/></button>
       </div>
       </div>
@@ -217,6 +217,9 @@ const ProductPage = () => {
                     <p className="mt-1 text-xs text-gray-500">
                       Fast Shipping
                     </p>
+                  </div>
+                  <div className="text-base font-bold">
+                    <p>Description</p>
                   </div>
                   <div className="text-base text-gray-600">
                     <p>{product.description || "No description available"}</p>

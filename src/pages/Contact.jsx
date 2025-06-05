@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { FaArrowLeft } from 'react-icons/fa';
 
 const Contact = () => {
   const [form, setForm] = useState({ name: '', email: '', message: '' });
@@ -29,12 +30,19 @@ const Contact = () => {
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 py-10">
-      <button
-        onClick={() => navigate(-1)}
-        className="absolute top-6 left-6 bg-themegreen text-white px-4 py-2 rounded-lg hover:bg-themeyellow hover:text-black transition"
-      >
-        Back
-      </button>
+      <div className="w-full h-[70px] sm:h-[80px] bg-white shadow-lg fixed top-0 left-0 z-50">
+                <div className="w-full h-full px-4 sm:px-10 flex items-center justify-between">
+                    <button 
+                        onClick={() => navigate('/')}
+                        className="flex items-center gap-1 text-themegreen hover:text-themeyellow"
+                    >
+                        <FaArrowLeft className='w-5 h-5 sm:w-[20px] sm:h-[20px]' />
+                        <span className="text-sm sm:text-base font-semibold">Back</span>
+                    </button>
+                    <h1 className="flex-grow text-center text-3xl italic font-bold capitalize">CyberDrive</h1>
+                    <div className="w-[105px]"></div>
+                </div>
+            </div>
       <div className="bg-white p-8 rounded-xl shadow-lg w-full max-w-lg mt-10">
         <h2 className="text-2xl font-bold mb-6 text-themegreen">Contact Us</h2>
         {submitted ? (

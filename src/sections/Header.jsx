@@ -163,7 +163,7 @@ function Header() {
                         Contact
                     </RouterLink>
                 </li>
-                {['Category', 'Featured', 'Contact'].map((item, index) => (
+                {['Category', 'Featured'].map((item, index) => (
                     <li key={index}>
                         <ScrollLink
                             to={item.toLowerCase()}
@@ -178,7 +178,7 @@ function Header() {
                 ))}
             </ul>
 
-{showCookieModal && <CookiesModal onAccept={handleAcceptCookies} />}+
+{showCookieModal && <CookiesModal onAccept={handleAcceptCookies} />}
     
             <div id='header-icons' className='lg:flex hidden justify-center items-center gap-6 text-black'>
                 <div className='relative items-center justify-center hidden gap-8 lg:flex'>
