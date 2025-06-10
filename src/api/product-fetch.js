@@ -208,3 +208,14 @@ export const getProductRating = async (productId) => {
 
   return await res.json();
 };
+
+export const getProductVariations = async () => {
+  const res = await fetch(`${url}/variations`, {
+    method: "GET",
+    headers: {
+      Accept: "application/json",
+    },
+  });
+
+  return await res.json();
+};

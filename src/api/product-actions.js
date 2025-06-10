@@ -62,64 +62,70 @@ export const addToCart = async (productId, cookies, setCookie, setLoading2, prod
 
 
 
-export const addToCartWithQuantity = async (productId, cookies, setCookie, setLoading2, productStock, quantity, productPrice = null, productExtension = null, productName = null) => {
+export const addToCartWithQuantity = async ( product, cookies, setCookie, setLoading2, productStock, quantity, productPrice = null, productExtension = null, productName = null, selectedVariation = null ) => {
   const token = cookies.token;
 
   if (!token || token === "undefined" || token.trim() === "") {
     let guestCart = cookies.guestCart || {};
 
-    if (guestCart[productId]) {
+    if (guestCart[product.id]) {
       toast.error("Product is already in the cart.");
       return;
     }
 
-    guestCart[productId] = {
-      quantity: 1,
+    guestCart[product.id] = {
+      quantity,
       price: productPrice,
       stock: productStock,
       extension: productExtension,
       name: productName,
+      variation_id: selectedVariation ? selectedVariation.id : null,
     };
-    setCookie("guestCart", guestCart, { path: "/", expires: new Date(Date.now() + 86400000) });
 
+    setCookie("guestCart", guestCart, { path: "/", expires: new Date(Date.now() + 86400000) });
     toast.success("Product added to cart!");
     return;
   }
 
-  if (!token || token === "undefined" || token.trim() === "") {
-    toast.error('You are not logged in.');
-    return;
-  }
-
-  if (typeof productStock === 'undefined' || productStock <= 0) {
-    toast.error('This product is out of stock!');
-    return;
-  }
-
-  if (quantity < 1) {
-    toast.error('Please select a valid quantity.');
-    return;
-  }
+  console.log("Token:", token);
+  console.log("Product ID:", product.id);
+  console.log("Quantity:", quantity);
+  console.log("Selected Variation:", selectedVariation);
+  console.log("Request Payload:", JSON.stringify({
+    products: [{
+      id: product.id,
+      quantity,
+      price: productPrice,
+      variation_id: selectedVariation ? selectedVariation.id : null,
+    }],
+  }));
 
   try {
     setLoading2(true);
 
     const addResponse = await fetch(`${url}/carts`, {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`,
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`,
       },
       body: JSON.stringify({
-        products: [{ id: productId, quantity, }],
+        products: [{
+          id: product.id,
+          quantity,
+          price: productPrice,
+          variation_id: selectedVariation ? selectedVariation.id : null,
+        }],
       }),
     });
 
-    const addData = await addResponse.json();
-    
-    if (addResponse.ok) {
-      const message = addData.message || 'Product added to cart successfully!';
+    console.log("API Response Status:", addResponse.status);
 
+    const addData = await addResponse.json();
+    console.log("API Response Data:", addData);
+
+    if (addResponse.ok) {
+      const message = addData.message || "Product added to cart successfully!";
       if (message === "Its already in the cart.") {
         toast.error("Product is already in the cart.");
       } else {
@@ -128,11 +134,12 @@ export const addToCartWithQuantity = async (productId, cookies, setCookie, setLo
     }
   } catch (error) {
     console.error("Fetch error:", error);
-    toast.error('An error occurred.');
+    toast.error("An error occurred.");
   } finally {
     setLoading2(false);
   }
 };
+
 
 
 

@@ -17,6 +17,7 @@ import OrderReview from "./pages/OrderReview";
 import CheckoutPage from "./pages/CheckoutPage";
 import Dashboard from "./admin/Dashboard";
 import Contact from './pages/Contact';
+import AddVariation from "./admin/AddVariation";
 
 export const router = createBrowserRouter([
   {
@@ -90,5 +91,9 @@ export const router = createBrowserRouter([
   {
     path: "/contact",
     element: <Contact />,
+  },
+  {
+    path: "/add-variation",
+    element: <AddVariation />,
   },
 ]);

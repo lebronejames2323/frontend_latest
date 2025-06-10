@@ -17,6 +17,7 @@ const ProductPage = () => {
   const { productId } = useParams();
   const navigate = useNavigate();
   const [products, setProducts] = useState([]);
+  const [variations, setVariations] = useState([]);
   const [cookies, setCookie] = useCookies();
   const [loading, setLoading] = useState(false);
   const [loading2, setLoading2] = useState(false);
@@ -25,6 +26,7 @@ const ProductPage = () => {
   const [lastPage, setLastPage] = useState(1);
   const [quantity, setQuantity] = useState(1);
   const [currentImageIdx, setCurrentImageIdx] = useState(0);
+  const [selectedVariation, setSelectedVariation] = useState(null);
 
   const refreshReviews = async () => {
     const res = await getProductReviews(productId, currentPage);
@@ -47,18 +49,40 @@ const ProductPage = () => {
     navigate("/cart");
   };
 
-  const handleAddToCart = async (productOrId, stock = null, quantity) => {
-    console.log("cookies.token:", cookies.token);
-    console.log("Product passed:", productOrId);
+const handleAddToCart = async (productOrId, stock = null, quantity) => {
+  console.log("cookies.token:", cookies.token);
+  console.log("Product passed:", productOrId);
 
-    if (cookies.token === "undefined" || !cookies.token) {
-      console.log("Adding to cart as guest");
-      await addToCartWithQuantity(productOrId?.id, cookies, setCookie, setLoading2, productOrId?.stock, quantity , productOrId?.price, productOrId?.extension, productOrId?.name);
-    } else {
-      console.log("Adding to cart as logged-in user");
-      await addToCartWithQuantity(productOrId, cookies, setCookie, setLoading2, stock, quantity);
-    }
-  };
+  if (cookies.token === "undefined" || !cookies.token) {
+    console.log("Adding to cart as guest");
+    await addToCartWithQuantity(
+      productOrId,
+      cookies,
+      setCookie,
+      setLoading2,
+      productOrId?.stock,
+      quantity,
+      productOrId?.price,
+      productOrId?.extension,
+      productOrId?.name,
+      selectedVariation
+    );
+  } else {
+    console.log("Adding to cart as logged-in user");
+    await addToCartWithQuantity(
+      productOrId,
+      cookies,
+      setCookie,
+      setLoading2,
+      stock,
+      quantity,
+      productOrId?.price,
+      productOrId?.extension,
+      productOrId?.name,
+      selectedVariation
+    );
+  }
+};
 
   const handleAddToWishlist = async (productOrId) => {
     console.log("cookies.token:", cookies.token);
@@ -75,28 +99,42 @@ const ProductPage = () => {
   };
 
   const refreshProducts = () => {
-    setLoading(true);
-    getSpecificProduct(productId)
-      .then((res) => {
+  setLoading(true);
+  getSpecificProduct(productId)
+    .then((res) => {
       if (res?.data) {
-        setProducts([{ 
-          ...res.data, 
-          averageRating: res.average_rating, 
-          totalReviews: res.total_reviews 
-        }]);
+        const productData = {
+          ...res.data,
+          averageRating: res.average_rating,
+          totalReviews: res.total_reviews,
+        };
+
+        setProducts([productData]);
+        setVariations(productData.variations || []);
+        setSelectedVariation(productData.variations?.[0] || null);
       } else {
         setProducts([]);
+        setVariations([]);
+        setSelectedVariation(null);
       }
       setLoading(false);
     })
     .catch(() => {
       setProducts([]);
+      setVariations([]);
+      setSelectedVariation(null);
       setLoading(false);
     });
-  };
+};
 
   useEffect(refreshProducts, [productId]);
   useEffect(() => setCurrentImageIdx(0), [products]);
+
+
+  useEffect(() => {
+    setQuantity(1);
+  }, [selectedVariation]);
+
 
   if (loading) {
     return (
@@ -221,9 +259,51 @@ const ProductPage = () => {
                   <div className="text-base font-bold">
                     <p>Description</p>
                   </div>
-                  <div className="text-base text-gray-600">
-                    <p>{product.description || "No description available"}</p>
-                  </div>
+
+                  {variations.length > 0 && (
+                    <div className="mt-6 relative">
+                      <label
+                        htmlFor="variation-select"
+                        className="absolute -top-2 left-3 text-xs bg-white px-1 text-themegreen font-medium z-10"
+                      >
+                        Choose Variation
+                      </label>
+                      <select
+                        id="variation-select"
+                        className="mt-2 block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-themegreen focus:border-themegreen text-gray-800 appearance-none bg-white"
+                        value={selectedVariation?.id || ""}
+                        onChange={(e) =>
+                          setSelectedVariation(
+                            variations.find((v) => v.id === Number(e.target.value))
+                          )
+                        }
+                      >
+                        <option value="">
+                          Default
+                        </option>
+                        {variations.map((variation) => (
+                          <option key={variation.id} value={variation.id}>
+                            {variation.variation_name} – ₱{Number(variation.variation_price).toLocaleString()}
+                          </option>
+                        ))}
+                      </select>
+                      <div className="pointer-events-none absolute inset-y-0 right-3 flex items-center text-gray-400">
+                        <svg
+                          className="w-5 h-5"
+                          xmlns="http://www.w3.org/2000/svg"
+                          viewBox="0 0 20 20"
+                          fill="currentColor"
+                        >
+                          <path
+                            fillRule="evenodd"
+                            d="M5.23 7.21a.75.75 0 011.06.02L10 10.939l3.71-3.71a.75.75 0 111.06 1.06l-4.24 4.25a.75.75 0 01-1.06 0l-4.25-4.25a.75.75 0 01.02-1.06z"
+                            clipRule="evenodd"
+                          />
+                        </svg>
+                      </div>
+                    </div>
+                  )}
+
                   <div className="grid grid-cols-3 gap-2">
                     <div className="flex flex-col items-center p-2 bg-gray-50 rounded-md">
                       <MdLocalShipping className="w-5 h-5 mb-1 text-themegreen" />
@@ -239,6 +319,7 @@ const ProductPage = () => {
                     </div>
                   </div>
                   <div className="flex items-center gap-4">
+
                     <div className="flex items-center border border-gray-200 rounded-md">
                       <button
                         className="flex items-center justify-center w-10 h-10 text-lg hover:bg-gray-100"
@@ -276,7 +357,7 @@ const ProductPage = () => {
                     onClick={() =>
                       cookies.token === "undefined" || !cookies.token
                         ? handleAddToCart(product)
-                        : handleAddToCart(product.id, product.stock, quantity)
+                        : handleAddToCart(product, product.stock, quantity)
                     }
                     className={`flex items-center justify-center w-full h-10 gap-2 text-sm font-semibold text-white rounded-md bg-themegreen ${
                       loading2 ? "opacity-50 cursor-not-allowed" : "hover:bg-themeyellow hover:text-black"
@@ -286,7 +367,6 @@ const ProductPage = () => {
                     <MdAddShoppingCart className="w-5 h-5" />
                     Add to Cart
                   </button>
-
                 </div>
               </div>
 
