@@ -165,7 +165,6 @@ function AllProductsPage() {
                 {[...Array(5)].map((_, i) => (
                   <FaStar key={i} className={`text-xl ${i < Math.round(ratings[product.id] || 0) ? "text-themeyellow" : "text-gray-300"}`} />
                 ))}
-                {/* <p>{product.averageRating ?? "No rating available"}</p> */}
               </div>
             </div>
             </div>
@@ -205,4 +204,4 @@ function AllProductsPage() {
   );
 }
 
-export default AllProductsPage;
+export default AllProductsPage;          
