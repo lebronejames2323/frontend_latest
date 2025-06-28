@@ -392,10 +392,10 @@ const handleAddToCart = async (productOrId, stock = null, quantity) => {
                         <div className="flex-1">
                             <div className="flex items-center gap-2 sm:gap-3">
                                 <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gray-300 rounded-full flex items-center justify-center text-gray-700 font-bold">
-                                    {review.user.profile.first_name.charAt(0).toUpperCase()}
+                                    {review.user.username.charAt(0).toUpperCase()}
                                 </div>
                                 <div>
-                                    <p className="font-semibold text-base sm:text-lg">{review.user.profile.first_name}</p>
+                                    <p className="font-semibold text-base sm:text-lg">{review.user.username}</p>
                                     <p className="text-xs sm:text-sm text-gray-500">
                                         {new Date(review.created_at).toISOString().slice(0, 16).replace('T', ' ')}
                                     </p>

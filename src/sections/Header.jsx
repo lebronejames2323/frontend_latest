@@ -149,7 +149,7 @@ function Header() {
             <ul className='lg:flex justify-center items-center gap-10 hidden'>
                 <li>
                     <a
-                        href="/all-products"
+                        onClick={() => navigate('/all-products')}
                         className="text-black text-sm uppercase font-semibold px-5 py-2 rounded-lg hover:bg-themegreen hover:text-white"
                     >
                         Products
