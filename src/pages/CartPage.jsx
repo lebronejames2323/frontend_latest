@@ -6,6 +6,7 @@ import { imageUrl1 } from '../api/configuration';
 import { fetchCarts } from '../api/product-fetch';
 import { deleteProductFromCart, updateProductQuantity } from '../api/product-actions';
 import { index } from '../api/auth';
+import { toast } from 'react-toastify';
 
 const CartPage = () => {
     const navigate = useNavigate();
@@ -34,12 +35,15 @@ const CartPage = () => {
     const refreshCarts = async () => {
         setLoading(true);
         const res = await fetchCarts(cookies);
+        console.log(res)
 
         if (!isAuthenticated) {
-        setCarts(Object.entries(res.guestCart).map(([id, data]) => ({
-            id,
-            quantity: data.quantity,
-        })));
+        setCarts(
+            Object.entries(res.guestCart || {}).map(([key, data]) => ({
+            id: key,
+            ...data,
+            }))
+        );
         } else {
         setCarts(res?.data || []);
         }
@@ -53,34 +57,44 @@ const CartPage = () => {
 
 
 
-    const handleDeleteFromCookies = (productId) => {
-        console.log("Deleting product ID:", productId);
+    const handleDeleteFromCookies = (cartKey) => {
+        console.log("Deleting product:", cartKey);
         let guestCart = { ...cookies.guestCart };
-        delete guestCart[productId];
+        delete guestCart[cartKey];
 
-        setCookie("guestCart", guestCart, { path: "/", expires: new Date(Date.now() + 86400000) });
+        setCookie("guestCart", guestCart, {
+            path: "/",
+            expires: new Date(Date.now() + 86400000),
+        });
 
-        setCarts(Object.entries(guestCart).map(([id, data]) => ({
-            id,
-            quantity: data.quantity,
-        })));
+        setCarts(
+            Object.entries(guestCart).map(([key, data]) => ({
+            id: key,
+            ...data,
+            }))
+        );
     };
 
-    const handleUpdateQuantityInCookies = (productId, newQuantity) => {
+    const handleUpdateQuantityInCookies = (cartKey, newQuantity) => {
         if (newQuantity < 1) return;
 
         let guestCart = { ...cookies.guestCart };
 
-        if (guestCart[productId]) {
-            guestCart[productId].quantity = Math.min(newQuantity, guestCart[productId].stock);
+        if (guestCart[cartKey]) {
+            guestCart[cartKey].quantity = Math.min(newQuantity, guestCart[cartKey].stock);
         }
 
-        setCookie("guestCart", guestCart, { path: "/", expires: new Date(Date.now() + 86400000) });
+        setCookie("guestCart", guestCart, {
+            path: "/",
+            expires: new Date(Date.now() + 86400000),
+        });
 
-        setCarts(Object.entries(guestCart).map(([id, data]) => ({
-            id,
-            quantity: data.quantity,
-        })));
+        setCarts(
+            Object.entries(guestCart).map(([key, data]) => ({
+            id: key,
+            ...data,
+            }))
+        );
     };
 
 
@@ -88,14 +102,21 @@ const CartPage = () => {
         setShowConfirm(true);
     };
     
-    const handleUpdateQuantity = async (cartId, productId, newQuantity) => {
-        await updateProductQuantity(cartId, productId, newQuantity, cookies, refreshCarts);
+    const handleUpdateQuantity = async (cartId, productId, variationId, newQuantity) => {
+        if (typeof newQuantity !== "number" || newQuantity < 1) {
+            toast.error("Invalid quantity.");
+            return;
+        }
+        console.log("Product ID:", productId, "New Quantity:", newQuantity);
+
+        await updateProductQuantity(cartId, productId, variationId, newQuantity, cookies, refreshCarts);
     };
     
     
-    const handleDeleteCart = async (cartId, productId) => {
-        await deleteProductFromCart(cartId, productId, cookies, setLoading2, refreshCarts);
+    const handleDeleteCart = async (cartId, productId, variationId,) => {
+        await deleteProductFromCart(cartId, productId, variationId, cookies, setLoading2, refreshCarts);
     };
+
     
     if (loading) {
         return (
@@ -135,8 +156,13 @@ const CartPage = () => {
                                     isAuthenticated
                                         ? carts.map(cart => (
                                             <div key={cart.id}>
-                                                {cart.products.map(product => (
-                                                    <div key={product.id} className="flex items-center gap-4 py-4 border-t">
+                                                {cart.products.map(product => {
+                                                    const uniqueKey = `${product.id}-${product.pivot.variation_id ?? 'no-variation'}`;
+
+                                                    const selectedVariation = product.variations.find(v => v.id === product.pivot.variation_id);
+
+                                                    return (
+                                                    <div key={uniqueKey} className="flex items-center gap-4 py-4 border-t">
                                                         <div className="w-[120px] h-[120px] sm:w-[10%] sm:h-[10%]">
                                                             <img
                                                                 src={`${imageUrl1}/${product.id}.${product.extension}`}
@@ -146,9 +172,11 @@ const CartPage = () => {
                                                         </div>
 
                                                         <div className="flex-grow text-center sm:text-left">
-                                                            <h3 className="text-sm sm:text-lg font-medium text-gray-800">{product.name}</h3>
+                                                            <h3 className="text-sm sm:text-lg font-medium text-gray-800">{selectedVariation?.variation_name || product.name}</h3>
                                                             <p className="text-xs sm:text-sm text-gray-400">
-                                                                ₱{Number(product.price).toLocaleString()} ({product.stock} stock)
+                                                                ₱{selectedVariation 
+                                                                    ? Number(selectedVariation.variation_price).toLocaleString() 
+                                                                    : Number(product.price).toLocaleString()}
                                                             </p>
                                                         </div>
 
@@ -156,16 +184,16 @@ const CartPage = () => {
                                                             <div className="flex items-center border rounded-lg">
                                                                 <button 
                                                                     className="p-2 hover:bg-gray-100"
-                                                                    onClick={() => handleUpdateQuantity(cart.id, product.id, Math.max(1, product.pivot.quantity - 1))}
+                                                                    onClick={() => handleUpdateQuantity(cart.id, product.id, product.pivot.variation_id, Math.max(1, product.pivot.quantity - 1))}
                                                                 >
                                                                     <FaMinus className="w-3 h-3" />
                                                                 </button>
                                                                 <span className="w-8 sm:w-12 text-center">{product.pivot.quantity}</span>
                                                                 <button 
-                                                                    className={`p-2 hover:bg-gray-100 ${product.pivot.quantity >= product.stock ? "cursor-not-allowed" : ""}`}
+                                                                    className={`p-2 hover:bg-gray-100 ${product.pivot.quantity >= (selectedVariation?.variation_stock ?? product.stock) ? "cursor-not-allowed" : ""}`}
                                                                     onClick={() => {
-                                                                        if (product.pivot.quantity < product.stock) {
-                                                                            handleUpdateQuantity(cart.id, product.id, product.pivot.quantity + 1);
+                                                                        if (product.pivot.quantity < (selectedVariation?.variation_stock ?? product.stock)) {
+                                                                            handleUpdateQuantity(cart.id, product.id, product.pivot.variation_id, product.pivot.quantity + 1);
                                                                         }
                                                                     }}
                                                                     disabled={product.pivot.quantity >= product.stock}
@@ -175,53 +203,65 @@ const CartPage = () => {
                                                             </div>
                                                             <button
                                                                 className="p-2 text-themered rounded-lg hover:text-opacity-50"
-                                                                onClick={() => handleDeleteCart(cart.id, product.id)}
+                                                                onClick={() => handleDeleteCart(cart.id, product.id, product.pivot?.variation_id ?? null)}
                                                             >
                                                                 <FaTrashAlt className="w-5 h-5" />
                                                             </button>
                                                         </div>
                                                     </div>
-                                                ))}
+                                                    );
+                                                })}
                                             </div>
                                         ))
-                                        : Object.entries(cookies.guestCart || {}).map(([id, product]) => (
-                                            <div key={id} className="flex items-center gap-4 py-4 border-t">
-                                                <div className="w-[120px] h-[120px] sm:w-[10%] sm:h-[10%]">
-                                                    <img src={`${imageUrl1}/${id}.${product.extension}`} alt="Product Image" />
-                                                </div>
+                                        : Object.entries(cookies.guestCart || {}).map(([key, product]) => {
+                                        const [productId, variationId] = key.split("_");
 
-                                                <div className="flex-grow text-center sm:text-left">
-                                                    <h3 className="text-sm sm:text-lg font-medium text-gray-800">{product.name}</h3>
-                                                    <p className="text-xs sm:text-sm text-gray-400">
-                                                        ₱{Number(product.price).toLocaleString()}
-                                                    </p>
-                                                </div>
-                                                <div className="flex items-center border rounded-lg">
-                                                    <button 
-                                                        className="p-2 hover:bg-gray-100"
-                                                        onClick={() => handleUpdateQuantityInCookies(id, product.quantity - 1)}
-                                                    >
-                                                        <FaMinus className="w-3 h-3" />
-                                                    </button>
-                                                    
-                                                    <span className="w-8 sm:w-12 text-center">{product.quantity}</span>
+                                        return (
+                                            <div key={key} className="flex items-center gap-4 py-4 border-t">
+                                            <div className="w-[120px] h-[120px] sm:w-[10%] sm:h-[10%]">
+                                                <img
+                                                src={`${imageUrl1}/${productId}.${product.extension}`}
+                                                alt="Product Image"
+                                                />
+                                            </div>
 
-                                                    <button 
-                                                        className={`p-2 hover:bg-gray-100 ${product.quantity >= product.stock ? "cursor-not-allowed" : ""}`}
-                                                        onClick={() => handleUpdateQuantityInCookies(id, product.quantity + 1)}
-                                                        disabled={product.quantity >= product.stock}
-                                                    >
-                                                        <FaPlus className="w-3 h-3" />
-                                                    </button>
-                                                </div>
+                                            <div className="flex-grow text-center sm:text-left">
+                                                <h3 className="text-sm sm:text-lg font-medium text-gray-800">
+                                                {product.variation_name || product.name}
+                                                </h3>
+                                                <p className="text-xs sm:text-sm text-gray-400">
+                                                ₱{Number(product.variation_price ?? product.price).toLocaleString()}
+                                                </p>
+                                            </div>
+
+                                            <div className="flex items-center border rounded-lg">
                                                 <button
-                                                    className="p-2 text-themered rounded-lg hover:text-opacity-50"
-                                                    onClick={() => handleDeleteFromCookies(id)}
+                                                className="p-2 hover:bg-gray-100"
+                                                onClick={() => handleUpdateQuantityInCookies(key, product.quantity - 1)}
                                                 >
-                                                    <FaTrashAlt className="w-5 h-5" />
+                                                <FaMinus className="w-3 h-3" />
+                                                </button>
+
+                                                <span className="w-8 sm:w-12 text-center">{product.quantity}</span>
+
+                                                <button
+                                                className={`p-2 hover:bg-gray-100 ${product.quantity >= product.stock ? "cursor-not-allowed" : ""}`}
+                                                onClick={() => handleUpdateQuantityInCookies(key, product.quantity + 1)}
+                                                disabled={product.quantity >= product.stock}
+                                                >
+                                                <FaPlus className="w-3 h-3" />
                                                 </button>
                                             </div>
-                                        ))
+
+                                            <button
+                                                className="p-2 text-themered rounded-lg hover:text-opacity-50"
+                                                onClick={() => handleDeleteFromCookies(key)}
+                                            >
+                                                <FaTrashAlt className="w-5 h-5" />
+                                            </button>
+                                            </div>
+                                        );
+                                        })
                                 ) : (
                                     <div className="py-8 text-center">
                                         <h2 className="mb-2 text-lg sm:text-2xl font-bold text-gray-900">Your cart is empty</h2>

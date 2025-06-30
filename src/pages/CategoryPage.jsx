@@ -28,7 +28,7 @@ const CategoryPage = () => {
     };
 
 
-    const handleAddToCart = async (productOrId, stock = null) => {
+    const handleAddToCart = async (productOrId, stock = null, price = null) => {
       console.log("cookies.token:", cookies.token);
       console.log("Product passed:", productOrId);
   
@@ -37,7 +37,7 @@ const CategoryPage = () => {
         await addToCart(productOrId?.id, cookies, setCookie, setLoading2, productOrId?.stock, productOrId?.price, productOrId?.extension, productOrId?.name);
       } else {
         console.log("Adding to cart as logged-in user");
-        await addToCart(productOrId, cookies, setCookie, setLoading2, stock);
+        await addToCart(productOrId, cookies, setCookie, setLoading2, stock, price);
       }
     };
   
@@ -126,7 +126,7 @@ const CategoryPage = () => {
                     <div onClick={() => { cookies.token === "undefined" || !cookies.token ? handleAddToWishlist(product) : handleAddToWishlist(product.id) }} className={`bg-themegreen hover:bg-themeyellow hover:text-black rounded-full p-3 text-white ${loading2 ? "opacity-50 cursor-not-allowed" : ""}`} disabled={loading2}>
                       <FaRegHeart />
                     </div>
-                    <div onClick={() => { cookies.token === "undefined" || !cookies.token ? handleAddToCart(product) : handleAddToCart(product.id, product.stock) }} className={`bg-themegreen hover:bg-themeyellow hover:text-black rounded-full p-3 text-white ${loading2 ? "opacity-50 cursor-not-allowed" : ""}`} disabled={loading2}>
+                    <div onClick={() => { cookies.token === "undefined" || !cookies.token ? handleAddToCart(product) : handleAddToCart(product.id, product.stock, product.price) }} className={`bg-themegreen hover:bg-themeyellow hover:text-black rounded-full p-3 text-white ${loading2 ? "opacity-50 cursor-not-allowed" : ""}`} disabled={loading2}>
                       <MdAddShoppingCart />
                     </div>
                   </div>

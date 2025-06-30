@@ -53,8 +53,8 @@ const handleAddToCart = async (productOrId, stock = null, quantity) => {
   console.log("cookies.token:", cookies.token);
   console.log("Product passed:", productOrId);
 
-  if (cookies.token === "undefined" || !cookies.token) {
-    console.log("Adding to cart as guest");
+    if (cookies.token === "undefined" || !cookies.token) {
+      console.log("Adding to cart as guest");
     await addToCartWithQuantity(
       productOrId,
       cookies,
@@ -67,7 +67,7 @@ const handleAddToCart = async (productOrId, stock = null, quantity) => {
       productOrId?.name,
       selectedVariation
     );
-  } else {
+    } else {
     console.log("Adding to cart as logged-in user");
     await addToCartWithQuantity(
       productOrId,
@@ -227,7 +227,7 @@ const handleAddToCart = async (productOrId, stock = null, quantity) => {
                       {product.category?.name}
                     </p>
                     <h1 className="mb-2 text-2xl font-bold text-gray-900">
-                      {product.name}
+                      {selectedVariation?.variation_name || product.name}
                     </h1>
 
                     <div className="flex items-center bg-white">
@@ -250,10 +250,10 @@ const handleAddToCart = async (productOrId, stock = null, quantity) => {
                   </div>
                   <div className="border-t pt-4">
                     <p className="text-3xl font-bold text-gray-900">
-                      ₱{Number(product.price).toLocaleString()}
+                      ₱{Number(selectedVariation?.variation_price || product.price).toLocaleString()}
                     </p>
                     <p className="mt-1 text-xs text-gray-500">
-                      Fast Shipping
+                      Free Shipping
                     </p>
                   </div>
                   <div className="text-base font-bold">
@@ -352,11 +352,14 @@ const handleAddToCart = async (productOrId, stock = null, quantity) => {
                     >
                       <FaRegHeart className="w-5 h-5 text-gray-600" />
                     </button>
+                    <p className="mt-1 text-sm text-gray-500">
+                      {(selectedVariation?.variation_stock ?? product.stock)} pieces available
+                    </p>
                   </div>
                   <button
                     onClick={() =>
                       cookies.token === "undefined" || !cookies.token
-                        ? handleAddToCart(product)
+                        ? handleAddToCart(product, product.stock, quantity)
                         : handleAddToCart(product, product.stock, quantity)
                     }
                     className={`flex items-center justify-center w-full h-10 gap-2 text-sm font-semibold text-white rounded-md bg-themegreen ${

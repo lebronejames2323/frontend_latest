@@ -171,22 +171,10 @@ const ProductsList = () => {
                 <input
                   type="text"
                   name="name"
-                  placeholder="Search by name"
+                  placeholder="Search..."
                   onChange={handleFilterChange}
-                  className="border p-2 rounded-md"
+                  className="border border-gray-300 p-2 rounded-md"
                 />
-                <select
-                  name="category"
-                  onChange={handleFilterChange}
-                  className="border p-2 rounded-md"
-                >
-                  <option value="">All Categories</option>
-                  {categories.map((category) => (
-                    <option key={category.id} value={category.id}>
-                      {category.name}
-                    </option>
-                  ))}
-                </select>
               </div>
             </div>
             <div className="mb-10">

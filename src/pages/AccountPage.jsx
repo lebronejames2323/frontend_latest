@@ -210,7 +210,7 @@ function AccountPage() {
                         orders.map(order => {
                             const orderTotal = order.products.reduce(
                                 (total, product) =>
-                                    total + Number(product.price) * product.pivot.quantity, 0
+                                    total + Number(product.pivot.price) * product.pivot.quantity, 0
                             );
 
                             return (
@@ -293,7 +293,7 @@ function AccountPage() {
                                             <div className="flex flex-col sm:flex-row items-center sm:justify-end w-full sm:w-[200px] gap-1 sm:space-x-6">
                                                 <h2 className="text-xs sm:text-base text-gray-600">Quantity: {product.pivot.quantity}</h2>
                                                 <h2 className="text-sm sm:text-base font-semibold text-themegreen">
-                                                    ₱{(product.price * product.pivot.quantity).toLocaleString()}
+                                                    ₱{(product.pivot.price * product.pivot.quantity).toLocaleString()}
                                                 </h2>
                                             </div>
 

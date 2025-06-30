@@ -57,7 +57,7 @@ function AllProductsPage() {
   }
 };
 
-  const handleAddToCart = async (productOrId, stock = null) => {
+  const handleAddToCart = async (productOrId, stock = null, price = null) => {
     console.log("cookies.token:", cookies.token);
     console.log("Product passed:", productOrId);
 
@@ -66,7 +66,7 @@ function AllProductsPage() {
       await addToCart(productOrId?.id, cookies, setCookie, setLoading2, productOrId?.stock, productOrId?.price, productOrId?.extension, productOrId?.name);
     } else {
       console.log("Adding to cart as logged-in user");
-      await addToCart(productOrId, cookies, setCookie, setLoading2, stock);
+      await addToCart(productOrId, cookies, setCookie, setLoading2, stock, price);
     }
   };
 
@@ -114,7 +114,7 @@ function AllProductsPage() {
                 <input
                   type="text"
                   name="name"
-                  placeholder="Search by name"
+                  placeholder="Search..."
                   onChange={handleFilterChange}
                   onFocus={() => setIsSearchFocused(true)}
                   onBlur={() => setIsSearchFocused(false)}
@@ -138,7 +138,7 @@ function AllProductsPage() {
             <div onClick={() => { cookies.token === "undefined" || !cookies.token ? handleAddToWishlist(product) : handleAddToWishlist(product.id) }} className={`bg-themegreen hover:bg-themeyellow hover:text-black rounded-full p-3 text-white ${loading2 ? "opacity-50 cursor-not-allowed" : ""}`} disabled={loading2}>
             <FaRegHeart />
             </div>
-            <div onClick={() => { cookies.token === "undefined" || !cookies.token ? handleAddToCart(product) : handleAddToCart(product.id, product.stock) }} className={`bg-themegreen hover:bg-themeyellow hover:text-black rounded-full p-3 text-white ${loading2 ? "opacity-50 cursor-not-allowed" : ""}`} disabled={loading2}>
+            <div onClick={() => { cookies.token === "undefined" || !cookies.token ? handleAddToCart(product) : handleAddToCart(product.id, product.stock, product.price) }} className={`bg-themegreen hover:bg-themeyellow hover:text-black rounded-full p-3 text-white ${loading2 ? "opacity-50 cursor-not-allowed" : ""}`} disabled={loading2}>
             <MdAddShoppingCart />
             </div>
             </div>
@@ -181,7 +181,7 @@ function AllProductsPage() {
         <div className="flex justify-center gap-4 mt-6 sm:mt-8">
           <button 
             onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
-            className={`px-2 sm:px-3 py-1 bg-gray-400 text-white rounded-md ${currentPage === 1 ? "opacity-50 cursor-not-allowed" : ""}`}
+            className={`px-2 sm:px-3 py-1 bg-themegreen text-white rounded-md ${currentPage === 1 ? "opacity-50 cursor-not-allowed" : ""}`}
             disabled={currentPage === 1}
           >
             <MdArrowBackIosNew />
@@ -193,7 +193,7 @@ function AllProductsPage() {
 
           <button 
             onClick={() => setCurrentPage(prev => prev + 1)}
-            className={`px-2 sm:px-3 py-1 bg-gray-400 text-white rounded-md ${currentPage >= pagination?.last_page ? "opacity-50 cursor-not-allowed" : ""}`}
+            className={`px-2 sm:px-3 py-1 bg-themegreen text-white rounded-md ${currentPage >= pagination?.last_page ? "opacity-50 cursor-not-allowed" : ""}`}
             disabled={currentPage >= pagination?.last_page}
           >
             <MdArrowForwardIos />

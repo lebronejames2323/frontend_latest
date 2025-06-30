@@ -39,7 +39,7 @@ export const addToCart = async (productId, cookies, setCookie, setLoading2, prod
         "Authorization": `Bearer ${token}`,
       },
       body: JSON.stringify({  
-        products: [{ id: productId, quantity: 1 }],
+        products: [{ id: productId, quantity: 1, price: productPrice, variation_id: null   }],
       }),
     });
 
@@ -68,12 +68,16 @@ export const addToCartWithQuantity = async ( product, cookies, setCookie, setLoa
   if (!token || token === "undefined" || token.trim() === "") {
     let guestCart = cookies.guestCart || {};
 
-    if (guestCart[product.id]) {
+    const guestKey = selectedVariation
+    ? `${product.id}_${selectedVariation.id}`
+    : `${product.id}`;
+
+    if (guestCart[guestKey]) {
       toast.error("Product is already in the cart.");
       return;
     }
 
-    guestCart[product.id] = {
+    guestCart[guestKey] = {
       quantity,
       price: productPrice,
       stock: productStock,
@@ -83,6 +87,7 @@ export const addToCartWithQuantity = async ( product, cookies, setCookie, setLoa
     };
 
     setCookie("guestCart", guestCart, { path: "/", expires: new Date(Date.now() + 86400000) });
+    console.log("guestCart after setting:", guestCart);
     toast.success("Product added to cart!");
     return;
   }
@@ -234,7 +239,7 @@ export const deleteProductFromWishlist = async (wishlistId, productId, cookies, 
 
 
 
-export const deleteProductFromCart = async (cartId, productId, cookies, setLoading, refreshCarts) => {
+export const deleteProductFromCart = async (cartId, productId, variationId, cookies, setLoading, refreshCarts) => {
   const token = cookies.token;
   if (!token || token === "undefined" || token.trim() === "") {
     toast.error('User is not authenticated!');
@@ -251,7 +256,10 @@ export const deleteProductFromCart = async (cartId, productId, cookies, setLoadi
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${token}`,
       },
-      body: JSON.stringify({ product_id: productId }),
+      body: JSON.stringify({ 
+        product_id: productId,
+        variation_id: variationId,
+      }),
     });
 
     const data = await response.json();
@@ -336,7 +344,7 @@ export const placeOrder = async (carts, cookies, setLoading, setLastOrder, setCa
 
 
 
-export const updateProductQuantity = async (cartId, productId, quantity, cookies, refreshCarts) => {
+export const updateProductQuantity = async (cartId, productId, variationId, quantity, cookies, refreshCarts) => {
   try {
     const response = await fetch(`${url}/carts/${cartId}/update-product`, {
       method: "PATCH",
@@ -346,6 +354,7 @@ export const updateProductQuantity = async (cartId, productId, quantity, cookies
       },
       body: JSON.stringify({
         product_id: productId,
+        variation_id: variationId,
         quantity: quantity,
       }),
     });
@@ -355,7 +364,7 @@ export const updateProductQuantity = async (cartId, productId, quantity, cookies
     if (response.ok) {
       refreshCarts();
     } else {
-      toast.error("Failed to update product quantity.");
+      toast.error(data.message || "Failed to update product quantity.");
     }
   } catch (error) {
     toast.error("An error occurred while updating the product quantity.");

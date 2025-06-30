@@ -68,12 +68,21 @@ const WishlistPage = () => {
         navigate(`/product/${productId}`);
     };
 
-    const handleAddToCart = async (productId, stock) => {
-        await addToCart(productId, cookies, setLoading2, stock);
-    };
+    const handleAddToCart = async (productOrId, stock = null, price = null) => {
+        console.log("cookies.token:", cookies.token);
+        console.log("Product passed:", productOrId);
+    
+        if (cookies.token === "undefined" || !cookies.token) {
+          console.log("Adding to cart as guest");
+          await addToCart(productOrId?.id, cookies, setCookie, setLoading2, productOrId?.stock, productOrId?.price, productOrId?.extension, productOrId?.name);
+        } else {
+          console.log("Adding to cart as logged-in user");
+          await addToCart(productOrId, cookies, setCookie, setLoading2, stock, price);
+        }
+      };
 
     const handleDeleteWishlist = async (wishlistId, productId) => {
-        await deleteProductFromWishlist(wishlistId, productId, cookies, setLoading2, refreshWishlists);
+        await deleteProductFromWishlist(wishlistId, productId, cookies, setLoading, refreshWishlists);
     };
 
     if (loading) {
@@ -138,8 +147,8 @@ const WishlistPage = () => {
 
                                             <div className="flex items-center justify-center gap-2 sm:gap-4">
                                                 <button
-                                                    className="w-full sm:w-auto bg-themegreen hover:bg-themeyellow hover:text-black text-white font-semibold px-3 sm:px-4 py-2 rounded-lg"
-                                                    onClick={() => handleAddToCart(product.id, product.stock)}
+                                                    className={`w-full sm:w-auto bg-themegreen hover:bg-themeyellow hover:text-black text-white font-semibold px-3 sm:px-4 py-2 rounded-lg ${loading2 ? "opacity-50 cursor-not-allowed" : ""}`} disabled={loading2}
+                                                    onClick={() => { cookies.token === "undefined" || !cookies.token ? handleAddToCart(product) : handleAddToCart(product.id, product.stock, product.price) }}
                                                 >
                                                     Add to Cart
                                                 </button>

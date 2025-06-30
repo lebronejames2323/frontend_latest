@@ -150,18 +150,10 @@ function Header() {
                 <li>
                     <a
                         onClick={() => navigate('/all-products')}
-                        className="text-black text-sm uppercase font-semibold px-5 py-2 rounded-lg hover:bg-themegreen hover:text-white"
+                        className="text-black text-sm uppercase cursor-pointer font-semibold px-5 py-2 rounded-lg hover:bg-themegreen hover:text-white"
                     >
                         Products
                     </a>
-                </li>
-                <li>
-                    <RouterLink
-                        to="/contact"
-                        className="text-black text-sm uppercase font-semibold px-5 py-2 rounded-lg hover:bg-themegreen hover:text-white cursor-pointer"
-                    >
-                        Contact
-                    </RouterLink>
                 </li>
                 {['Category', 'Featured'].map((item, index) => (
                     <li key={index}>
@@ -176,6 +168,14 @@ function Header() {
                         </ScrollLink>
                     </li>
                 ))}
+                <li>
+                    <RouterLink
+                        to="/contact"
+                        className="text-black text-sm uppercase font-semibold px-5 py-2 rounded-lg hover:bg-themegreen hover:text-white cursor-pointer"
+                    >
+                        Contact
+                    </RouterLink>
+                </li>
             </ul>
 
 {showCookieModal && <CookiesModal onAccept={handleAcceptCookies} />}
@@ -322,7 +322,7 @@ function Header() {
             <div className={`${isMenuOpen ? 'flex' : 'hidden'} w-full bg-themegreen2 p-4 absolute top-[80px] left-0`}>
                 <ul className='flex flex-col justify-center items-center gap-2 w-full'>
                     <li className='w-full text-center'>
-                        <a href="/all-products" className="text-white uppercase font-semibold p-3 rounded-lg hover:bg-themeyellow hover:text-black w-full block">
+                        <a onClick={() => navigate('/all-products')} className="text-white uppercase font-semibold p-3 rounded-lg hover:bg-themeyellow hover:text-black w-full block">
                             Products
                         </a>
                     </li>
