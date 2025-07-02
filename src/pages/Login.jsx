@@ -5,12 +5,19 @@ import { toast } from "react-toastify";
 import { useCookies } from "react-cookie";
 import { transferGuestDataToUser } from '../api/product-actions';
 import { FaEye, FaEyeSlash } from "react-icons/fa";
+import AdminAccountModal from "../components/AdminAccountModal";
 
 function Login() {
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
   const [cookies, setCookie] = useCookies();
+
+  const [isModalOpen, setModalOpen] = useState(false);
+  const openModal = () => setModalOpen(true);
+  const closeModal = () => setModalOpen(false);
+
+
 
   const onFormSubmit = (e) => {
   e.preventDefault();
@@ -43,7 +50,8 @@ function Login() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 flex justify-center items-center">
+    <div className="min-h-screen bg-gray-100 flex flex-col justify-center items-center">
+  
     <div className="bg-white p-8 rounded-xl shadow-lg w-full max-w-sm">
       <form onSubmit={onFormSubmit} className="flex flex-col gap-5">
 
@@ -89,6 +97,12 @@ function Login() {
         </div>
       </form>
     </div>
+
+    <div onClick={openModal} className="bg-blue-500 hover:bg-opacity-75 cursor-pointer text-white py-1 px-4 rounded-md w-full max-w-[130px] mt-4 text-center">
+      Click me
+    </div>
+    
+    <AdminAccountModal isOpen={isModalOpen} onClose={closeModal} />
     </div>
   );
 }

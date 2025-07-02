@@ -52,6 +52,9 @@ export const addToCart = async (productId, cookies, setCookie, setLoading2, prod
       } else {
         toast.success(message);
       }
+    } else {
+      const errorMsg = addData.message || "Failed to add product to cart.";
+      toast.error(errorMsg);
     }
   } catch (error) {
     toast.error("An error occurred.");
@@ -136,6 +139,9 @@ export const addToCartWithQuantity = async ( product, cookies, setCookie, setLoa
       } else {
         toast.success(message);
       }
+    } else {
+      const errorMsg = addData.message || "Failed to add product to cart.";
+      toast.error(errorMsg);
     }
   } catch (error) {
     console.error("Fetch error:", error);
@@ -335,7 +341,8 @@ export const placeOrder = async (carts, cookies, setLoading, setLastOrder, setCa
 
     setCarts([]);
   } catch (err) {
-    toast.error("Your cart is empty");
+    const message = err.message || "Something went wrong while placing your order.";
+    toast.error(message);
   } finally {
     setLoading(false);
     setShowReceipt(true);
@@ -391,10 +398,22 @@ export const transferGuestDataToUser = async (token, cookies, setCookie) => {
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({ products: Object.entries(guestCart).map(([id, data]) => ({
-        id,
-        quantity: data.quantity
-        })) })
+        body: JSON.stringify({
+          products: Object.entries(guestCart).map(([key, data]) => {
+            const [rawId] = key.split("_");
+            const productData = {
+              id: parseInt(rawId),
+              quantity: data.quantity,
+              price: data.price
+            };
+
+            if (data.variation_id) {
+              productData.variation_id = data.variation_id;
+            }
+
+            return productData;
+          })
+        })
       });
     }
 
