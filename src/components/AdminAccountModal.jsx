@@ -1,5 +1,5 @@
 import { useState } from "react";
-import instructionImage from "../assets/Admin-info.png";
+import instructionImage from "../assets/Admin-Info.png";
 import { MdClose } from "react-icons/md";
 
 const AdminAccountModal = ({ isOpen, onClose }) => {
