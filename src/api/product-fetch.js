@@ -219,3 +219,15 @@ export const getProductVariations = async () => {
 
   return await res.json();
 };
+
+export const getAllNotifications = async (token) => {
+  const res = await fetch(`${url}/notifications`, {
+    method: "GET",
+    headers: {
+      Accept: "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  return await res.json();
+};

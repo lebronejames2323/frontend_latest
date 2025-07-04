@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef} from 'react'
 import { FaSearch, FaHeart, FaShoppingCart, FaBars } from 'react-icons/fa'
 import { FaTimes } from 'react-icons/fa';
-import { IoPerson } from 'react-icons/io5'
+import { IoPerson, IoNotificationsSharp } from 'react-icons/io5'
 import { Link as ScrollLink } from 'react-scroll'
 import { Link as RouterLink } from 'react-router-dom'
 import { useNavigate, useLocation } from 'react-router-dom'
@@ -9,7 +9,8 @@ import { index, logout as Logout } from '../api/auth';
 import { useCookies } from 'react-cookie';
 import { toast } from "react-toastify";
 import { imageUrl1 } from '../api/configuration';
-import { getAllProducts } from "../api/product-fetch";
+import { getAllProducts, getAllNotifications } from "../api/product-fetch";
+import { markAllAsRead } from "../api/product-actions";
 import CookiesModal from "../components/CookiesModal"
 
 function Header() {
@@ -27,6 +28,8 @@ function Header() {
     const searchDebounceRef = useRef(null);
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [showCookieModal, setShowCookieModal] = useState(!cookies.userConsent);
+    const [open, setOpen] = useState(false);
+    const [notifications, setNotifications] = useState([]);
 
     const handleAcceptCookies = () => {
         setCookie("userConsent", true, { path: "/", expires: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000) });
@@ -57,6 +60,31 @@ function Header() {
     };
 
     useEffect(refreshUsers, []);
+
+
+    const fetchNotifications = () => {
+        getAllNotifications(cookies.token)
+            .then((res) => {
+            setNotifications(res.notifications);
+            })
+            .catch((error) => {
+            console.error("Error fetching notifications:", error);
+            });
+        };
+
+    useEffect(() => {
+        fetchNotifications();
+    }, []);
+
+    const handleMarkAllAsRead = async () => {
+        try {
+            const response = await markAllAsRead(cookies.token);
+            console.log(response.message);
+            fetchNotifications(); 
+        } catch (error) {
+            console.error("Failed to mark all as read", error);
+        }
+    };
 
 
     const handleAccountClick = () => {
@@ -178,7 +206,7 @@ function Header() {
                 </li>
             </ul>
 
-{showCookieModal && <CookiesModal onAccept={handleAcceptCookies} />}
+            {showCookieModal && <CookiesModal onAccept={handleAcceptCookies} />}
     
             <div id='header-icons' className='lg:flex hidden justify-center items-center gap-6 text-black'>
                 <div className='relative items-center justify-center hidden gap-8 lg:flex'>
@@ -249,8 +277,8 @@ function Header() {
                 <div>
                   <IoPerson className="w-[20px] h-[20px] transform hover:scale-125 transition-transform duration-300 cursor-pointer hover:text-themegreen" />
                 </div>
-                <div className="absolute top-full right-0 w-25 bg-white rounded-lg mt-1 shadow-md scale-y-0 group-hover:scale-y-100 origin-top transition-transform duration-200">
-                <div className='w-full p-3 bg-gradient-to-r bg-themegreen2  rounded-t-lg'>
+                <div className="absolute top-5 right-0 w-25 bg-white rounded-lg mt-1 shadow-md scale-y-0 group-hover:scale-y-100 origin-top transition-transform duration-200">
+                <div className='w-full p-2 bg-gradient-to-r bg-themegreen2  rounded-t-lg'>
                     <p className="text-sm font-medium text-white capitalize">{user.username}</p>
                 </div>
                   {user.username.toLowerCase()  === "admin" && (
@@ -263,15 +291,52 @@ function Header() {
                 ) : (
                   <div>
                   <IoPerson className=" relative group w-[20px] h-[20px] transform hover:scale-125 transition-transform duration-300 cursor-pointer hover:text-themegreen" />
-                    <div className="absolute top-full right-0 w-25 bg-white rounded-lg mt-1 shadow-md scale-y-0 group-hover:scale-y-100 origin-top transition-transform duration-200">
+                    <div className="absolute top-5 right-0 w-25 bg-white rounded-lg mt-1 shadow-md scale-y-0 group-hover:scale-y-100 origin-top transition-transform duration-200">
                       <div className='pt-2 px-2'><a onClick={handleLoginClick} className="block px-2 py-2 hover:bg-gray-100 rounded text-sm">Login</a></div>
                       <div className='pb-2 px-2'><a onClick={handleRegisterClick} className="block px-2 py-2 hover:bg-gray-100 rounded text-sm">Register</a></div>
                     </div>
                   </div>
                 )}
                 </button>
-              <FaHeart onClick={handleWishlistClick} className='w-[20px] h-[20px] transform hover:scale-125 transition-transform duration-300 cursor-pointer hover:text-themegreen'/>
-              <FaShoppingCart onClick={handleCartClick} className='w-[20px] h-[20px] transform hover:scale-125 transition-transform duration-300 cursor-pointer hover:text-themegreen'/>
+                {user && (
+                    <div className="relative group">
+                        <IoNotificationsSharp
+                        className="w-[22px] h-[22px] transform hover:scale-125 transition-transform duration-300 cursor-pointer hover:text-themegreen"
+                        />
+                        <div className="absolute top-5 right-0 w-[250px] bg-white rounded-lg mt-2 shadow-md scale-y-0 group-hover:scale-y-100 origin-top transition-transform duration-200">
+                        <div className="bg-themegreen2 text-white text-center py-2 rounded-t-lg">
+                            <h3 className="font-semibold">Notifications</h3>
+                        </div>
+
+                        {notifications.length > 0 ? (
+                            notifications.map((notification) => (
+                            <div key={notification.id} className="pb-2 px-2">
+                                <a
+                                onClick={() => alert(notification.message)}
+                                className="block px-2 py-2 hover:bg-gray-100 rounded text-sm"
+                                >
+                                <strong>{notification.title}</strong>
+                                <p className="text-xs text-gray-600">{notification.message}</p>
+                                </a>
+                            </div>
+                            ))
+                        ) : (
+                            <div className="block w-full text-center px-2 py-2 text-sm text-gray-500">
+                            No new notifications here
+                            </div>
+                        )}
+
+                        <button
+                            onClick={handleMarkAllAsRead}
+                            className="block w-full text-center rounded-b-lg text-sm font-medium text-themegreen hover:bg-gray-100 py-2 transition-colors duration-200 border-t border-gray-200"
+                        >
+                            Mark All as Read
+                        </button>
+                        </div>
+                    </div>
+                )}
+                <FaHeart onClick={handleWishlistClick} className='w-[20px] h-[20px] transform hover:scale-125 transition-transform duration-300 cursor-pointer hover:text-themegreen'/>
+                <FaShoppingCart onClick={handleCartClick} className='w-[20px] h-[20px] transform hover:scale-125 transition-transform duration-300 cursor-pointer hover:text-themegreen'/>
             </div>
 
 

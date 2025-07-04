@@ -461,3 +461,15 @@ export const cancelOrder = async (orderId, cookies) => {
     toast.error("An error occurred while canceling the order.");
   }
 };
+
+export const markAllAsRead = async (token) => {
+  const res = await fetch(`${url}/notifications/mark-read`, {
+    method: "POST",
+    headers: {
+      Accept: "application/json",
+      Authorization: `Bearer ${token}`,
+    }
+  });
+
+  return await res.json();
+};
