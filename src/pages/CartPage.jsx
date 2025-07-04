@@ -99,7 +99,11 @@ const CartPage = () => {
 
 
     const handleCheckoutOrder = async () => {
-        setShowConfirm(true);
+        if (carts.length > 0) {
+            setShowConfirm(true);
+        }else{
+            toast.error("You dont have products in your cart.");
+        }
     };
     
     const handleUpdateQuantity = async (cartId, productId, variationId, newQuantity) => {
@@ -343,7 +347,7 @@ const CartPage = () => {
                                         onClick={() => navigate('/login')}
                                         className="w-full text-base sm:text-lg py-2 sm:py-3 font-semibold text-white transition-colors rounded-lg bg-themegreen hover:bg-themeyellow hover:text-black disabled:opacity-50 disabled:cursor-not-allowed"
                                     >
-                                        Place order
+                                        Check out
                                     </button>
                                     )}
                                 </div>

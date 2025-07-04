@@ -288,8 +288,6 @@ const CheckoutPage = () => {
 
   return (
     <div className="max-w-4xl mx-auto">
-      {user && userAddresses ? (
-      <>
         <div className="w-full h-[80px] bg-white shadow-lg fixed top-0 left-0 z-50">
           <div className="w-full h-full lg:px-10 px-5 flex items-center">
             <button 
@@ -454,19 +452,6 @@ const CheckoutPage = () => {
             </button>
           </div>
         </div>
-        </>
-        ) : (
-        <div className="flex flex-col items-center bg-white justify-center text-center min-h-[50vh]">
-          <h2 className="text-lg sm:text-2xl font-bold text-gray-900">Your are not Logged in</h2>
-          <p className="text-sm sm:text-gray-600 mt-2">Start creating your account and buy our products</p>
-          <button 
-              onClick={() => navigate('/login')} 
-              className="mt-4 sm:mt-5 px-4 sm:px-6 py-2 sm:py-3 bg-themegreen text-white rounded-lg hover:bg-themeyellow hover:text-black transition-all transform hover:scale-105"
-          >
-              Login Here
-          </button>
-      </div>
-        )}
 
 
       {openModal && (
