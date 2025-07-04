@@ -28,11 +28,9 @@ const OrderModal = ({ order, isOpen, onClose }) => {
         <div className="bg-gray-50 rounded-lg p-4 mb-6">
       <h3 className="text-sm font-semibold text-gray-700 mb-3">Customer Information</h3>
       <div className="text-sm text-gray-800 space-y-1">
-        <p>
-          <span className="font-medium text-gray-600">Name:</span>{' '}
-          {order.full_name}
-        </p>
+        <p><span className="font-medium text-gray-600">Name:</span> {order.full_name}</p>
         <p><span className="font-medium text-gray-600">Phone:</span> {order.phone_number}</p>
+        <p>Payment: {order.payment_method}</p>
         <p><span className="font-medium text-gray-600">Address:</span> {order.delivery_address}</p>
       </div>
     </div>

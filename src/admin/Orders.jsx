@@ -35,7 +35,7 @@ const Orders = () => {
 
   const handleSearchChange = (e) => {
     setSearchValue(e.target.value);
-    refreshOrders(selectedStatus, selectedDateRange, e.target.value, e.target.value);
+    refreshOrders(selectedStatus, selectedDateRange, e.target.value);
     setCurrentPage(1);
   };
 
@@ -92,7 +92,7 @@ const Orders = () => {
           <div className="flex items-center gap-4 py-4 bg-white">
             <input 
               type="text" 
-              placeholder="Search Order ID" 
+              placeholder="Search..." 
               onChange={handleSearchChange} 
               className="p-2 border border-gray-300 rounded-md w-[300px]"
             />
@@ -143,6 +143,7 @@ const Orders = () => {
                   <p className='text-sm sm:text-[15]'>Items: {order.products.reduce( (total, product) => total + product.pivot.quantity, 0)}</p>
                   <p className='mt-3'>Date : {new Date(order.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric'})}</p>
                   <p>Order ID: {order.order_id}</p>
+                  <p>{order.payment_method}</p>
                 </div>
                 <p onClick={() => setSelectedOrder(order)} className='cursor-pointer text-sm sm:text-[15px]'>Total: ₱{order.products.reduce( (total, product) => total + product.price * product.pivot.quantity, 0)}</p>
                 <div>
