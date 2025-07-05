@@ -29,7 +29,7 @@ const AddVariation = () => {
     
     try{
     setLoading(true);
-    const response = await fetch(`${url}/variations`,{
+    const response = await fetch(`${url}/variations/post`,{
       method: "POST",
       headers:{
       Accept: "application/json",

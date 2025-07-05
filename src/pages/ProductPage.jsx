@@ -256,8 +256,8 @@ const handleAddToCart = async (productOrId, stock = null, quantity) => {
                       Free Shipping
                     </p>
                   </div>
-                  <div className="text-base font-bold">
-                    <p>Description</p>
+                  <div>
+                    <h1 className="text-base font-bold">Description</h1>
                   </div>
 
                   {variations.length > 0 && (

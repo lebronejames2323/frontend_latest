@@ -301,8 +301,13 @@ function Header() {
                 {user && (
                     <div className="relative group">
                         <IoNotificationsSharp
-                        className="w-[22px] h-[22px] transform hover:scale-125 transition-transform duration-300 cursor-pointer hover:text-themegreen"
+                            className="w-[22px] h-[22px] transform hover:scale-125 transition-transform duration-300 cursor-pointer hover:text-themegreen"
                         />
+                        {notifications.length > 0 && (
+                            <span className="absolute top-0 right-0 flex items-center justify-center w-5 h-5 text-xs font-bold text-white transform translate-x-1/2 -translate-y-1/2 rounded-full bg-themegreen group-hover:hidden">
+                            {notifications.length}
+                            </span>
+                        )}
                         <div className="absolute top-5 right-0 w-[250px] bg-white rounded-lg mt-2 shadow-md scale-y-0 group-hover:scale-y-100 origin-top transition-transform duration-200">
                         <div className="bg-themegreen2 text-white text-center py-2 rounded-t-lg">
                             <h3 className="font-semibold">Notifications</h3>

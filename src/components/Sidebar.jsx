@@ -71,6 +71,16 @@ const Sidebar = () => {
             <p className='hidden md:block'>Product List</p>
 
           </NavLink>
+          <NavLink className='flex items-center gap-3 border border-gray-300 border-r-0 px-3 rounded-l' to = "/variation-list"
+          style={({ isActive }) => ({
+            backgroundColor: isActive ? '#90EE90' : 'transparent',
+            borderColor: isActive ? '#32CD32' : 'transparent',
+          })}
+          >
+            <LiaCalendarCheckSolid className='w-7 h-7'/>
+            <p className='hidden md:block'>Variation List</p>
+
+          </NavLink>
           <NavLink className='flex items-center gap-3 border border-gray-300 border-r-0 px-3 rounded-l' to = "/order"
           style={({ isActive }) => ({
             backgroundColor: isActive ? '#90EE90' : 'transparent',

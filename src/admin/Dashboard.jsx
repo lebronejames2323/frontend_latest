@@ -91,7 +91,7 @@ const Dashboard = () => {
 
     const salesData = {
         labels: monthlySalesData.map((entry) => 
-            new Date(entry.month + "-01").toLocaleString('default', { month: 'long' })
+            new Date(entry.month + "-01").toLocaleString('default', { month: 'short' })
         ),
         datasets: [
             {
