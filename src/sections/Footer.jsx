@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import client1 from '../assets/client1.png'
 import client2 from '../assets/client2.png'
 import client3 from '../assets/client3.png'
@@ -10,7 +10,11 @@ import pay2 from '../assets/pay-2.jpg'
 import pay3 from '../assets/pay-3.jpg'
 import pay4 from '../assets/pay-4.jpg'
 import { Link } from 'react-scroll';
-import { FaArrowUp } from 'react-icons/fa'
+import { FaArrowUp, FaRegCommentDots } from 'react-icons/fa';
+import { index } from '../api/auth';
+import { useCookies } from 'react-cookie';
+import ChatModal from '../components/ChatModal';
+import AdminChatModal from '../components/AdminChatModal';
 import TermsOfService from '../components/TermsOfService';
 import CancellationPolicyModal from '../components/CancellationPolicyModal';
 import PrivacyPolicyModal from '../components/PrivacyPolicyModal';
@@ -21,6 +25,8 @@ import FAQsModal from '../components/FAQsModal';
 
 
 const Footer = () => {
+    const [cookies] = useCookies();
+    const [user, setUser] = useState(null);
     const [showTermsModal, setShowTermsModal] = useState(false);
     const [showPolicyModal, setShowPolicyModal] = useState(false);
     const [showPrivacyModal, setShowPrivacyModal] = useState(false);
@@ -28,6 +34,20 @@ const Footer = () => {
     const [showCompanyModal, setShowCompanyModal] = useState(false);
     const [showDeliveryModal, setShowDeliveryModal] = useState(false);
     const [showFAQsModal, setShowFAQsModal] = useState(false);
+    const [isChatOpen, setIsChatOpen] = useState(false);
+    const [isAdminChatOpen, setIsAdminChatOpen] = useState(false);
+
+    const refreshUsers = () => {
+        const token = cookies.token
+            if (!token || token === 'undefined' || token.trim() === '') {
+                return;
+            }
+            index(cookies.token).then((res) => {
+            setUser(res?.data || null);
+            });
+        };
+    
+    useEffect(refreshUsers, []);
 
     return (
         <div id='contact' className='w-full flex flex-col justify-center items-center'>
@@ -98,18 +118,42 @@ const Footer = () => {
                 </div>
             </div>
 
+            {!user ? (
+                <div className="text-sm text-gray-500"></div>
+            ) : (
+            <div
+            onClick={() => {
+                if (user?.id === 1) {
+                setIsAdminChatOpen(true);
+                } else {
+                setIsChatOpen(true);
+                }
+            }}
+            className='bg-themegreen text-white p-3 rounded-full hover:bg-themeyellow hover:text-black cursor-pointer fixed right-6 bottom-[90px]'
+            >
+            <FaRegCommentDots className='w-[30px] h-[30px]' />
+            </div>
+            )}
+
+
             <Link to="hero" spy={true} offset={-100} smooth={true}>
-                <div id='icon-box' className='bg-themegreen text-white p-3 rounded-full hover:bg-themeyellow hover:text-black cursor-pointer fixed lg:bottom-6 right-6 bottom-6'>
-                    <FaArrowUp className='w-[35px] h-[35px]'/>
-                </div>
+            <div
+                id='icon-box'
+                className='bg-themegreen text-white p-3 rounded-full hover:bg-themeyellow hover:text-black cursor-pointer fixed right-6 bottom-6'
+            >
+                <FaArrowUp className='w-[30px] h-[30px]' />
+            </div>
             </Link>
+
+            {isChatOpen && <ChatModal onClose={() => setIsChatOpen(false)} token={cookies.token} />}
+            {isAdminChatOpen && <AdminChatModal onClose={() => setIsAdminChatOpen(false)} token={cookies.token} />}
             <TermsOfService isOpen={showTermsModal} onClose={() => setShowTermsModal(false)} />
             <CancellationPolicyModal isOpen={showPolicyModal} onClose={() => setShowPolicyModal(false)} />
             <PrivacyPolicyModal isOpen={showPrivacyModal} onClose={() => setShowPrivacyModal(false)} />
             <OrderAndPaymentModal isOpen={showOrderModal} onClose={() => setShowOrderModal(false)} />
             <OurCompanyModal isOpen={showCompanyModal} onClose={() => setShowCompanyModal(false)} />
-                <DeliveryModal isOpen={showDeliveryModal} onClose={() => setShowDeliveryModal(false)} />
-                    <FAQsModal isOpen={showFAQsModal} onClose={() => setShowFAQsModal(false)} />
+            <DeliveryModal isOpen={showDeliveryModal} onClose={() => setShowDeliveryModal(false)} />
+            <FAQsModal isOpen={showFAQsModal} onClose={() => setShowFAQsModal(false)} />
         </div>
     )
 }

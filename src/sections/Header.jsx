@@ -63,6 +63,9 @@ function Header() {
 
 
     const fetchNotifications = () => {
+        if (!cookies.token || cookies.token === 'undefined' || cookies.token.trim() === '') {
+            return;
+        }
         getAllNotifications(cookies.token)
             .then((res) => {
             setNotifications(res.notifications);
